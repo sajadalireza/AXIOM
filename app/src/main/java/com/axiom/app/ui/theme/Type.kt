@@ -1,17 +1,23 @@
+@file:OptIn(androidx.compose.ui.text.ExperimentalTextApi::class)
+
 package com.axiom.app.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.em
 import com.axiom.app.R
 
+// Outfit and Fraunces ship from Google Fonts as variable fonts only (no static
+// per-weight files exist upstream anymore) — one font file covers every weight
+// via the 'wght' variation axis, selected per Font() entry below.
 val Inter = FontFamily(
-    Font(R.font.outfit_regular, FontWeight.Normal)
+    Font(R.font.outfit_variable, FontWeight.Normal, variationSettings = FontVariation.Settings(FontVariation.weight(400)))
 )
 
 val FiraCode = FontFamily(
@@ -22,17 +28,17 @@ val FiraCode = FontFamily(
 val JetBrainsMono = FiraCode
 
 val Fraunces = FontFamily(
-    Font(R.font.fraunces_regular, FontWeight.Normal),
-    Font(R.font.fraunces_bold, FontWeight.Bold),
-    Font(R.font.fraunces_black, FontWeight.Black),
-    Font(R.font.fraunces_italic, FontWeight.Normal, style = FontStyle.Italic)
+    Font(R.font.fraunces_variable, FontWeight.Normal, variationSettings = FontVariation.Settings(FontVariation.weight(400))),
+    Font(R.font.fraunces_variable, FontWeight.Bold, variationSettings = FontVariation.Settings(FontVariation.weight(700))),
+    Font(R.font.fraunces_variable, FontWeight.Black, variationSettings = FontVariation.Settings(FontVariation.weight(900))),
+    Font(R.font.fraunces_italic_variable, FontWeight.Normal, style = FontStyle.Italic, variationSettings = FontVariation.Settings(FontVariation.weight(400)))
 )
 
 val Outfit = FontFamily(
-    Font(R.font.outfit_light, FontWeight.Light),
-    Font(R.font.outfit_regular, FontWeight.Normal),
-    Font(R.font.outfit_medium, FontWeight.Medium),
-    Font(R.font.outfit_semibold, FontWeight.SemiBold)
+    Font(R.font.outfit_variable, FontWeight.Light, variationSettings = FontVariation.Settings(FontVariation.weight(300))),
+    Font(R.font.outfit_variable, FontWeight.Normal, variationSettings = FontVariation.Settings(FontVariation.weight(400))),
+    Font(R.font.outfit_variable, FontWeight.Medium, variationSettings = FontVariation.Settings(FontVariation.weight(500))),
+    Font(R.font.outfit_variable, FontWeight.SemiBold, variationSettings = FontVariation.Settings(FontVariation.weight(600)))
 )
 
 // ─────────────────────────────────────────────
