@@ -16,6 +16,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
@@ -26,6 +31,17 @@ import androidx.compose.ui.unit.sp
 import com.axiom.app.domain.engine.XPEngine
 import com.axiom.app.ui.theme.*
 import kotlinx.coroutines.delay
+import kotlin.random.Random
+
+private data class RankUpParticle(
+    val angle: Float,
+    val cosAngle: Float,
+    val sinAngle: Float,
+    val speedPx: Float,
+    val color: Color,
+    val radiusPx: Float,
+    val elongation: Float
+)
 
 @Composable
 fun RankUpCeremony(
@@ -59,7 +75,49 @@ fun RankUpCeremony(
     val newRankColorVal = remember(cleanNewRank) { XPEngine.getRankColor(cleanNewRank) }
     val newRankColor = remember(newRankColorVal) { Color(newRankColorVal.toInt()) }
 
-    val isSClass = cleanNewRank.startsWith("S", ignoreCase = true)
+    // Was `cleanNewRank.startsWith("S")`, a leftover from the old letter-grade ladder
+    // (E/D/C/B/A/S). The word ladder (RECRUIT..ARCHITECT) means that check wrongly
+    // matched mid-tier STRATEGIST/SPECIALIST while missing ARCHITECT, the actual
+    // terminal rank — which is the one that should get the bonus glow.
+    val isSClass = cleanNewRank.equals("ARCHITECT", ignoreCase = true) ||
+        cleanNewRank.equals("S", ignoreCase = true)
+
+    // Particle burst on the new-rank glyph slam — RankUp previously had none, making
+    // the app's rarest promotion event the least visually elaborate of the major
+    // ceremonies (LevelUp/ShadowAcquisition/BossDefeated all burst particles).
+    val isGlyphFullyVisible = remember { derivedStateOf { newGlyphScaleState >= 0.95f } }
+    val particleAnim = remember { Animatable(0f) }
+    val particles = remember(isGlyphFullyVisible.value, density, reduceMotion) {
+        if (isGlyphFullyVisible.value && !reduceMotion) {
+            val colorsList = listOf(newRankColor, SystemGlint, LegendaryGold)
+            with(density) {
+                List(if (isSClass) 40 else 24) { index ->
+                    val angle = Random.nextFloat() * 360f
+                    val angleRad = Math.toRadians(angle.toDouble())
+                    val speedDp = 150f + Random.nextFloat() * 150f
+                    val sizeDp = 4f + Random.nextFloat() * 4f
+                    RankUpParticle(
+                        angle = angle,
+                        cosAngle = kotlin.math.cos(angleRad).toFloat(),
+                        sinAngle = kotlin.math.sin(angleRad).toFloat(),
+                        speedPx = speedDp.dp.toPx(),
+                        color = colorsList[index % colorsList.size],
+                        radiusPx = sizeDp.dp.toPx() / 2f,
+                        elongation = 1.5f + Random.nextFloat() * 1.5f
+                    )
+                }
+            }
+        } else {
+            emptyList()
+        }
+    }
+
+    LaunchedEffect(isGlyphFullyVisible.value) {
+        if (isGlyphFullyVisible.value) {
+            particleAnim.snapTo(0f)
+            particleAnim.animateTo(targetValue = 1f, animationSpec = tween(700, easing = LinearEasing))
+        }
+    }
 
     val paint = remember(newRankColor, density) {
         Paint().asFrameworkPaint().apply {
@@ -192,6 +250,34 @@ fun RankUpCeremony(
             }
         }
 
+        // Particle burst once the new-rank glyph has fully slammed in
+        if (isGlyphFullyVisible.value && particleAnim.value < 1.0f) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val centerPx = Offset(size.width / 2f, size.height / 2f)
+                val elapsed = particleAnim.value
+                val particleAlpha = (1f - elapsed).coerceIn(0f, 1f)
+
+                particles.forEach { particle ->
+                    val travelPx = particle.speedPx * elapsed
+                    val px = centerPx.x + travelPx * particle.cosAngle
+                    val py = centerPx.y + travelPx * particle.sinAngle
+
+                    withTransform({
+                        translate(px, py)
+                        rotate(particle.angle)
+                        scale(particle.elongation, 1f)
+                    }) {
+                        drawCircle(
+                            color = particle.color,
+                            radius = particle.radiusPx,
+                            center = Offset.Zero,
+                            alpha = particleAlpha
+                        )
+                    }
+                }
+            }
+        }
+
         // Phase 4: New Glyph with spring scale and optional Blur shadow for S-Class
         if (newGlyphScaleState > 0f) {
             val glyphModifier = if (isSClass) {
@@ -248,7 +334,7 @@ fun RankUpCeremony(
                         text = fullText2.take(text2ProgState),
                         fontFamily = Inter,
                         fontSize = 28.sp,
-                        color = TextPrimary,
+                        color = LocalAxiomColors.current.textPrimary,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.testTag("ceremony_subtitle")
                     )
@@ -262,11 +348,14 @@ fun RankUpCeremony(
                 text = "[ TAP TO CONTINUE ]",
                 fontFamily = JetBrainsMono,
                 fontSize = 12.sp,
-                color = TextDim,
+                color = LocalAxiomColors.current.textDim,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 48.dp)
-                    .alpha(blinkAlpha)
+                    // graphicsLayer defers the read to the draw phase — blinkAlpha ticks
+                    // indefinitely for as long as the ceremony is undismissed, and a
+                    // plain .alpha() value read would force recomposition every tick.
+                    .graphicsLayer { alpha = blinkAlpha }
                     .testTag("ceremony_tap_continue")
             )
         }

@@ -1,6 +1,8 @@
 package com.axiom.app.domain.engine
 
+import androidx.compose.ui.graphics.toArgb
 import com.axiom.app.domain.model.*
+import com.axiom.app.ui.theme.AxiomDarkColors
 import java.util.UUID
 
 object XPEngine {
@@ -133,12 +135,17 @@ object XPEngine {
                clean == "SPECIALIST" || clean == "STRATEGIST" || clean == "ARCHITECT"
     }
 
+    // These must match AxiomColorScheme's tokens exactly — previously a disconnected
+    // parallel palette (e.g. gold 0xFFFFD700 vs the real brand legendaryGold
+    // 0xFFF0C860), so every rank-based ceremony color silently drifted from the
+    // design system. toArgb() gives the same ARGB bit pattern the Color(Long)
+    // constructor expects, so this round-trips correctly through Color(x.toInt()).
     fun getRankColor(rankLabel: String): Long {
         return when (rankLabel.uppercase().replace("-RANK", "").trim()) {
-            "S", "ARCHITECT"  -> 0xFFFFD700L // Gold
-            "A", "STRATEGIST" -> 0xFF9C27B0L // Purple
-            "B", "SPECIALIST" -> 0xFF00BCD4L // Teal
-            "C", "OPERATOR"   -> 0xFF2196F3L // Blue
+            "S", "ARCHITECT"  -> AxiomDarkColors.legendaryGold.toArgb().toLong() and 0xFFFFFFFFL
+            "A", "STRATEGIST" -> AxiomDarkColors.epicPurple.toArgb().toLong() and 0xFFFFFFFFL
+            "B", "SPECIALIST" -> AxiomDarkColors.systemGreen.toArgb().toLong() and 0xFFFFFFFFL
+            "C", "OPERATOR"   -> AxiomDarkColors.rareBlue.toArgb().toLong() and 0xFFFFFFFFL
             "D", "BUILDER"    -> 0xFFD4A843L // Gold/Orange
             "E", "RECRUIT"    -> 0xFF9E9E9EL // Grey
             else              -> 0xFF2A2A2AL

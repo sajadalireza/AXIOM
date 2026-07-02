@@ -59,9 +59,11 @@
 -dontwarn com.squareup.moshi.**
 
 # ── OkHttp ────────────────────────────────────────────────────────────────
+# Per Square's own documented minimal rule (square.github.io/okhttp/features/r8_proguard/) —
+# OkHttp/Okio aren't reflected into by app code, so no -keep is needed, only -dontwarn.
+# The previous blanket `-keep class okhttp3.** { *; }` kept the entire library
+# unobfuscated/unshrunk for no real benefit.
 -dontwarn okhttp3.**
 -dontwarn okio.**
--keep class okhttp3.** { *; }
--keep interface okhttp3.** { *; }
 # ── CrashReporter ─────────────────────────────────────────
 -keep class com.axiom.app.core.CrashReporter { *; }

@@ -38,7 +38,7 @@ fun WeeklyAnalyticsScreen(
     val missStreaks by viewModel.kpiMissStreaks.collectAsStateWithLifecycle()
     val streak by viewModel.streakFlow.collectAsStateWithLifecycle()
     val aiSummary by viewModel.aiSummary.collectAsStateWithLifecycle()
-    val lastReviewTimestamp by viewModel.preferences.lastReviewTimestampFlow.collectAsStateWithLifecycle(initialValue = 0L)
+    val lastReviewTimestamp by viewModel.lastReviewTimestampFlow.collectAsStateWithLifecycle(initialValue = 0L)
 
     val limit = System.currentTimeMillis() - 7 * 86400000L
     val missionsLast7Days = completedMissions.count { (it.completedAt ?: 0L) >= limit }

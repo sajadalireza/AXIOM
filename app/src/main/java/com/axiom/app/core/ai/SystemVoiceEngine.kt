@@ -1,5 +1,6 @@
 package com.axiom.app.core.ai
 
+import android.util.Log
 import com.axiom.app.data.local.AxiomPreferences
 import com.axiom.app.domain.model.Hunter
 import com.axiom.app.domain.model.Mission
@@ -20,10 +21,21 @@ class NoApiKeyException : Exception("No Gemini API key configured.")
 
 private const val SYSTEM_PROMPT = ""
 
+// Google retires pinned model ids periodically (gemini-1.5-flash already 404s as of
+// mid-2026). "gemini-flash-latest" is a maintained alias that always points at the
+// current GA flash model, so this doesn't need to be updated every time Google
+// deprecates a version. Single source of truth — every Gemini call site in the app
+// imports this instead of hardcoding its own model id string.
+const val GEMINI_MODEL_NAME = "gemini-flash-latest"
+
 @Singleton
 class SystemVoiceEngine @Inject constructor(
     private val preferences: AxiomPreferences
 ) {
+    companion object {
+        private const val TAG = "SystemVoiceEngine"
+    }
+
     // Model is rebuilt on each call so a newly-saved key takes effect immediately.
     private suspend fun getModel(): GenerativeModel {
         val key = preferences.geminiApiKeyFlow.first()
@@ -59,7 +71,7 @@ class SystemVoiceEngine @Inject constructor(
             """.trimIndent()
         }
         return GenerativeModel(
-            modelName = "gemini-1.5-flash",
+            modelName = GEMINI_MODEL_NAME,
             apiKey = key,
             systemInstruction = content { text(systemPrompt) }
         )
@@ -82,6 +94,7 @@ class SystemVoiceEngine @Inject constructor(
     } catch (e: NoApiKeyException) {
         "[ SYSTEM ] API key not configured. Set your key in the SYSTEM tab."
     } catch (e: Exception) {
+        Log.e(TAG, "generate() failed, model=$GEMINI_MODEL_NAME", e)
         "[ SYSTEM ] Connection to dimensional interface lost."
     }
 
@@ -189,6 +202,7 @@ class SystemVoiceEngine @Inject constructor(
             ).text
             if (modelText.isNullOrBlank()) fallback() else modelText
         } catch (e: Exception) {
+            Log.e(TAG, "generateDailyBriefing() failed, model=$GEMINI_MODEL_NAME", e)
             fallback()
         }
     }
@@ -237,6 +251,7 @@ class SystemVoiceEngine @Inject constructor(
             ).text
             if (modelText.isNullOrBlank()) fallback() else modelText
         } catch (e: Exception) {
+            Log.e(TAG, "generateCompletionReaction() failed, model=$GEMINI_MODEL_NAME", e)
             fallback()
         }
     }
@@ -266,6 +281,7 @@ class SystemVoiceEngine @Inject constructor(
             ).text
             if (modelText.isNullOrBlank()) fallback() else modelText
         } catch (e: Exception) {
+            Log.e(TAG, "generateRankUpSpeech() failed, model=$GEMINI_MODEL_NAME", e)
             fallback()
         }
     }
@@ -329,6 +345,7 @@ class SystemVoiceEngine @Inject constructor(
             val modelText = getModel().generateContent("$contextStr\nHunter asks: \"$question\"").text
             if (modelText.isNullOrBlank()) fallback() else modelText
         } catch (e: Exception) {
+            Log.e(TAG, "askSystem() failed, model=$GEMINI_MODEL_NAME", e)
             fallback()
         }
     }
@@ -352,6 +369,7 @@ class SystemVoiceEngine @Inject constructor(
             model.generateContentStream("$contextStr\nHunter asks: \"$question\"")
                 .map { response -> response.text ?: "" }
         } catch (e: Exception) {
+            Log.e(TAG, "askSystemStream() failed, model=$GEMINI_MODEL_NAME", e)
             flow {
                 val fallbackResponse = askSystem(hunter, streakDays, question)
                 emit(fallbackResponse)
@@ -458,7 +476,7 @@ Make missions progressively harder: easy → medium → hard.
 
         return try {
             val key  = preferences.geminiApiKeyFlow.first() ?: throw NoApiKeyException()
-            val model = GenerativeModel(modelName = "gemini-1.5-flash", apiKey = key)
+            val model = GenerativeModel(modelName = GEMINI_MODEL_NAME, apiKey = key)
             val raw   = model.generateContent(prompt).text ?: return fallback()
             val clean = raw.trim()
                 .removePrefix("```json").removePrefix("```")
@@ -476,6 +494,7 @@ Make missions progressively harder: easy → medium → hard.
                 )
             }
         } catch (e: Exception) {
+            Log.e(TAG, "generateStructuredMissions() failed, model=$GEMINI_MODEL_NAME", e)
             fallback()
         }
     }

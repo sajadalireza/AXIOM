@@ -7,6 +7,7 @@ import com.axiom.app.data.local.entity.*
 import com.axiom.app.data.remote.SupabaseClient
 import com.axiom.app.data.remote.UserProgressRow
 import com.axiom.app.domain.repository.CloudSyncRepository
+import androidx.room.withTransaction
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -155,17 +156,19 @@ class CloudSyncRepositoryImpl @Inject constructor(
             val adapter = moshi.adapter(CloudProgressData::class.java)
             val data = adapter.fromJson(row.progressData) ?: return false
 
-            // Clean existing database first to prevent duplicate keys
-            database.clearAllTables()
+            // Clean existing database and re-populate atomically — a partial
+            // failure mid-restore must not leave the user with a wiped local DB.
+            database.withTransaction {
+                database.clearAllTables()
 
-            // Re-populate Room
-            data.hunter?.firstOrNull()?.let { database.hunterDao().updateProfile(it) }
-            data.skills?.forEach { database.skillDao().insertSkill(it) }
-            data.missions?.forEach { database.missionDao().insertMission(it) }
-            data.dungeons?.forEach { database.dungeonDao().insertDungeon(it) }
-            data.shadows?.forEach { database.shadowDao().insertShadow(it) }
-            data.streaks?.forEach { database.streakDao().insertStreak(it) }
-            data.systemFeed?.forEach { database.systemFeedDao().insertMessage(it) }
+                data.hunter?.firstOrNull()?.let { database.hunterDao().updateProfile(it) }
+                data.skills?.forEach { database.skillDao().insertSkill(it) }
+                data.missions?.forEach { database.missionDao().insertMission(it) }
+                data.dungeons?.forEach { database.dungeonDao().insertDungeon(it) }
+                data.shadows?.forEach { database.shadowDao().insertShadow(it) }
+                data.streaks?.forEach { database.streakDao().insertStreak(it) }
+                data.systemFeed?.forEach { database.systemFeedDao().insertMessage(it) }
+            }
 
             // Restore preferences
             preferences.restoreStatsAndStreak(

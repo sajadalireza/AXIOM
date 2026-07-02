@@ -8,6 +8,7 @@ import com.axiom.app.domain.repository.HunterRepository
 import com.axiom.app.domain.repository.SkillRepository
 import com.axiom.app.domain.repository.DungeonRepository
 import com.axiom.app.domain.repository.MissionRepository
+import com.axiom.app.data.BlueprintV51Data
 import com.axiom.app.data.local.AxiomPreferences
 import java.util.UUID
 import javax.inject.Inject
@@ -38,16 +39,28 @@ class InitializeAxiomUseCase @Inject constructor(
             xpToNextLevel = 100,
             progressPercent = 0.0f,
             rankColor = 0xFF9E9E9E, // Grey
-            rankGlyph = "E"
+            rankGlyph = "E",
+            // Generic placeholder so AwakeningCompleteScreen has something to reveal —
+            // BlueprintWizardViewModel.completeOnboarding() overwrites this with the
+            // user's chosen domain-specific thesis once they reach that step.
+            personalThesis = BlueprintV51Data.DRIVING_THESIS
         )
         hunterRepository.updateHunterProfile(defaultHunter)
 
-        // 2. Create Starter Skills (aligned with SeedDataHelper parent skills)
+        // Grant a starter Streak Shield so the highest-churn window (day 1-6, before
+        // the first 7-day milestone would otherwise award one) isn't the one week with
+        // zero forgiveness for a missed day.
+        preferences.awardStreakFreeze()
+
+        // 2. Create Starter Skills — generic, domain-neutral so XP progression isn't
+        // tied to any one person's life goals. BlueprintWizardViewModel's track
+        // selection (career/finance/health/relationships) layers on top of these
+        // once the user reaches that step; these are just the always-present base set.
         val skills = listOf(
             Skill(
-                id = "skill_ml_and_computational_biology",
-                name = "ML & Computational Biology",
-                category = "ML & Computational Biology",
+                id = "skill_deep_work",
+                name = "Deep Work",
+                category = "Deep Work",
                 currentXP = 0L,
                 level = 1,
                 rankLabel = "E-Rank",
@@ -60,9 +73,9 @@ class InitializeAxiomUseCase @Inject constructor(
                 trackId = "capability"
             ),
             Skill(
-                id = "skill_public_research_project",
-                name = "Public Research Project",
-                category = "Public Research Project",
+                id = "skill_creative_output",
+                name = "Creative Output",
+                category = "Creative Output",
                 currentXP = 0L,
                 level = 1,
                 rankLabel = "E-Rank",
@@ -75,9 +88,9 @@ class InitializeAxiomUseCase @Inject constructor(
                 trackId = "capability"
             ),
             Skill(
-                id = "skill_english_and_outreach",
-                name = "English & Outreach",
-                category = "English & Outreach",
+                id = "skill_communication",
+                name = "Communication",
+                category = "Communication",
                 currentXP = 0L,
                 level = 1,
                 rankLabel = "E-Rank",
@@ -105,9 +118,9 @@ class InitializeAxiomUseCase @Inject constructor(
                 trackId = "commercial_intelligence"
             ),
             Skill(
-                id = "skill_relocation_progress",
-                name = "Relocation Progress",
-                category = "Relocation Progress",
+                id = "skill_personal_growth",
+                name = "Personal Growth",
+                category = "Personal Growth",
                 currentXP = 0L,
                 level = 1,
                 rankLabel = "E-Rank",
@@ -176,11 +189,11 @@ class InitializeAxiomUseCase @Inject constructor(
             ),
             Mission(
                 id = UUID.randomUUID().toString(),
-                title = "Implement MVVM Architecture Patterns",
-                track = "Engineering",
+                title = "Complete a High-Leverage Focus Block (2 Hours)",
+                track = "Deep Work",
                 rarity = "Rare",
-                skillId = "skill_ml_and_computational_biology",
-                skillName = "ML & Computational Biology",
+                skillId = "skill_deep_work",
+                skillName = "Deep Work",
                 xpReward = 50,
                 powerScore = 4.0f,
                 status = "ACTIVE",

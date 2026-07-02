@@ -45,10 +45,26 @@ class MissionsViewModel @Inject constructor(
     private val createMissionUseCase: CreateMissionUseCase,
     private val repository: MissionRepository,
     private val ceremonyEngine: CeremonyEngine,
-    val preferences: AxiomPreferences,
+    private val preferences: AxiomPreferences,
     private val feedRepository: SystemFeedRepository,
-    val focusProtocolManager: FocusProtocolManager
+    private val focusProtocolManager: FocusProtocolManager
 ) : ViewModel() {
+
+    // Forwarded surface — screens read/act through the ViewModel, not by reaching
+    // into raw injected collaborators (was: public `preferences`/`focusProtocolManager`).
+    val isFocusTimerActive: StateFlow<Boolean> = focusProtocolManager.isTimerActive
+    val activeFocusMission: StateFlow<Mission?> = focusProtocolManager.activeFocusMission
+    val activeFocusTitle: StateFlow<String?> = focusProtocolManager.activeFocusTitle
+
+    fun startFocusProtocol(mission: Mission, durationMinutes: Int) {
+        focusProtocolManager.startFocusProtocol(mission, durationMinutes)
+    }
+
+    suspend fun isMissionsBriefingShown(): Boolean = preferences.briefingMissionsFlow.first()
+
+    fun markMissionsBriefingShown() {
+        viewModelScope.launch { preferences.setBriefingShown("missions") }
+    }
 
     init {
         viewModelScope.launch {

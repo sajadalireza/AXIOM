@@ -47,7 +47,10 @@ fun FirstMissionScreen(
 
     val c = LocalAxiomColors.current
     val isFa = java.util.Locale.getDefault().language == "fa"
-    var showTutorial by remember { mutableStateOf(true) }
+    // Opt-in via the [?] button below, not an auto-shown blocker — this screen is the
+    // single highest-leverage moment in onboarding (first real reward), and a forced
+    // interstitial here was absorbing the user's first tap right before that reward.
+    var showTutorial by remember { mutableStateOf(false) }
     var tutorialStep by remember { mutableStateOf(1) }
 
     Box(

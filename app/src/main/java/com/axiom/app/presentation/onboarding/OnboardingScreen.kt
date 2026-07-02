@@ -102,13 +102,13 @@ fun OnboardingScreen(
                 displayedText1 = t1.substring(0, i)
                 delay(50)
             }
-            delay(1500)
+            delay(400)
             val t2 = if (isFa) "موجود ناشناس شناسایی شد" else "UNKNOWN ENTITY DETECTED"
             for (i in 0..t2.length) {
                 displayedText2 = t2.substring(0, i)
                 delay(50)
             }
-            delay(2000)
+            delay(500)
             val t3 = if (isFa) "در حال اجرای پروتکل بیداری..." else "INITIATING AWAKENING PROTOCOL..."
             for (i in 0..t3.length) {
                 displayedText3 = t3.substring(0, i)
@@ -129,7 +129,9 @@ fun OnboardingScreen(
 
     LaunchedEffect(currentStep) {
         if (currentStep == 1) {
-            delay(4000)
+            // Was 4000ms — the biggest single chunk of forced, non-interactive
+            // wait at the very top of the onboarding funnel before any user action.
+            delay(1200)
             showContinue1 = true
         }
     }
@@ -149,18 +151,18 @@ fun OnboardingScreen(
             countdownSecs = 3
             showBeginProtocolButton = false
 
-            delay(500)
-            
+            delay(300)
+
             val nameToType = nameState.trim()
             for (i in 0..nameToType.length) {
                 displayedAwakenedName = nameToType.substring(0, i)
                 delay(50)
             }
-            delay(1000)
-            
+            delay(400)
+
             showRankGlyph = true
-            delay(1000)
-            
+            delay(400)
+
             // Progress animation from 0% to 3%
             val duration = 1000L
             val startTime = System.currentTimeMillis()
@@ -171,8 +173,8 @@ fun OnboardingScreen(
                 delay(16)
             }
             progressValue = 0.03f
-            delay(1000)
-            
+            delay(400)
+
             showBeginProtocolButton = true
             while (countdownSecs > 0) {
                 delay(1000)

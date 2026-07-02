@@ -454,10 +454,9 @@ fun MissionDetailContent(
 
         // 3. Execution Protocols (Complete Panel)
         if (!isCompleted) {
-            val focusManager = viewModel.focusProtocolManager
-            val isTimerActive by focusManager.isTimerActive.collectAsStateWithLifecycle()
-            val activeFocusTitle by focusManager.activeFocusTitle.collectAsStateWithLifecycle()
-            val activeFocusMission by focusManager.activeFocusMission.collectAsStateWithLifecycle()
+            val isTimerActive by viewModel.isFocusTimerActive.collectAsStateWithLifecycle()
+            val activeFocusTitle by viewModel.activeFocusTitle.collectAsStateWithLifecycle()
+            val activeFocusMission by viewModel.activeFocusMission.collectAsStateWithLifecycle()
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -577,7 +576,7 @@ fun MissionDetailContent(
                         Button(
                             onClick = {
                                 val duration = durations[selectedDurationIndex]
-                                focusManager.startFocusProtocol(mission, duration)
+                                viewModel.startFocusProtocol(mission, duration)
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = colors.systemGreen),

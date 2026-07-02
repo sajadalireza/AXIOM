@@ -50,8 +50,15 @@ class HomeViewModel @Inject constructor(
     private val systemFeedRepository: SystemFeedRepository,
     private val muscleRepository: MuscleGroupRepository,
     private val habitRepository: com.axiom.app.domain.repository.DailyHabitLogRepository,
-    val preferences: AxiomPreferences
+    private val preferences: AxiomPreferences
 ) : ViewModel() {
+
+    val lastReviewTimestampFlow: Flow<Long> = preferences.lastReviewTimestampFlow
+    val vehicleProgramStartDateFlow: Flow<Long> = preferences.vehicleProgramStartDateFlow
+
+    fun setVehicleProgramStartDate(timestampMillis: Long) {
+        viewModelScope.launch { preferences.setVehicleProgramStartDate(timestampMillis) }
+    }
 
     private val todayStr: String = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
 

@@ -32,46 +32,47 @@ class SeedDataHelper @Inject constructor(
         val seeded = preferences.skillTreeSeededFlow.first()
         if (seeded) return
 
-        // 1. Insert 6 parent skills (isUnlocked=true)
-        val mlBiologyParent = createParentSkill("ML & Computational Biology", "ML & Computational Biology", "capability")
-        val researchProjectParent = createParentSkill("Public Research Project", "Public Research Project", "capability")
-        val englishOutreachParent = createParentSkill("English & Outreach", "English & Outreach", "capability")
+        // 1. Insert 6 parent skills (isUnlocked=true) — generic, domain-neutral names,
+        // matching InitializeAxiomUseCase's starter skill set exactly (same names ->
+        // same generated ids) so this doesn't create duplicate/orphaned skill rows.
+        val deepWorkParent = createParentSkill("Deep Work", "Deep Work", "capability")
+        val creativeOutputParent = createParentSkill("Creative Output", "Creative Output", "capability")
+        val communicationParent = createParentSkill("Communication", "Communication", "capability")
         val commercialParent = createParentSkill("Income & Commercial Intelligence", "Income & Commercial Intelligence", "commercial_intelligence")
-        val relocationParent = createParentSkill("Relocation Progress", "Relocation Progress", "capability")
+        val personalGrowthParent = createParentSkill("Personal Growth", "Personal Growth", "capability")
         val physicalParent = createParentSkill("Physical Mastery", "Physical Mastery", "capability")
 
-        val parents = listOf(mlBiologyParent, researchProjectParent, englishOutreachParent, commercialParent, relocationParent, physicalParent)
+        val parents = listOf(deepWorkParent, creativeOutputParent, communicationParent, commercialParent, personalGrowthParent, physicalParent)
         for (parent in parents) {
             skillRepository.insertSkill(parent)
         }
 
         // 2. Insert child skills (isUnlocked=false)
         val children = listOf(
-            // ML & Computational Biology children
-            createChildSkill("ESM2 & Protein Modeling", "ML & Computational Biology", mlBiologyParent.id, "capability"),
-            createChildSkill("COBRApy & Metabolic Modeling", "ML & Computational Biology", mlBiologyParent.id, "capability"),
-            createChildSkill("PyTorch Deployment", "ML & Computational Biology", mlBiologyParent.id, "capability"),
-            createChildSkill("FastAPI / Streamlit", "ML & Computational Biology", mlBiologyParent.id, "capability"),
+            // Deep Work children
+            createChildSkill("Focus Session Habit", "Deep Work", deepWorkParent.id, "capability"),
+            createChildSkill("Time Blocking", "Deep Work", deepWorkParent.id, "capability"),
+            createChildSkill("Distraction-Free Environment", "Deep Work", deepWorkParent.id, "capability"),
 
-            // Public Research Project children
-            createChildSkill("Terminator Efficiency Research", "Public Research Project", researchProjectParent.id, "capability"),
-            createChildSkill("GitHub Portfolio", "Public Research Project", researchProjectParent.id, "capability"),
-            createChildSkill("Preprint Writing", "Public Research Project", researchProjectParent.id, "capability"),
+            // Creative Output children
+            createChildSkill("Idea Journal", "Creative Output", creativeOutputParent.id, "capability"),
+            createChildSkill("Portfolio Building", "Creative Output", creativeOutputParent.id, "capability"),
+            createChildSkill("Public Sharing", "Creative Output", creativeOutputParent.id, "capability"),
 
-            // English & Outreach children
-            createChildSkill("LinkedIn Direct Outreach", "English & Outreach", englishOutreachParent.id, "capability"),
-            createChildSkill("Technical English Writing", "English & Outreach", englishOutreachParent.id, "capability"),
-            createChildSkill("Client Communication", "English & Outreach", englishOutreachParent.id, "capability"),
+            // Communication children
+            createChildSkill("Written Communication", "Communication", communicationParent.id, "capability"),
+            createChildSkill("Public Speaking", "Communication", communicationParent.id, "capability"),
+            createChildSkill("Active Listening", "Communication", communicationParent.id, "capability"),
 
             // Income & Commercial Intelligence children
             createChildSkill("Problem Discovery Conversations", "Income & Commercial Intelligence", commercialParent.id, "commercial_intelligence"),
             createChildSkill("Consulting Delivery", "Income & Commercial Intelligence", commercialParent.id, "commercial_intelligence"),
             createChildSkill("Monthly Income Diagnostic", "Income & Commercial Intelligence", commercialParent.id, "commercial_intelligence"),
 
-            // Relocation Progress children
-            createChildSkill("PhD Applications (Path A)", "Relocation Progress", relocationParent.id, "capability"),
-            createChildSkill("Highly Skilled Migrant Visa (Path B)", "Relocation Progress", relocationParent.id, "capability"),
-            createChildSkill("Dubai Bridge Prep (backup)", "Relocation Progress", relocationParent.id, "capability"),
+            // Personal Growth children
+            createChildSkill("Goal Setting Review", "Personal Growth", personalGrowthParent.id, "capability"),
+            createChildSkill("Habit Tracking", "Personal Growth", personalGrowthParent.id, "capability"),
+            createChildSkill("Reflection Practice", "Personal Growth", personalGrowthParent.id, "capability"),
 
             // Physical Mastery children
             createChildSkill("Strength Training", "Physical Mastery", physicalParent.id, "capability"),

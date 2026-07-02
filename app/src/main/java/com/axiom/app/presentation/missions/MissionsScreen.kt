@@ -26,8 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import com.axiom.app.domain.model.Mission
 import com.axiom.app.navigation.Screen
 import com.axiom.app.ui.MissionsUiState
@@ -58,9 +56,8 @@ fun MissionsScreen(
     val xpFloatEvent = viewModel.xpFloatEvent
     val colors = LocalAxiomColors.current
 
-    val focusManager = viewModel.focusProtocolManager
-    val isTimerActive by focusManager.isTimerActive.collectAsStateWithLifecycle()
-    val activeFocusMission by focusManager.activeFocusMission.collectAsStateWithLifecycle()
+    val isTimerActive by viewModel.isFocusTimerActive.collectAsStateWithLifecycle()
+    val activeFocusMission by viewModel.activeFocusMission.collectAsStateWithLifecycle()
 
     var selectedTab by remember { mutableStateOf(0) } // 0 = Active, 1 = Pending, 2 = Completed
     var showAISheet by remember { mutableStateOf(false) }
@@ -105,10 +102,8 @@ fun MissionsScreen(
             }
 
             var showGlossary by remember { mutableStateOf(false) }
-            val scope = rememberCoroutineScope()
             LaunchedEffect(Unit) {
-                val shown = viewModel.preferences.briefingMissionsFlow.first()
-                showGlossary = !shown
+                showGlossary = !viewModel.isMissionsBriefingShown()
             }
             if (showGlossary) {
                 Spacer(modifier = Modifier.height(10.dp))
@@ -116,9 +111,7 @@ fun MissionsScreen(
                     stringResId = com.axiom.app.R.string.glossary_missions,
                     onDismiss = {
                         showGlossary = false
-                        scope.launch {
-                            viewModel.preferences.setBriefingShown("missions")
-                        }
+                        viewModel.markMissionsBriefingShown()
                     }
                 )
             }
@@ -350,7 +343,7 @@ fun MissionsScreen(
                                             onNavigate(Screen.MissionDetail(mission.id).route)
                                         },
                                         onFocusClick = {
-                                            focusManager.startFocusProtocol(mission, 25)
+                                            viewModel.startFocusProtocol(mission, 25)
                                         },
                                         isTimerActive = isTimerActive,
                                         isTimerActiveForMe = activeFocusMission?.id == mission.id,

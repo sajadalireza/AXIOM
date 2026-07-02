@@ -386,7 +386,7 @@ fun LevelUpCeremony(
                     text = text1.take(text1ProgState),
                     fontFamily = JetBrainsMono,
                     fontSize = 16.sp,
-                    color = SystemGreen,
+                    color = LocalAxiomColors.current.systemGreen,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.testTag("ceremony_title")
                 )
@@ -400,7 +400,7 @@ fun LevelUpCeremony(
                     text = text2.take(text2ProgState),
                     fontFamily = Inter,
                     fontSize = 32.sp,
-                    color = TextPrimary,
+                    color = LocalAxiomColors.current.textPrimary,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.testTag("ceremony_subtitle")
                 )
@@ -490,11 +490,14 @@ fun LevelUpCeremony(
                 text = stringResource(R.string.ceremony_tap_continue),
                 fontFamily = JetBrainsMono,
                 fontSize = 12.sp,
-                color = TextDim,
+                color = LocalAxiomColors.current.textDim,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 48.dp)
-                    .alpha(blinkAlpha)
+                    // graphicsLayer defers the read to the draw phase — blinkAlpha ticks
+                    // indefinitely for as long as the ceremony is undismissed, and a
+                    // plain .alpha() value read would force recomposition every tick.
+                    .graphicsLayer { alpha = blinkAlpha }
                     .testTag("ceremony_tap_continue")
             )
         }

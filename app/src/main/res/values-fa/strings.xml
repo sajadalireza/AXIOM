@@ -307,7 +307,8 @@
     <!-- System Voice & API Key Translations -->
     <string name="system_voice_interface">[ اتاق مشورت جنگ استراتژیک ]</string>
     <string name="system_voice_link_active">کانال‌های صوتی ماتریکس امن و فعالند</string>
-    <string name="system_voice_no_api_key">کلید API شناسی یافت نشد — ضربه برای بارگذاری</string>
+    <string name="system_voice_no_api_key">حالت محلی — پاسخ‌های آفلاین فعال است</string>
+    <string name="system_voice_enable_live_ai">[ فعال‌سازی هوش مصنوعی زنده ]</string>
     <string name="system_voice_set_key">[ سوار کردن کلید اختصاصی ]</string>
     <string name="system_voice_action_briefing">کالیبراسیون و برون‌دهی صبحگاهی</string>
     <string name="system_voice_action_briefing_prompt">دستورالعمل‌ها و کالیبراسیون صبحگاهی من را سازماندهی کن.</string>
@@ -434,8 +435,8 @@
     <!-- Premium Checkout Sim -->
     <string name="premium_benefit_1_title">سپر پایداری استریک</string>
     <string name="premium_benefit_1_desc">یک‌بار در هفته از استریک تمرکز شما دفاع می‌کند. اگر یک روز فراموش کنید، سپر صدمه را جذب نموده و تسلسل کار سالم می‌ماند.</string>
-    <string name="premium_benefit_2_title">۱۰٪+ ظرفیت دائمی تکانه</string>
-    <string name="premium_benefit_2_desc">بهبود اثر انباشتی در مأموریت‌ها، اسپرینت‌ها و کارهای با اهمیت بالا به صورت ممتد در طول زمان.</string>
+    <string name="premium_benefit_2_title">خلبان خودکار مأموریت (AI)</string>
+    <string name="premium_benefit_2_desc">سیستم بر اساس اهداف شما مأموریت‌های بعدی را خودکار پیشنهاد می‌دهد — یک لمس، بدون کاغذ سفید.</string>
     <string name="premium_benefit_3_title">پوسته آتشفشان بنفش ویژه (Obsidian Theme)</string>
     <string name="premium_benefit_3_desc">رابط کاربری مجلل و تیره رنگ بنفش تیره منحصراً با تهیه مجوز کاربری.</string>
     <string name="premium_arm_yours">به جریان کاری و پیشروی ممتد در مسیر اهداف اعتبار ورزید.</string>

@@ -307,7 +307,8 @@
     <!-- System Voice & API Key Translations -->
     <string name="system_voice_interface">[ THE STRATEGIC WAR ROOM ]</string>
     <string name="system_voice_link_active">VIRTUAL CHANNELS ENCRYPTED &amp; ONLINE</string>
-    <string name="system_voice_no_api_key">NO API KEY LOADED — TAP TO MOUNT</string>
+    <string name="system_voice_no_api_key">LOCAL MODE — OFFLINE PERSONA ACTIVE</string>
+    <string name="system_voice_enable_live_ai">[ ENABLE LIVE AI ]</string>
     <string name="system_voice_set_key">[ SECURE API KEY ]</string>
     <string name="system_voice_action_briefing">MORNING CALIBRATION</string>
     <string name="system_voice_action_briefing_prompt">Designate my morning strategic calibration parameters.</string>
@@ -434,8 +435,8 @@
     <!-- Premium Checkout Sim -->
     <string name="premium_benefit_1_title">Momentum Shield</string>
     <string name="premium_benefit_1_desc">Protects your focus pipeline streak once per week. Miss a day — the Shield neutralizes it, pipeline stays unbroken.</string>
-    <string name="premium_benefit_2_title">+10% Permanent Momentum Gain</string>
-    <string name="premium_benefit_2_desc">Compounding focus leverage bonus across all completed routines, sessions, and checklists.</string>
+    <string name="premium_benefit_2_title">AI Mission Autopilot</string>
+    <string name="premium_benefit_2_desc">The System auto-generates your next mission slate from your goals — one tap, zero blank-page friction.</string>
     <string name="premium_benefit_3_title">Sovereign Obsidian Theme</string>
     <string name="premium_benefit_3_desc">Unlocks an exclusive violet-purple premium interface configuration.</string>
     <string name="premium_arm_yours">Safeguard your momentum trends from setback.</string>

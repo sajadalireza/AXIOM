@@ -29,6 +29,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import android.util.Log
+import com.axiom.app.core.ai.GEMINI_MODEL_NAME
 import com.google.ai.client.generativeai.GenerativeModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -46,12 +48,14 @@ class WeeklyAnalyticsViewModel @Inject constructor(
     private val vitalsRepository: VitalsRepository,
     private val kpiProgressDao: KPIProgressDao,
     private val dailyHabitLogRepository: DailyHabitLogRepository,
-    val ceremonyEngine: CeremonyEngine,
-    val preferences: AxiomPreferences
+    private val ceremonyEngine: CeremonyEngine,
+    private val preferences: AxiomPreferences
 ) : ViewModel() {
 
     val streakFlow: StateFlow<Int> = preferences.streakFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
+    val lastReviewTimestampFlow: Flow<Long> = preferences.lastReviewTimestampFlow
 
     private val _aiSummary = MutableStateFlow<String>("Generating summary...")
     val aiSummary: StateFlow<String> = _aiSummary
@@ -85,7 +89,7 @@ class WeeklyAnalyticsViewModel @Inject constructor(
             try {
                 val key = preferences.geminiApiKeyFlow.first()
                 if (!key.isNullOrBlank()) {
-                    val model = GenerativeModel(modelName = "gemini-1.5-flash", apiKey = key)
+                    val model = GenerativeModel(modelName = GEMINI_MODEL_NAME, apiKey = key)
                     val prompt = "Write a concise, motivational 1-line summary of a warrior's performance this week. Stats: Completed $missionsLast7Days missions, current streak: $streakVal days, hit sleep targets: $sleepHits/7 days. Keep it short and direct under 20 words. Do not include intro or outro, write in third person, starting with 'You completed...'"
                     val response = model.generateContent(prompt)
                     val text = response.text?.trim()
@@ -95,7 +99,7 @@ class WeeklyAnalyticsViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("WeeklyAnalyticsViewModel", "AI weekly summary failed, model=$GEMINI_MODEL_NAME", e)
             }
             _aiSummary.value = fallbackSummary
         }

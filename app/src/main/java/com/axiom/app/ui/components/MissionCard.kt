@@ -77,20 +77,9 @@ fun MissionCardBase(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     onLongClick: (() -> Unit)? = null,
-    content: @Composable BoxScope.(rColor: Color, glowEnabled: Boolean, pulseAlpha: Float, instantGateRemainingMs: Long) -> Unit
+    content: @Composable BoxScope.(rColor: Color, glowEnabled: Boolean) -> Unit
 ) {
     var showBurst by remember { mutableStateOf(false) }
-
-    val currentMillis by produceState(initialValue = System.currentTimeMillis(), keys = arrayOf(mission.id)) {
-        while (true) {
-            delay(1000)
-            value = System.currentTimeMillis()
-        }
-    }
-
-    val instantGateElapsed = currentMillis - mission.createdAt
-    val instantGateRemainingMs = (3600000L - instantGateElapsed).coerceAtLeast(0L)
-    val isInstantGateActive = mission.isInstantGate && instantGateRemainingMs > 0L
 
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -107,26 +96,6 @@ fun MissionCardBase(
     val isFlashing = showBurst
     val isLegendaryOrEpic = mission.rarity.uppercase() in listOf("LEGENDARY", "EPIC", "DEPTH", "SHIELD", "WEALTH_ENGINE") || mission.isInstantGate
     val glowEnabled = isFlashing || isLegendaryOrEpic
-
-    // InstantGate Urgency Pulse logic
-    val remainingSeconds = (instantGateRemainingMs / 1000).toInt()
-    val isTimerUrgent = isInstantGateActive && remainingSeconds in 1..299
-    var pulseTarget by remember { mutableStateOf(1f) }
-    LaunchedEffect(isTimerUrgent) {
-        if (isTimerUrgent) {
-            while (true) {
-                pulseTarget = if (pulseTarget == 1f) 0.4f else 1f
-                delay(500)
-            }
-        } else {
-            pulseTarget = 1f
-        }
-    }
-    val pulseAlpha by animateFloatAsState(
-        targetValue = pulseTarget,
-        animationSpec = tween(500, easing = LinearEasing),
-        label = "instant_gate_countdown_pulse"
-    )
 
     HolographicCard(
         modifier = modifier
@@ -145,7 +114,7 @@ fun MissionCardBase(
         accentColor = rColor,
         glowEnabled = glowEnabled
     ) {
-        content(rColor, glowEnabled, pulseAlpha, instantGateRemainingMs)
+        content(rColor, glowEnabled)
 
         if (showBurst) {
             MissionParticleBurst(
@@ -155,6 +124,84 @@ fun MissionCardBase(
                 onComplete = { showBurst = false },
                 modifier = Modifier.matchParentSize()
             )
+        }
+    }
+}
+
+/**
+ * Self-contained 1Hz countdown badge for instant-gate missions. Holds its own
+ * ticker so only this leaf recomposes each second — the rest of MissionCard
+ * (title, badges, buttons, canvases) is untouched.
+ */
+@Composable
+private fun InstantGateBadge(createdAt: Long, modifier: Modifier = Modifier) {
+    fun remainingMsNow() = (3600000L - (System.currentTimeMillis() - createdAt)).coerceAtLeast(0L)
+
+    var remainingMs by remember(createdAt) { mutableStateOf(remainingMsNow()) }
+    LaunchedEffect(createdAt) {
+        while (remainingMs > 0L) {
+            delay(1000)
+            remainingMs = remainingMsNow()
+        }
+    }
+
+    val remainingSeconds = (remainingMs / 1000).toInt()
+    val isTimerUrgent = remainingMs > 0L && remainingSeconds in 1..299
+    var pulseTarget by remember { mutableStateOf(1f) }
+    LaunchedEffect(isTimerUrgent) {
+        if (isTimerUrgent) {
+            while (true) {
+                pulseTarget = if (pulseTarget == 1f) 0.4f else 1f
+                delay(500)
+            }
+        } else {
+            pulseTarget = 1f
+        }
+    }
+    val pulseAlpha by animateFloatAsState(
+        targetValue = pulseTarget,
+        animationSpec = tween(500, easing = LinearEasing),
+        label = "instant_gate_countdown_pulse"
+    )
+
+    val totalSecs = (remainingMs / 1000).toInt()
+    val mins = totalSecs / 60
+    val secs = totalSecs % 60
+    val timerText = if (remainingMs > 0L) {
+        String.format(java.util.Locale.US, "%02d:%02d", mins, secs)
+    } else {
+        "EXPIRED"
+    }
+    val badgeColor = if (remainingMs > 0L) LegendaryGold else TextDim
+
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(3.dp))
+            .background(badgeColor.copy(alpha = 0.12f))
+            .border(1.dp, badgeColor.copy(alpha = 0.35f), RoundedCornerShape(3.dp))
+            .padding(horizontal = 4.dp, vertical = 1.2.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            Text(
+                text = "⚡ INSTANT",
+                fontFamily = JetBrainsMono,
+                fontSize = 8.sp,
+                fontWeight = FontWeight.Bold,
+                color = badgeColor
+            )
+            if (remainingMs > 0L) {
+                Text(
+                    text = timerText,
+                    fontFamily = JetBrainsMono,
+                    fontSize = 8.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = SystemGreen,
+                    modifier = Modifier.graphicsLayer { alpha = pulseAlpha }
+                )
+            }
         }
     }
 }
@@ -272,7 +319,7 @@ fun MissionCard(
                     showContextMenu = true 
                 }
             }
-        ) { rColor, glowEnabled, pulseAlpha, instantGateRemainingMs ->
+        ) { rColor, glowEnabled ->
         when (cardSize) {
             CardSize.FULL -> {
                 val twentyFourHours = 24L * 60 * 60 * 1000
@@ -399,45 +446,7 @@ fun MissionCard(
                                 RarityBadge(rarity = mission.rarity, fontSize = 8.sp)
 
                                 if (mission.isInstantGate) {
-                                    val totalSecs = (instantGateRemainingMs / 1000).toInt()
-                                    val mins = totalSecs / 60
-                                    val secs = totalSecs % 60
-                                    val timerText = if (instantGateRemainingMs > 0L) {
-                                        String.format(java.util.Locale.US, "%02d:%02d", mins, secs)
-                                    } else {
-                                        "EXPIRED"
-                                    }
-                                    val badgeColor = if (instantGateRemainingMs > 0L) LegendaryGold else TextDim
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(3.dp))
-                                            .background(badgeColor.copy(alpha = 0.12f))
-                                            .border(1.dp, badgeColor.copy(alpha = 0.35f), RoundedCornerShape(3.dp))
-                                            .padding(horizontal = 4.dp, vertical = 1.2.dp)
-                                    ) {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(2.dp)
-                                        ) {
-                                            Text(
-                                                text = "⚡ INSTANT",
-                                                fontFamily = JetBrainsMono,
-                                                fontSize = 8.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                color = badgeColor
-                                            )
-                                            if (instantGateRemainingMs > 0L) {
-                                                Text(
-                                                    text = timerText,
-                                                    fontFamily = JetBrainsMono,
-                                                    fontSize = 8.sp,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = SystemGreen,
-                                                    modifier = Modifier.graphicsLayer { alpha = pulseAlpha }
-                                                )
-                                            }
-                                        }
-                                    }
+                                    InstantGateBadge(createdAt = mission.createdAt)
                                 }
 
                                 MissionXpBadge(xpReward = mission.xpReward, isLegendary = isLegendary)

@@ -259,10 +259,11 @@ private fun SystemVoiceHeader(hasApiKey: Boolean, onSetupKey: () -> Unit) {
                         .clip(RoundedCornerShape(4.dp))
                         .background(colors.borderFaint.copy(alpha = 0.10f))
                         .border(1.dp, colors.borderFaint, RoundedCornerShape(4.dp))
+                        .clickable { onSetupKey() }
                         .padding(horizontal = 10.dp, vertical = 6.dp)
                 ) {
                     Text(
-                        "[ LOCKED ]",
+                        stringResource(R.string.system_voice_enable_live_ai),
                         fontFamily = JetBrainsMono,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,

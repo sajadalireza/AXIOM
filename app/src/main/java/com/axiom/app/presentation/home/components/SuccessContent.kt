@@ -31,7 +31,6 @@ import com.axiom.app.ui.AxiomViewModel
 import com.axiom.app.ui.MissionsViewModel
 import com.axiom.app.ui.VitalsViewModel
 import com.axiom.app.ui.theme.*
-import kotlinx.coroutines.launch
 import java.util.Calendar
 
 @Composable
@@ -47,14 +46,13 @@ fun SuccessContent(
     val colors = LocalAxiomColors.current
     val context = LocalContext.current
     val isFa = java.util.Locale.getDefault().language == "fa"
-    val scope = rememberCoroutineScope()
 
     val weekly by axiomViewModel.weeklyProgress.collectAsStateWithLifecycle()
     val muscles by viewModel.muscleGroups.collectAsStateWithLifecycle()
     val todayHabitLog by viewModel.todayHabitLog.collectAsStateWithLifecycle()
 
-    val lastReviewTimestamp by viewModel.preferences.lastReviewTimestampFlow.collectAsStateWithLifecycle(initialValue = 0L)
-    val vehicleProgramStartDate by viewModel.preferences.vehicleProgramStartDateFlow.collectAsStateWithLifecycle(initialValue = 0L)
+    val lastReviewTimestamp by viewModel.lastReviewTimestampFlow.collectAsStateWithLifecycle(initialValue = 0L)
+    val vehicleProgramStartDate by viewModel.vehicleProgramStartDateFlow.collectAsStateWithLifecycle(initialValue = 0L)
 
     val actualStartDate = remember(vehicleProgramStartDate) { if (vehicleProgramStartDate == 0L) System.currentTimeMillis() else vehicleProgramStartDate }
 
@@ -77,7 +75,7 @@ fun SuccessContent(
                     set(Calendar.SECOND, 0)
                     set(Calendar.MILLISECOND, 0)
                 }
-                scope.launch { viewModel.preferences.setVehicleProgramStartDate(selectedCal.timeInMillis) }
+                viewModel.setVehicleProgramStartDate(selectedCal.timeInMillis)
             },
             calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
         )

@@ -7,7 +7,12 @@ import androidx.work.WorkManager
 import com.axiom.app.core.CrashReporter
 import com.axiom.app.core.notification.AxiomNotificationManager
 import com.axiom.app.core.sound.SoundEngine
+import com.axiom.app.data.local.AxiomPreferences
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -15,6 +20,9 @@ class AwakenApplication : Application(), Configuration.Provider {
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
+
+    @Inject
+    lateinit var preferences: AxiomPreferences
 
     override fun onCreate() {
         super.onCreate()
@@ -65,12 +73,21 @@ class AwakenApplication : Application(), Configuration.Provider {
             com.axiom.app.core.AppInitDiagnostics.logException(t, "NOTIFICATION_CHANNEL_INIT")
         }
 
-        // Schedule notifications
-        try {
-            AxiomNotificationManager.scheduleStreakReminder(this, hour = 21, minute = 0)
-            com.axiom.app.core.AppInitDiagnostics.log("STARTUP_INIT", "Streak reminders scheduled.")
-        } catch (t: Throwable) {
-            com.axiom.app.core.AppInitDiagnostics.logException(t, "NOTIFICATION_SCHEDULE_INIT")
+        // Schedule notifications — only once onboarding is actually done. Otherwise a
+        // user who installs and doesn't finish onboarding the same day can still get
+        // a "streak == 0" fear-copy notification that evening, before they've formed
+        // any relationship with the app at all.
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                if (preferences.firstMissionDoneFlow.first()) {
+                    AxiomNotificationManager.scheduleStreakReminder(this@AwakenApplication, hour = 21, minute = 0)
+                    com.axiom.app.core.AppInitDiagnostics.log("STARTUP_INIT", "Streak reminders scheduled.")
+                } else {
+                    com.axiom.app.core.AppInitDiagnostics.log("STARTUP_INIT", "Streak reminders skipped (onboarding not complete yet).")
+                }
+            } catch (t: Throwable) {
+                com.axiom.app.core.AppInitDiagnostics.logException(t, "NOTIFICATION_SCHEDULE_INIT")
+            }
         }
         
         com.axiom.app.core.AppInitDiagnostics.log("STARTUP_INIT", "Application onCreate finished.")
