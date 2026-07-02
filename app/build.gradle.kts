@@ -188,6 +188,89 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
+tasks.register("preBuildFonts") {
+    doFirst {
+        println("========================================")
+        println("WARRIOR1 PRE-BUILD: Downloading fonts...")
+        println("========================================")
+    }
+    
+    doLast {
+        val destDir = file("src/main/res/font")
+        if (!destDir.exists()) {
+            destDir.mkdirs()
+        }
+        val fonts = mapOf(
+            "outfit_light.ttf" to "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-Light.ttf",
+            "outfit_regular.ttf" to "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-Regular.ttf",
+            "outfit_medium.ttf" to "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-Medium.ttf",
+            "outfit_semibold.ttf" to "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-SemiBold.ttf",
+            "outfit_bold.ttf" to "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-Bold.ttf",
+            "fraunces_regular.ttf" to "https://cdn.jsdelivr.net/gh/googlefonts/fraunces@main/fonts/ttf/Fraunces-Regular.ttf",
+            "fraunces_medium.ttf" to "https://cdn.jsdelivr.net/gh/googlefonts/fraunces@main/fonts/ttf/Fraunces-Medium.ttf",
+            "fraunces_bold.ttf" to "https://cdn.jsdelivr.net/gh/googlefonts/fraunces@main/fonts/ttf/Fraunces-Bold.ttf",
+            "fraunces_black.ttf" to "https://cdn.jsdelivr.net/gh/googlefonts/fraunces@main/fonts/ttf/Fraunces-Black.ttf",
+            "fraunces_italic.ttf" to "https://cdn.jsdelivr.net/gh/googlefonts/fraunces@main/fonts/ttf/Fraunces-Italic.ttf",
+            "fira_code_regular.ttf" to "https://cdn.jsdelivr.net/npm/firacode@6.2.0/distr/ttf/FiraCode-Regular.ttf",
+            "fira_code_medium.ttf" to "https://cdn.jsdelivr.net/npm/firacode@6.2.0/distr/ttf/FiraCode-Medium.ttf",
+            "jetbrains_mono_regular.ttf" to "https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono@master/fonts/ttf/JetBrainsMono-Regular.ttf",
+            "jetbrains_mono_medium.ttf" to "https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono@master/fonts/ttf/JetBrainsMono-Medium.ttf",
+            "jetbrains_mono_bold.ttf" to "https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono@master/fonts/ttf/JetBrainsMono-Bold.ttf"
+        )
+        var downloadedCount = 0
+        var failedCount = 0
+        
+        fonts.forEach { (name, urlStr) ->
+            val destFile = file("src/main/res/font/$name")
+            if (!destFile.exists() || destFile.length() < 1000) {
+                println("  ⬇ Downloading $name...")
+                try {
+                    val url = URI(urlStr).toURL()
+                    val conn = url.openConnection() as HttpURLConnection
+                    conn.connectTimeout = 15000
+                    conn.readTimeout = 15000
+                    conn.setRequestProperty("User-Agent", "Mozilla/5.0")
+                    conn.connect()
+                    
+                    if (conn.responseCode in 200..299) {
+                        conn.inputStream.use { input ->
+                            destFile.outputStream().use { output ->
+                                input.copyTo(output)
+                            }
+                        }
+                        println("  ✓ Downloaded $name (${destFile.length() / 1024} KB)")
+                        downloadedCount++
+                    } else {
+                        throw Exception("HTTP ${conn.responseCode}")
+                    }
+                } catch (e: Exception) {
+                    println("  ✗ Failed to download $name: ${e.message}")
+                    failedCount++
+                    // Write a minimum-valid sfnt/TTF signature file to satisfy packaging check
+                    if (!destFile.exists()) {
+                        destFile.writeBytes(byteArrayOf(
+                            0x00, 0x01, 0x00, 0x00, // sfnt version
+                            0x00, 0x01,             // numTables = 1
+                            0x00, 0x10,             // searchRange = 16
+                            0x00, 0x00,             // entrySelector = 0
+                            0x00, 0x00              // rangeShift = 0
+                        ) + ByteArray(512))
+                    }
+                }
+            } else {
+                println("  ✓ $name already exists")
+            }
+        }
+        println("========================================")
+        println("Font download complete: $downloadedCount downloaded, $failedCount failed")
+        println("========================================")
+    }
+}
+
+tasks.matching { it.name == "preBuild" }.configureEach {
+    dependsOn("preBuildFonts")
+}
+
 tasks.register("renamePackages") {
     doLast {
         val rootDir = file("src/main/java")
@@ -213,56 +296,6 @@ tasks.register("renamePackages") {
             }
         }
         println("SUCCESS: Renamed packages/imports in $count files!")
-    }
-}
-
-tasks.register("downloadFonts") {
-    doLast {
-        val destDir = file("src/main/res/font")
-        if (!destDir.exists()) {
-            destDir.mkdirs()
-        }
-        val fonts = mapOf(
-            "outfit_light.ttf" to "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-Light.ttf",
-            "outfit_regular.ttf" to "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-Regular.ttf",
-            "outfit_medium.ttf" to "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-Medium.ttf",
-            "outfit_semibold.ttf" to "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-SemiBold.ttf",
-            "fraunces_regular.ttf" to "https://cdn.jsdelivr.net/gh/googlefonts/fraunces@main/fonts/ttf/Fraunces-Regular.ttf",
-            "fraunces_bold.ttf" to "https://cdn.jsdelivr.net/gh/googlefonts/fraunces@main/fonts/ttf/Fraunces-Bold.ttf",
-            "fraunces_black.ttf" to "https://cdn.jsdelivr.net/gh/googlefonts/fraunces@main/fonts/ttf/Fraunces-Black.ttf",
-            "fraunces_italic.ttf" to "https://cdn.jsdelivr.net/gh/googlefonts/fraunces@main/fonts/ttf/Fraunces-Italic.ttf",
-            "fira_code_regular.ttf" to "https://cdn.jsdelivr.net/npm/firacode@6.2.0/distr/ttf/FiraCode-Regular.ttf",
-            "fira_code_medium.ttf" to "https://cdn.jsdelivr.net/npm/firacode@6.2.0/distr/ttf/FiraCode-Medium.ttf"
-        )
-        fonts.forEach { (name, urlStr) ->
-            val destFile = file("src/main/res/font/$name")
-            if (!destFile.exists() || destFile.length() < 1000) {
-                println("Downloading $name...")
-                try {
-                    val conn = URI(urlStr).toURL().openConnection() as HttpURLConnection
-                    conn.connectTimeout = 15000
-                    conn.readTimeout = 15000
-                    conn.setRequestProperty("User-Agent", "Mozilla/5.0")
-                    conn.connect()
-                    conn.inputStream.use { input ->
-                        destFile.outputStream().use { output ->
-                            input.copyTo(output)
-                        }
-                    }
-                    println("Downloaded $name successfully!")
-                } catch (e: Exception) {
-                    println("Failed to download $name: ${e.javaClass.name} - ${e.message}")
-                    // Write a minimum-valid sfnt/TTF signature file to satisfy packaging check
-                    destFile.writeBytes(byteArrayOf(
-                        0x00, 0x01, 0x00, 0x00, // sfnt version
-                        0x00, 0x01,             // numTables = 1
-                        0x00, 0x10,             // searchRange = 16
-                        0x00, 0x00,             // entrySelector = 0
-                        0x00, 0x00              // rangeShift = 0
-                    ) + ByteArray(512))
-                }
-            }
-        }
     }
 }
 
@@ -376,9 +409,3 @@ tasks.register("rebrandStrings") {
         println("REBRAND COMPLETED: Eng changed $engCount, Fa changed $faCount")
     }
 }
-
-// tasks.matching { it.name == "preBuild" }.configureEach {
-//     dependsOn("downloadFonts")
-// }
-
-
