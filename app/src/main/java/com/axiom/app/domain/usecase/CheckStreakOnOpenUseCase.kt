@@ -27,6 +27,7 @@ class CheckStreakOnOpenUseCase @Inject constructor(
             if (currentStreak >= 1 && preferences.consumeStreakFreeze()) {
                 val remaining = preferences.streakFreezeFlow.first()
                 ceremonyEngine.emit(CeremonyEvent.StreakShieldUsed(currentStreak, remaining))
+                com.axiom.app.core.AnalyticsLogger.log("streak_shield_used", mapOf("streak_length" to currentStreak))
                 feedRepository.emitMessage(
                     SystemMessage(
                         id = java.util.UUID.randomUUID().toString(),
@@ -39,6 +40,7 @@ class CheckStreakOnOpenUseCase @Inject constructor(
             preferences.setStreak(0)
             if (currentStreak >= 1) {
                 ceremonyEngine.emit(CeremonyEvent.StreakBroken(currentStreak))
+                com.axiom.app.core.AnalyticsLogger.log("streak_broken", mapOf("streak_length" to currentStreak))
             }
             return
         }

@@ -200,9 +200,16 @@ class SystemVoiceEngine @Inject constructor(
                 "Active missions: $activeCount\n" +
                 "Generate a customized daily mission briefing for this hunter matching the System personality mode."
             ).text
-            if (modelText.isNullOrBlank()) fallback() else modelText
+            if (modelText.isNullOrBlank()) {
+                com.axiom.app.core.AnalyticsLogger.log("ai_call", mapOf("method" to "generateDailyBriefing", "success" to false, "reason" to "blank_response"))
+                fallback()
+            } else {
+                com.axiom.app.core.AnalyticsLogger.log("ai_call", mapOf("method" to "generateDailyBriefing", "success" to true))
+                modelText
+            }
         } catch (e: Exception) {
             Log.e(TAG, "generateDailyBriefing() failed, model=$GEMINI_MODEL_NAME", e)
+            com.axiom.app.core.AnalyticsLogger.log("ai_call", mapOf("method" to "generateDailyBriefing", "success" to false, "reason" to e.javaClass.simpleName))
             fallback()
         }
     }
@@ -249,9 +256,16 @@ class SystemVoiceEngine @Inject constructor(
                 "Mission completed: \"${mission.title}\" | XP gained: $xpGained\n" +
                 "React to this completion in System voice."
             ).text
-            if (modelText.isNullOrBlank()) fallback() else modelText
+            if (modelText.isNullOrBlank()) {
+                com.axiom.app.core.AnalyticsLogger.log("ai_call", mapOf("method" to "generateCompletionReaction", "success" to false, "reason" to "blank_response"))
+                fallback()
+            } else {
+                com.axiom.app.core.AnalyticsLogger.log("ai_call", mapOf("method" to "generateCompletionReaction", "success" to true))
+                modelText
+            }
         } catch (e: Exception) {
             Log.e(TAG, "generateCompletionReaction() failed, model=$GEMINI_MODEL_NAME", e)
+            com.axiom.app.core.AnalyticsLogger.log("ai_call", mapOf("method" to "generateCompletionReaction", "success" to false, "reason" to e.javaClass.simpleName))
             fallback()
         }
     }
@@ -279,9 +293,16 @@ class SystemVoiceEngine @Inject constructor(
                 "Hunter $hunterName has ranked up from $oldRank to $newRank.\n" +
                 "Deliver a rank-up announcement in System voice."
             ).text
-            if (modelText.isNullOrBlank()) fallback() else modelText
+            if (modelText.isNullOrBlank()) {
+                com.axiom.app.core.AnalyticsLogger.log("ai_call", mapOf("method" to "generateRankUpSpeech", "success" to false, "reason" to "blank_response"))
+                fallback()
+            } else {
+                com.axiom.app.core.AnalyticsLogger.log("ai_call", mapOf("method" to "generateRankUpSpeech", "success" to true))
+                modelText
+            }
         } catch (e: Exception) {
             Log.e(TAG, "generateRankUpSpeech() failed, model=$GEMINI_MODEL_NAME", e)
+            com.axiom.app.core.AnalyticsLogger.log("ai_call", mapOf("method" to "generateRankUpSpeech", "success" to false, "reason" to e.javaClass.simpleName))
             fallback()
         }
     }
@@ -343,9 +364,16 @@ class SystemVoiceEngine @Inject constructor(
         return try {
             val contextStr = hunterContext(hunter, streakDays)
             val modelText = getModel().generateContent("$contextStr\nHunter asks: \"$question\"").text
-            if (modelText.isNullOrBlank()) fallback() else modelText
+            if (modelText.isNullOrBlank()) {
+                com.axiom.app.core.AnalyticsLogger.log("ai_call", mapOf("method" to "askSystem", "success" to false, "reason" to "blank_response"))
+                fallback()
+            } else {
+                com.axiom.app.core.AnalyticsLogger.log("ai_call", mapOf("method" to "askSystem", "success" to true))
+                modelText
+            }
         } catch (e: Exception) {
             Log.e(TAG, "askSystem() failed, model=$GEMINI_MODEL_NAME", e)
+            com.axiom.app.core.AnalyticsLogger.log("ai_call", mapOf("method" to "askSystem", "success" to false, "reason" to e.javaClass.simpleName))
             fallback()
         }
     }
@@ -366,10 +394,12 @@ class SystemVoiceEngine @Inject constructor(
         return try {
             val contextStr = hunterContext(hunter, streakDays)
             val model = getModel()
+            com.axiom.app.core.AnalyticsLogger.log("ai_call", mapOf("method" to "askSystemStream", "success" to true))
             model.generateContentStream("$contextStr\nHunter asks: \"$question\"")
                 .map { response -> response.text ?: "" }
         } catch (e: Exception) {
             Log.e(TAG, "askSystemStream() failed, model=$GEMINI_MODEL_NAME", e)
+            com.axiom.app.core.AnalyticsLogger.log("ai_call", mapOf("method" to "askSystemStream", "success" to false, "reason" to e.javaClass.simpleName))
             flow {
                 val fallbackResponse = askSystem(hunter, streakDays, question)
                 emit(fallbackResponse)
@@ -482,7 +512,7 @@ Make missions progressively harder: easy → medium → hard.
                 .removePrefix("```json").removePrefix("```")
                 .removeSuffix("```").trim()
             val arr = org.json.JSONArray(clean)
-            List(arr.length()) { i ->
+            val suggestions = List(arr.length()) { i ->
                 val o = arr.getJSONObject(i)
                 AIMissionSuggestion(
                     title          = o.getString("title"),
@@ -493,8 +523,11 @@ Make missions progressively harder: easy → medium → hard.
                     reasoning      = o.getString("reasoning")
                 )
             }
+            com.axiom.app.core.AnalyticsLogger.log("ai_call", mapOf("method" to "generateStructuredMissions", "success" to true))
+            suggestions
         } catch (e: Exception) {
             Log.e(TAG, "generateStructuredMissions() failed, model=$GEMINI_MODEL_NAME", e)
+            com.axiom.app.core.AnalyticsLogger.log("ai_call", mapOf("method" to "generateStructuredMissions", "success" to false, "reason" to e.javaClass.simpleName))
             fallback()
         }
     }

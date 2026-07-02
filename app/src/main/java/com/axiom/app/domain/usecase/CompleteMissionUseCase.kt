@@ -335,6 +335,13 @@ class CompleteMissionUseCase @Inject constructor(
             }
         }
 
+        if (result != null) {
+            com.axiom.app.core.AnalyticsLogger.log(
+                "mission_completed",
+                mapOf("rarity" to mission.rarity, "xp_gained" to result.hunterXPGained, "leveled_up" to result.leveledUp)
+            )
+        }
+
         return result
     }
 }

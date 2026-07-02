@@ -60,6 +60,7 @@ class FirstMissionViewModel @Inject constructor(
 
                 // Mark onboarding done
                 preferences.setFirstMissionDone(true)
+                com.axiom.app.core.AnalyticsLogger.log("onboarding_completed")
 
                 // Feed the existing XP float animation with the real XP gained
                 if (xpResult != null) {
