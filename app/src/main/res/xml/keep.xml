@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+    Resources looked up dynamically via Resources.getIdentifier() are invisible
+    to the resource shrinker's static analysis and get stripped in release
+    builds only. Every prefix listed here has a constructed-name lookup:
+      - skill_*    -> LocalizationUtils.kt ("skill_$cleanName")
+      - category_* -> LocalizationUtils.kt ("category_$cleanCat")
+      - workout_*  -> MainScreen.kt (WorkoutTemplate.nameKey)
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@string/skill_*,@string/category_*,@string/workout_*,@drawable/ic_axiom_notification" />

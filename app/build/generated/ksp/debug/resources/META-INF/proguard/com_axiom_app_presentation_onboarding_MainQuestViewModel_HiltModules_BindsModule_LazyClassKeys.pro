@@ -1,0 +1,1 @@
+-keep,allowobfuscation,allowshrinking class com.axiom.app.presentation.onboarding.MainQuestViewModel

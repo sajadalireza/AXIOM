@@ -1,0 +1,6 @@
+com.axiom.app-updated_navigation_xml-0 /Users/sajadalireza/Downloads/Warrior/warrior_fixed/app/build/generated/updated_navigation_xml/debug
+com.axiom.app-packageDebugResources-1 /Users/sajadalireza/Downloads/Warrior/warrior_fixed/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
+com.axiom.app-packageDebugResources-2 /Users/sajadalireza/Downloads/Warrior/warrior_fixed/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
+com.axiom.app-debug-3 /Users/sajadalireza/Downloads/Warrior/warrior_fixed/app/build/intermediates/merged_res/debug/mergeDebugResources
+com.axiom.app-debug-4 /Users/sajadalireza/Downloads/Warrior/warrior_fixed/app/src/debug/res
+com.axiom.app-main-5 /Users/sajadalireza/Downloads/Warrior/warrior_fixed/app/src/main/res

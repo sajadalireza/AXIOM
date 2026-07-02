@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Cyber / Tech accent background circle shadow/aura -->
+    <path
+        android:fillColor="#0D10202F"
+        android:strokeColor="#3300E5FF"
+        android:strokeWidth="1.5"
+        android:pathData="M 54,54 m -42,0 a 42,42 0 1,1 84,0 a 42,42 0 1,1 -84,0" />
+
+    <!-- XION Left Cyber Ear -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M 33.6,44.8 L 22.8,29.4 L 29.4,49 Z" />
+
+    <!-- XION Right Cyber Ear -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M 74.4,44.8 L 85.2,29.4 L 78.6,49 Z" />
+
+    <!-- XION Visor Base (black) and outline (accent system neon cyan) -->
+    <path
+        android:fillColor="#030308"
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="3"
+        android:pathData="M 34,38 H 74 A 10,10 0 0 1 84,48 V 60 A 10,10 0 0 1 74,70 H 34 A 10,10 0 0 1 24,60 V 48 A 10,10 0 0 1 34,38 Z" />
+
+    <!-- Cute Glowing Eyes -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M 39.5,54 m -6.5,0 a 6.5,6.5 0 1,1 13,0 a 6.5,6.5 0 1,1 -13,0 M 68.5,54 m -6.5,0 a 6.5,6.5 0 1,1 13,0 a 6.5,6.5 0 1,1 -13,0" />
+
+    <!-- Subtle White reflections in the eyes for innocent/cute look -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 37.5,52 m -2.2,0 a 2.2,2.2 0 1,1 4.4,0 a 2.2,2.2 0 1,1 -4.4,0 M 66.5,52 m -2.2,0 a 2.2,2.2 0 1,1 4.4,0 a 2.2,2.2 0 1,1 -4.4,0" />
+
+</vector>

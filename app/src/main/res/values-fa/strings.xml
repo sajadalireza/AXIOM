@@ -1,0 +1,637 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App -->
+    <string name="app_name">WARRIOR</string>
+    <string name="app_subtitle">پروتکل سیستم‌عامل WARRIOR</string>
+    <string name="privacy_policy_link">حریم خصوصی</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">کارت</string>
+    <string name="nav_missions">مأموریت‌ها</string>
+    <string name="nav_dungeons">اسپرینت‌ها</string>
+    <string name="nav_gates">مأموریت‌ها</string>
+    <string name="nav_leagues">لیگ‌ها</string>
+    <string name="nav_daily_habits">عادت روزانه</string>
+    <string name="nav_physical_condition">وضعیت بدنی</string>
+    <string name="leagues_coming_soon">◈ مدار سراسری لیگ‌ها در حالت آماده‌سازی ◈</string>
+    <string name="leagues_coming_soon_desc">شبکه سراسری لیگ‌های تمرکزی هم‌اکنون در حال کالیبراسیون و ارتقای هسته است. به زودی می‌توانید با دیگر وریرهای هم‌سطح خود در سراسر جهان همگام شده و در رقابت‌های روزانه برتری خود را اثبات کرده و نشان‌های دائمی دریافت دارید.</string>
+    <string name="leagues_badge_bronze">لیگ برنز (Bronze)</string>
+    <string name="leagues_badge_silver">لیگ نقره (Silver)</string>
+    <string name="leagues_badge_gold">لیگ طلایی (Gold)</string>
+    <string name="leagues_badge_shadow_monarch">رهبر تاکتیکی تیم</string>
+    <string name="leagues_preregister_btn">[ رزرو اولویت اتصال به شبکه لیگ ]</string>
+    <string name="leagues_preregister_success">همگام‌سازی شما در اولویت قرار گرفت! پیش‌ثبت‌نام شما با موفقیت برای دوره لیگ پیش‌رو ثبت گردید.</string>
+    <string name="league_title">لیگ‌های رتبه‌بندی WARRIOR</string>
+    <string name="league_subtitle">در لیدربرد جهانی تمرکز به رقابت بپردازید.</string>
+    <string name="league_no_active_gates">هیچ زمان‌سنج شناختی فعالی وجود ندارد</string>
+    <string name="league_add_mission_hint">یک مأموریت فعال اضافه کنید تا جلسه تمرکز آغاز شود.</string>
+    <string name="league_breach_title">◈ هشدار نقض توجه شناختی ◈</string>
+    <string name="league_breach_body">جلسه تمرکز قطع شد. خروج از برنامه در حین روند کار، پیوند سیستم را منحل می‌کند.</string>
+    <string name="league_demo_leaderboard_banner">لیدربرد جهانی متصل نیست. فقط پیشرفت محلی شما نمایش داده می‌شود.</string>
+    <string name="league_rank_up_alert">ارتقاء رتبه! شما بخش جدیدی از سطح لیگ را باز کردید.</string>
+    <string name="league_gap_behind">%1$s LP اختلاف با %2$s. برای کاهش فاصله، جلسات تمرکز بیشتری ثبت کنید.</string>
+    <string name="league_local_standings_top">شما در صدر رتبه‌بندی محلی خود هستید. برای رقابت با دیگر وریرها به لیدربرد جهانی فرکانس متصل شوید.</string>
+    <string name="league_global_standings_top">شما بالاترین رتبه را در لیدربرد جهانی تمرکز دارید. پیوستگی زنجیره کار خود را حفظ کنید.</string>
+    <string name="league_promotion_zone">نفرات برتر در دوره بعدی ارتقا می‌یابند.</string>
+    <string name="league_stable_zone">پایدار — بدون خطر سقوط.</string>
+    <string name="league_demotion_risk">خطر سقوط — در اولین فرصت یک جلسه تمرکز کامل کنید.</string>
+    <string name="nav_shadows">سایه‌ها</string>
+    <string name="nav_hunter">هانتر</string>
+    <string name="nav_system">فرماندهی</string>
+    <string name="nav_archive">آرشیو</string>
+    <string name="nav_skill_tree">درخت مهارت</string>
+
+    <!-- Setup Screen (first launch) -->
+    <string name="setup_welcome">[ سیستم‌عامل WARRIOR ]</string>
+    <string name="setup_language_title">زبان واسط کاربری</string>
+    <string name="setup_language_subtitle">زبان رابط کاربری خود را انتخاب کنید</string>
+    <string name="setup_lang_en">English</string>
+    <string name="setup_lang_fa">فارسی</string>
+    <string name="setup_theme_title">تم فرماندهی را انتخاب کنید</string>
+    <string name="setup_theme_system">سیستم فرماندهی</string>
+    <string name="setup_theme_light">روشن</string>
+    <string name="setup_theme_dark">تاریک</string>
+    <string name="setup_continue">[ راه‌اندازی هسته سیستم‌عامل ]</string>
+    <string name="setup_language_label">زبان</string>
+    <string name="setup_theme_label">پوسته</string>
+
+    <!-- Splash -->
+    <string name="splash_subtitle">سیستم‌عامل وریر</string>
+    <string name="splash_initializing">[ در حال بارگذاری سیستم‌عامل WARRIOR… ]</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_continue">[ ادامه ]</string>
+    <string name="onboarding_register_identity">ثبت هویت کاربری</string>
+    <string name="onboarding_identify_desc">شناسه خود را وارد کنید تا همسویی ماتریکس اهداف شما ثبت شود.</string>
+    <string name="onboarding_hunter_designation">نام رمز وریر (CODE NAME)</string>
+    <string name="onboarding_enter_code_name">نام مأمور خود را وارد کنید…</string>
+    <string name="onboarding_legend_begins">[ لاگ عملیاتی شما با یک نام آغاز می‌گردد ]</string>
+    <string name="onboarding_error_unique">[ خطا: وارد کردن شناسه منحصربه‌فرد الزامی است ]</string>
+    <string name="onboarding_begin_awakening">[ فعال‌سازی سیستم‌عامل WARRIOR ]</string>
+    <string name="onboarding_e_rank">وریر تازه‌وارد (RECRUIT)</string>
+    <string name="onboarding_awakening_progress">میزان همسویی ماتریکس سیستم: %d%%</string>
+
+    <!-- Awakening Complete -->
+    <string name="awakening_rank">سطح کار ▸ تازه‌وارد (RECRUIT)</string>
+    <string name="awakening_level">سطح ▸ ۱</string>
+    <string name="awakening_protocol_begins">پروتکل کاری شما از همین لحظه معتبر است.</string>
+    <string name="awakening_begin">[ اجرا ]</string>
+
+    <!-- Main Quest -->
+    <string name="main_quest_reason">دلیل بیداری و فعال‌سازی این سیستم‌عامل چیست؟</string>
+    <string name="main_quest_example">مثال: پایه‌گذاری موفق سیستم محاسباتی زیستی سودآور</string>
+    <string name="main_quest_lock_in">[ قفل کردن هدف کلیدی ]</string>
+
+    <!-- Home -->
+    <string name="home_xp_progression">تکانه تمرکز (MOMENTUM)</string>
+    <string name="home_today_protocol">[ گزارش دستورالعمل‌های امروز ]</string>
+    <string name="home_day_streak">%d روز زنجیره جریان کار</string>
+    <string name="home_active_missions">جلسات فعال</string>
+    <string name="home_active_count">%d جلسه موازی در حال اجرا</string>
+    <string name="home_active_dungeon">اسپرینت فعال و جاری</string>
+    <string name="home_system_feed">تشخیص وضعیت سیستم‌عامل</string>
+    <string name="home_accessing_system">[ همگام‌سازی فید عملیاتی فرماندهی… ]</string>
+    <string name="home_system_error">خطای انتقال تلماتری هسته اصلی</string>
+    <string name="home_awaiting_mission">[ OS ] در حالت انتظار. اولین جلسه تمرکز را آغاز کنید.</string>
+    <string name="home_xp_active">%s برابر ضریب تکانه‌ فعال است</string>
+
+    <!-- Missions -->
+    <string name="missions_title">عادت‌ها و جلسات کالیبره‌شده</string>
+    <string name="missions_active_protocols">%d جلسه تمرکز فعال</string>
+    <string name="missions_resolve">حذف/اتمام پروتکل</string>
+    <string name="missions_terminate">توقف همیشگی عادت</string>
+    <string name="missions_mission_report">[ بررسی و تحلیل مأموریت ]</string>
+    <string name="missions_hours_invested">ساعات واقعی صرف‌شده را جهت بازتخصیص آمارهای بهینه وارد کنید.</string>
+    <string name="missions_metric_analytics">تحلیل متریک کارایی</string>
+    <string name="missions_manifold">عادت‌های جانبی</string>
+    <string name="missions_danger">عادت‌های سپر حیاتی (Critical-Shield)</string>
+    <string name="missions_not_found">پروتکل کار با موفقیت تکمیل یا پاکسازی شد</string>
+    <string name="missions_protocol_title">اعزام به جلسه کار</string>
+    <string name="missions_no_active">[ OS ] هیچ کانال موازی فعالی ثبت نشده است.</string>
+    <string name="missions_no_pending">[ OS ] هیچ جلسه برنامه‌ریزی‌شده معلقی وجود ندارد.</string>
+    <string name="missions_no_completed">[ OS ] فاقد سوابق ثبت کار موفق.</string>
+
+    <!-- Add Mission -->
+    <string name="add_mission_new_transmission">ایجاد جریان کار جدید</string>
+    <string name="add_mission_terminal_title">پایانه اعزام جریان کار</string>
+    <string name="add_mission_define">[ ایجاد ماژول تمرکز ]</string>
+    <string name="add_mission_linked_skill">[ اتصال به گره‌های مهارت ]</string>
+    <string name="add_mission_target_rarity">[ انتساب تگ اهرم کارایی ]</string>
+    <string name="add_mission_alignment">[ شاخص همسویی استراتژیک ]</string>
+    <string name="add_mission_market_value">ارزش بازار پروژه</string>
+    <string name="add_mission_growth">پتانسیل رشد مهارت</string>
+    <string name="add_mission_mental_load">سرعت و فشار ذهنی موردنیاز</string>
+    <string name="add_mission_assign_dungeon">انتقال مستقیم به اسپرینت جاری (اختیاری)</string>
+    <string name="add_mission_power_score">امتیاز تخصیص قدرت</string>
+    <string name="add_mission_success_chance">نسبت همسویی برآورد شده: %d%%</string>
+    <string name="add_mission_accept">[ تعهد به اجرای مداوم عادت ]</string>
+
+    <!-- Mission Card -->
+    <string name="mission_complete">تکمیل مأموریت</string>
+    <string name="mission_defer">به تعویق‌اندازی</string>
+    <string name="mission_xp_reward">%d+ تجربه (XP)</string>
+    <string name="mission_estimated_hours">تخمین فیزیکی: %d ساعت</string>
+
+    <!-- Dungeons -->
+    <string name="dungeons_locked_title">اطلاعات اسپرینت‌ها رمزنگاری شده‌ است</string>
+    <string name="dungeons_locked_message">یک اسپرینت نشان‌دهنده یک پروژه پیچیده و چند مرحله‌ای از اهداف بزرگ است. ابتدا بر روی جلسات و عادت‌های روزانه مسلط شوید تا شایستگی تمرکز بالای شما احراز گردد.</string>
+    <string name="dungeons_locked_requirement">همسویی تکانه‌ای موردنیاز</string>
+    <string name="dungeons_locked_progress">سطح بهره‌وری %1$d / سطح ۳</string>
+    <string name="dungeons_locked_action">ثبت جلسات روزانه</string>
+    <string name="dungeons_title">اسپرینت‌ها</string>
+    <string name="dungeons_active_raids">%d اسپرینت فعال و جاری</string>
+    <string name="dungeons_all_conquered">[ تبریک ] کلیه اسپرینت‌ها با موفقیت حل شدند.</string>
+    <string name="dungeons_conquered_count">اسپرینت‌های پایان‌یافته (%d)</string>
+    <string name="dungeons_create_title">راه‌اندازی اسپرینت جدید</string>
+    <string name="dungeons_name_label">نام اسپرینت</string>
+    <string name="dungeons_desc_label">نقشه کلی اسپرینت / تبیین اهداف</string>
+    <string name="dungeons_difficulty_label">سطح حساسیت اسپرینت / تگ اهرم</string>
+    <string name="dungeons_total_stages_label">مراحل اسپرینت (چک‌پوینت‌ها)</string>
+    <string name="dungeons_stages_count">%d گام اجرایی</string>
+    <string name="dungeons_begin_raid">[ آغاز فرآیند اسپرینت ]</string>
+
+    <!-- Dungeon Detail -->
+    <string name="dungeon_raid_title">اسپرینت جاری</string>
+    <string name="dungeon_not_found">[ خطای سیستمی ] پروفایل گام اجرایی یا اسپرینت نامعتبر است.</string>
+    <string name="dungeon_stages_label">⚔ چک‌پوینت‌ها: %d</string>
+    <string name="dungeon_boss_label">💀 چک‌پوینت اصلی: %s</string>
+    <string name="dungeon_xp_label">🏆 پاداش: %d تجربه (XP)</string>
+    <string name="dungeon_raid_progress">خط زمانی اجرای اسپرینت</string>
+    <string name="dungeon_stages_completed">%1$d از %2$d مرحله با موفقیت پاکسازی شد</string>
+    <string name="dungeon_stages_timeline">بخش‌های گام اجرایی</string>
+    <string name="dungeon_raid_conquered">🏆 اسپرینت با موفقیت خاتمه یافت 🏆</string>
+    <string name="dungeon_raid_conquered_desc">چک‌پوینت نهایی با موفقیت حل شد. جریان کار اسپرینت به کمال رسید.</string>
+    <string name="dungeon_boss_encounter">⚠ رسیدن به یک چک‌پوینت حساس</string>
+    <string name="dungeon_boss_warning">توجه: حل این چک‌پوینت با کیفیت بالا نیازمند تمرکز کامل و رعایت قوانین طلایی است.</string>
+    <string name="dungeon_defeat_boss">[ غلبه استراتژیک بر چک‌پوینت ]</string>
+    <string name="dungeon_complete_stage">تکمیل بخش اسپرینت</string>
+    <string name="dungeon_boss_active">مجرای چک‌پوینت فعال و پاسخگوست</string>
+    <string name="dungeon_stage_completed">حل شد</string>
+
+    <!-- Dungeon Card -->
+    <string name="dungeon_card_stages">چک‌پوینت‌ها: </string>
+    <string name="dungeon_card_ready">%d%% پاکسازی شده</string>
+    <string name="dungeon_card_stages_count">%1$d/%2$d چک‌پوینت</string>
+    <string name="dungeon_card_boss_stage">⚔ معیار چک‌پوینت کلیدی ⚔</string>
+
+    <!-- Shadow Army -->
+    <string name="shadow_locked_title">مکانیسم به‌کارگیری تیم مجازی غیرفعال است</string>
+    <string name="shadow_locked_message">سیستم همکاری با تیم هوشمند مجازی منوط به رشد ویژگی‌های تخصصی شماست. سطح تجربی خود را ارتقا دهید تا بتوانید متخصصین برجسته کلود را بکار بگیرید.</string>
+    <string name="shadow_locked_requirement">سطح تکانه مورد نیاز</string>
+    <string name="shadow_locked_progress">سطح %1$d / سطح ۵</string>
+    <string name="shadow_locked_action">پیشرفت در جلسات کار</string>
+    <string name="shadow_army_title">تیم مجازی</string>
+    <string name="shadow_subjugated_count">[%d همکار متخصص فعال]</string>
+    <string name="shadow_capacity_label">ظرفیت اعضای تیم مجازی</string>
+    <string name="shadow_none">[ فاقد عاملین و مأمورین فکری هوشمند ]</string>
+    <string name="shadow_none_desc">[ چک‌پوینت‌ها را پشت سر بگذارید تا متخصصین همسو باز شوند ]</string>
+    <string name="shadow_system_error">خطای ناسازگاری ماژول: %s</string>
+    <string name="shadow_extract_title">فعال‌سازی مأمور هوشمند</string>
+    <string name="shadow_extract_desc">فرمان فعال‌سازی را صادر کنید تا مربی یا متخصص فکری در حوزه [ %s ] باز کالیبره گردد:</string>
+    <string name="shadow_arise">شروع همکاری</string>
+    <string name="shadow_cancel">انصراف</string>
+    <string name="shadow_arise_action">[ استخدام همکار مجازی: %s ]</string>
+
+    <!-- Archive Tabs -->
+    <string name="archive_shadow_army">تیم مجازی</string>
+    <string name="archive_character_metrics">شاخص‌های متریک عملکرد</string>
+
+    <!-- Character Stats -->
+    <string name="stats_title">کنسول تکانه</string>
+    <string name="stats_interface">[ صفحه تخصیص تکانه و انرژی ]</string>
+    <string name="stats_available_points">ظرفیت‌های خام بدون‌استفاده</string>
+    <string name="stats_alert">[ ! ]</string>
+    <string name="stats_earn_credits">سطح تجربی را افزایش دهید تا امتیازهای عملکردی به دست آورید.</string>
+    <string name="stats_error">خطای ماژول وضعیت کاربری: %s</string>
+    <string name="stats_level_value">سطح بهره‌وری %d</string>
+
+    <!-- Skill Tree -->
+    <string name="skill_category">بخش انباشت مهارت: %s</string>
+    <string name="skill_locked">[ ساختار مهارت بسته است ]</string>
+    <string name="skill_current_level">میزان تسلط: %d</string>
+    <string name="skill_xp_progress">انباشت پیشرفت: %1$d / %2$d</string>
+    <string name="skill_ready_percent">%d%% بارگذاری شده</string>
+    <string name="skill_battle_analytics">[ گزارش تلماتری سیستم‌عامل ]</string>
+    <string name="skill_missions_completed">جلسات کارهای روزانه ثبت‌شده</string>
+    <string name="skill_guild_raids">%d اقدام مشارکتی ثبت شده</string>
+    <string name="skill_total_xp_label">انرژی معطوف و مصرف شده</string>
+    <string name="skill_total_xp_value">%d تجربه (XP)</string>
+    <string name="skill_shadow_candidate">★ [ نامزد همکار مجازی یافت شد ] ★</string>
+    <string name="skill_shadow_candidate_desc">تمرکز و کیفیت شما در %s اثبات شده است. سیستم شما آماده جذب یک مأمور فکری برای راهنمایی اهداف است.</string>
+    <string name="skill_arise_shadow">استخدام همکار</string>
+    <string name="skill_eternal_master">🏆 [ استاد انباشت مهارت ] 🏆</string>
+    <string name="skill_eternal_master_desc">این گره مهارتی با موفقیت به سقف پتانسیل و حداکثر تجلی خود رسیده است.</string>
+    <string name="skill_extract_shadow">جذب مأمور هوشمند</string>
+    <string name="skill_extract_desc">کلید فعال‌سازی را وارد کنید تا مأمور متخصص آغاز به کار کند. شناسه کار با چه نامی ثبت شود؟</string>
+
+    <!-- Profile -->
+    <string name="profile_share_preview">[ پیش‌نمایش کارت کاربری فدراسیون ]</string>
+    <string name="profile_cancel">انصراف</string>
+    <string name="profile_share">[ اشتراک پیشرفت ]</string>
+    <string name="profile_share_btn">⬟ ارسال کارت کارایی شما</string>
+    <string name="profile_axiom_protocol">[ دیتابیس ثبت تجربیات توسعه‌یافته WARRIOR ]</string>
+    <string name="profile_streak_record">[ بالاترین استمرار استوار ]</string>
+    <string name="profile_current">پایداری فعلی</string>
+    <string name="profile_best">بهترین زنجیره تمرکز</string>
+    <string name="profile_days">%d روز پیاپی</string>
+
+    <!-- Save Progress (anonymous → email upgrade prompts) -->
+    <string name="profile_save_progress_title">[ پشتیبان‌گیری ماتریکس ایمن ]</string>
+    <string name="profile_save_progress_desc">اطمینان حاصل کنید که رتبه و زنجیره شما در ارتقای دیتابیس از دست نمی‌رود. اتصال ایمیل برقرار کنید.</string>
+    <string name="save_progress_nudge_title">[ قفل کردن محتوای کاربری ]</string>
+    <string name="save_progress_nudge_body">آمار، زنجیره‌ها و تیم موازی شما همگی روی دیسک لوکال هستند. اتصال یک ایمیل ابری پایداری دائمی دیتا را تضمین می‌کند.</string>
+    <string name="save_progress_nudge_cta">[ ایمن‌سازی دیتابیس پشتیبان ]</string>
+    <string name="save_progress_nudge_dismiss">فعلاً نه</string>
+
+    <!-- Ceremonies -->
+    <string name="ceremony_tap_continue">[ کلیک برای ادامه عملیات ]</string>
+    <string name="ceremony_system_warning">[ اخطار ناگهانی یا کالیبراسیون ]</string>
+    <string name="ceremony_resume_protocol">[ ادامه روندهای جاری ]</string>
+    <string name="ceremony_shadow_acquired">[ همکار متخصص ملحق شد ]</string>
+    <string name="ceremony_shadow_bound">اکنون بر اساس اهداف شما کالیبره است.</string>
+    <string name="ceremony_rank_hunter">[ مأمور رسته %s ]</string>
+
+    <!-- System Toast / General -->
+    <string name="error_general">خطا: %s</string>
+    <string name="label_days_suffix">روز</string>
+
+    <!-- Glossary -->
+    <string name="glossary_title">[ شاخص کلیدی مفاهیم سیستم ]</string>
+    <string name="glossary_home">[سیستم‌عامل WARRIOR] داشبورد عالی فرماندهی و کالیبراسیون شما. روند کارهای روزانه، زنجیره‌های ممتد و سطح را از اینجا ببینید.</string>
+    <string name="glossary_missions">[سیستم‌عامل WARRIOR] جلسات اهداف روزانه متمرکز شما هستند که بر اساس اهمیت، سودآوری و اهرم بودن امتیازدهی می‌شوند.</string>
+    <string name="glossary_dungeons">[سیستم‌عامل WARRIOR] اسپرینت‌ها پروژه‌های بزرگ چندمرحله‌ای هستند که دستیابی به نقاط عطف را تسهیل می‌کنند.</string>
+    <string name="glossary_shadow_army">[سیستم‌عامل WARRIOR] تیم مجازی شما شامل نقش‌های کلیدی هوش مصنوعی مربیان (کلود) است که با کسب مهارت‌ها فعال می‌شوند.</string>
+    <string name="glossary_skill_tree">[سیستم‌عامل WARRIOR] درخت مهارت یا انباشت شما تناسب توان کارهای شما را در ابعاد گوناگون بهبود می‌بخشد.</string>
+    <string name="glossary_system_voice">[سیستم‌عامل WARRIOR] اتاق جنگ یا فرمان فکری که می‌توانید در آن با ۸ مربی مجازی برای طراحی مسیر مشورت کنید.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">[ واسط تنظیمات سخت‌افزاری سیستمی ]</string>
+    <string name="settings_theme_title">تم گرافیکی پایانه کاربری:</string>
+    <string name="settings_theme_system">سیستم‌عامل پیش‌فرض</string>
+    <string name="settings_theme_light">پوسته روشن</string>
+    <string name="settings_theme_dark">کیهان تاریک (تیره)</string>
+    <string name="settings_language_title">سیستم ارتباط کلامی واسط:</string>
+    <string name="settings_language_en">English</string>
+    <string name="settings_language_fa">فارسی</string>
+    <string name="settings_sound_title">کنترل‌های خروجی صوتی نوری:</string>
+    <string name="settings_sound_mute">بی‌صدا کردن</string>
+    <string name="settings_sound_unmute">فعال‌سازی صدا</string>
+    <string name="settings_sound_volume">سطح فرکانس صوتی: %d%%</string>
+
+    <!-- New Skill Tree Translations -->
+    <string name="skill_protocol_awakening">درخت مهارت: فعال و پویا</string>
+    <string name="skill_parent_required">برای دسترسی، ابتدا تسلط بر مهارتی پیش‌نیاز [ %s ] را در درخت مهارت ارتقا دهید.</string>
+    <string name="skill_conditions_not_met">شرایط بازگشایی بارگذاری نگردیده.</string>
+    <string name="skill_canvas_zone">&lt;&lt; بخش انباشت گره: %s &gt;&gt;</string>
+    <string name="unfold_subtree">توسعه ساختار شاخه‌ها ⊕</string>
+    <string name="fold_subtree">کاهش یا منقبض‌سازی شاخه‌ها ⊖</string>
+    
+    <!-- Rank Card Translations -->
+    <string name="rank_card_hunter_registry">دفتر ثبت احوال و مأموران وریر</string>
+    <string name="rank_card_total_xp">کل پتانسیل انباشت</string>
+    <string name="rank_card_rank">میزان تکانه تمرکز</string>
+    <string name="rank_card_protocol">پروتکل کاربری</string>
+    <string name="rank_card_share_footer">[ پروتکل ثبت وریر — نتایج خود را ابراز دارید ]</string>
+    <string name="rank_card_download_app">دریافت مستقیم هسته: WARRIOR.SALE</string>
+
+    <!-- Skill Category names -->
+    <string name="category_programming">برنامه‌نویسی</string>
+    <string name="category_business">تجارت و کاربری</string>
+    <string name="category_knowledge">علم و دانش</string>
+    <string name="category_health">سلامت و ورزش</string>
+    <string name="category_creativity">خلاقیت و انطباق</string>
+
+    <!-- Home screen link -->
+    <string name="home_awaken_skill_tree">[ دسترسی به درخت مهارت ]</string>
+
+    <!-- System Voice & API Key Translations -->
+    <string name="system_voice_interface">[ اتاق مشورت جنگ استراتژیک ]</string>
+    <string name="system_voice_link_active">کانال‌های صوتی ماتریکس امن و فعالند</string>
+    <string name="system_voice_no_api_key">کلید API شناسی یافت نشد — ضربه برای بارگذاری</string>
+    <string name="system_voice_set_key">[ سوار کردن کلید اختصاصی ]</string>
+    <string name="system_voice_action_briefing">کالیبراسیون و برون‌دهی صبحگاهی</string>
+    <string name="system_voice_action_briefing_prompt">دستورالعمل‌ها و کالیبراسیون صبحگاهی من را سازماندهی کن.</string>
+    <string name="system_voice_action_suggest">پیشنهاد تصمیمات با اهمیت بالا</string>
+    <string name="system_voice_action_suggest_prompt">۳ مأموریت پر اهمیت و دارای اهرم بالا متناسب با درخت مهارتم تبیین نما.</string>
+    <string name="system_voice_action_analyze">گزارش‌گیری بهره‌وری و تمرکز</string>
+    <string name="system_voice_action_analyze_prompt">کیفیت کار، زنجیره پایداری و درصد تعهد من به قوانین آهنین را تحلیل کن.</string>
+    <string name="system_voice_enter_query">ارسال فرمان تعاملی</string>
+    <string name="system_voice_key_required">[ ملزومات اتصال کلید کلود جمینی ]</string>
+    <string name="system_voice_key_desc">وریور برای شروع چت صوتی مربیان در اتاق جنگ به کلید API جمینی نیاز دارد. این کلید به‌صورت کاملاً محلی ذخیره می‌شود.</string>
+    <string name="system_voice_key_get">▶ دریافت امن کلید رایگان: aistudio.google.com/app/apikey</string>
+    <string name="system_voice_key_label">[کلید امنیتی جمینی]</string>
+    <string name="system_voice_paste_here">[ کلید را مستقیم درج کنید ]</string>
+    <string name="system_voice_hide">پنهان‌سازی</string>
+    <string name="system_voice_show">نمایش کلید</string>
+    <string name="system_voice_activate">[ همگام‌سازی و بازگشایی مربیان مجازی ]</string>
+
+    <!-- Skill Names Translations -->
+    <string name="skill_android">اندروید</string>
+    <string name="skill_backend">بک‌اند</string>
+    <string name="skill_ai">هوش مصنوعی</string>
+    <string name="skill_python">پایتون</string>
+    <string name="skill_sales">فروش و عرضه</string>
+    <string name="skill_marketing">بازاریابی</string>
+    <string name="skill_startup">نوآوری استارتاپی</string>
+    <string name="skill_negotiation">مذاکره مستقیم</string>
+    <string name="skill_fitness">آمادگی فیزیکی</string>
+    <string name="skill_cardio">هوازی و دویدن</string>
+    <string name="skill_sleep">بهبود خواب</string>
+    <string name="skill_research">پژوهش‌های کلیدی</string>
+    <string name="skill_writing">نگارش علمی</string>
+    <string name="skill_languages">زبان غریبه</string>
+    <string name="skill_design">انطباق دیزاین</string>
+    <string name="skill_content">تولید محتوا</string>
+    <string name="skill_music">موسیقی زیستی</string>
+    <string name="skill_programming">برنامه‌نویسی</string>
+    <string name="skill_business">تجارت و کاربری</string>
+    <string name="skill_health">سلامت و ورزش</string>
+    <string name="skill_knowledge">علم و دانش</string>
+    <string name="skill_creativity">خلاقیت و انطباق</string>
+
+    <!-- Stat Grid in Profile Page -->
+    <string name="profile_stat_missions_cleared">جلسات با موفقیت انجام شده</string>
+    <string name="profile_stat_active_missions">جریان‌های در انتظار اقدام</string>
+    <string name="profile_stat_current_streak">طول زنجیره پایدار کار</string>
+    <string name="profile_stat_total_xp">انرژی جنبشی معطوف شده</string>
+
+    <!-- Character Stats names & descriptions -->
+    <string name="stat_execution_title">سرعت اجرا</string>
+    <string name="stat_execution_desc">سرعت کلی و پایداری شما در اتمام گام کارهای روزانه را فزونی می‌بخشد.</string>
+    <string name="stat_focus_title">عمق تمرکز</string>
+    <string name="stat_focus_desc">آستانه تاب‌آوری شناختی شما را افزایش داده و دقت تصمیمات را عمیق می‌کند.</string>
+    <string name="stat_knowledge_title">نسبت دانش</string>
+    <string name="stat_knowledge_desc">جذب اطلاعات ارزنده و تحلیل ساختارهای علمی را بهبود می‌دهد.</string>
+    <string name="stat_business_title">هوش تجاری</string>
+    <string name="stat_business_desc">پتانسیل کسب انتفاع پولی و اتخاذ مانورهای سودآور استراتژیک را تقویت می‌کند.</string>
+    <string name="stat_fitness_title">پایداری فیزیکی</string>
+    <string name="stat_fitness_desc">میزان تولید انرژی بیومتریک و استقامت بلندمدت ماهیچه‌ای را تأمین می‌کند.</string>
+    <string name="stat_creativity_title">سازگاری خلاقانه</string>
+    <string name="stat_creativity_desc">پویایی کارهای طراحی و انعطاف در انتخاب مسیرهای موازی را هموار می‌کند.</string>
+
+    <!-- AI Mission Generator Translations -->
+    <string name="ai_generate_placeholder">مثلاً: مدل‌سازی پروتئین ESM2، تمرین و طرح ایده استارتاپی...</string>
+    <string name="ai_generate_sheet_title">[ ماژول سازماندهی جلسات هوشمند ]</string>
+    <string name="ai_generate_sheet_subtitle">اهداف کلان خود را تعیین کنید. سیستم جلساتی متناسب با آن برایتان تنظیم می‌کند.</string>
+    <string name="ai_generate_no_api_key">[ هشدار سیستمی ] کلید جمینی کالیبره نیست. در اتاق جنگ آن را تنظیم کنید.</string>
+    <string name="ai_generate_label_goal">بیان شفاف مقاصد کاری</string>
+    <string name="ai_generate_processing">[ تجزیه اهداف کلان و سازماندهی مأموریت‌ها… ]</string>
+    <string name="ai_generate_btn_missions">[ تولید مأموریت‌های همسو ]</string>
+    <string name="ai_generate_assigned">[ ۳ مأموریت ویژه متمرکز بازسازی شد ]</string>
+    <string name="ai_generate_registered">[ دستورالعمل‌ها به الگوهای روزانه الحاق گشت ✓ ]</string>
+    <string name="ai_generate_accept">[ قبول و تعهد به مأموریت‌ها ]</string>
+
+    <!-- Localized Screen Elements -->
+    <string name="cognitive_link_ready">◈ ماتریکس شناختی آنلاین است</string>
+    <string name="core_connection_locked">◈ پایداری دیتابیس قفل فعال است</string>
+    <string name="awaken_core_node">◈ فعال‌سازی گره مهارتی</string>
+    <string name="overclock_node">◈ اورکلاک آنی ویژگی‌ها</string>
+    <string name="instant_gate_protocol_title">◈ دالان مأموریت فوری فعال شد</string>
+    <string name="instant_gate_protocol_desc">مأموریت جاری: کار را زیر ۱ ساعت انجام دهید تا ۳ برابر ضریب تکانه‌ تجربه کسب گردد!</string>
+    <string name="cognitive_interface_modulator">◈ بستر همفکری اتاق جنگ</string>
+    <string name="system_voice_cold">منتقد سخت‌گیر (بازخورد شفاف و مقتدر)</string>
+    <string name="system_voice_warm">همکار مسئولیت‌پذیری (انگیزشی و حامی پیگیری کارهای مداوم)</string>
+    <string name="streak_flame_frozen">زنجیره شما موقتاً راکد گشته. یک کار را حل کنید تا شعله پیشروی دوباره گداخته گردد.</string>
+    <string name="streak_flame_burning">شعله کاملاً روشن است! استمرار تلاش روزانه و انضباط پولادین اثبات گردیده.</string>
+    <string name="streak_days_label">روز</string>
+    <string name="system_voice_absolute_title">◈ منتقد مقتدر بی‌رحم</string>
+    <string name="system_voice_supportive_title">◈ صدای مسئول همکار حامی</string>
+    <string name="streak_broken_overlay_desc">استریک متناوب پیاپی %d روزه شما فرو ریخت! سیستم تنبلی یا تزلزل روندهای شما را نشان می‌دهد. برای ممانعت از تنزل شدید آمارها، کارهای اصلاحی را تعهد کنید:</string>
+    <string name="streak_broken_accept_btn">[ پذیرش دستورالعمل‌های اصلاحی عملیاتی ]</string>
+    <string name="streak_broken_decline_btn">← پذیرش جریمه و افت آمارهای فدراسیون</string>
+
+    <!-- Xion System Companion -->
+    <string name="xion_companion_title">[ راهنمای سیستم‌عامل: زیون ]</string>
+    <string name="xion_companion_greet">سیستم یکپارچه گشت مأمور. کنترل پنل جامع با موفقیت بالا آمد. من زیون هستم، راهنمای پویای سیستم شما. راهنماها:</string>
+    <string name="xion_companion_home_tip">◈ خانه: تکانه‌ها، گزارش خلاصه روزانه و اعلان‌های فید سیستم را پیگیری کنید.</string>
+    <string name="xion_companion_missions_tip">◈ جلسات: جلسات و کارهای روزانه برای افزایش ویژگی‌های درخت مهارت را هدایت کنید.</string>
+    <string name="xion_companion_dungeons_tip">◈ اسپرینت‌ها: پروژه‌های مرکب چندمرحله‌ای برای بازگشایی چک‌پوینت‌های بزرگ را ترتیب دهید.</string>
+    <string name="xion_companion_shadows_tip">◈ تیم مجازی: افراد متبحر هوشمند را فعال کنید تا همواره ضرب‌های دائمی روی تجارب اثر گذارند.</string>
+
+    <!-- Passive Boost Slot -->
+    <string name="passive_boost_slot">جایگاه تجهیز غیرفعال مأمور</string>
+    <string name="equip_passive_boost">تجهیز مأمور غیرفعال</string>
+    <string name="unequip_passive_boost">عدم همبستگی و حذف تجهیز</string>
+    <string name="empty_slot_desc">[ اسلات خالی برای همکاران فکری ]\nیک گره مهارت بالا را انتخاب و تجهیز کنید</string>
+    <string name="passive_multiplier_bonus">۵٪+ بهبود اثر اهرم تمرکز</string>
+
+    <!-- Tactical Broadcast Protocol strings -->
+    <string name="cognitive_uplink_recalibration">◈ به‌روزرسانی سیستم کالیبراسیون ◈</string>
+    <string name="cognitive_uplink_recalibration_desc">سیستم مدل‌سازی هم‌اکنون در حال بازچینی دیتابیس است. ارتباطات کلود برای پیشگیری از نشت به روش بومی آفلاین ایمن تغییر کاربری داده. کارهای تکی خود را ثبت کنید.</string>
+    <string name="xion_tac_broadcast_protocols">◈ ماتریس یادآورهای عملیاتی ◈</string>
+    <string name="xion_tac_broadcast_desc">کنترل و شبیه‌سازی یادآورهای تعاملی هویت زیون</string>
+    <string name="calm_liaison_label">سنجش‌های عملکردی</string>
+    <string name="calm_liaison_desc">وضعیت سنجی و کالیبراسیون‌های سلامتی سیستم (سبز)</string>
+    <string name="inspired_surge_label">انرژی آنی کارایی</string>
+    <string name="inspired_surge_desc">یادآوری تعهد و همپوشانی زنجیره‌ها (آبی)</string>
+    <string name="critical_alert_label">توجه فوق‌العادی حیاتی</string>
+    <string name="critical_alert_desc">هشدارهای زمانی ذهن و پیشگیری از سقوط زنجیره‌ها (قرمز)</string>
+    <string name="void_hyperlink_label">گزارش‌های تلو متری داخلی</string>
+    <string name="void_hyperlink_desc">پخش امواج واسط کنترل‌کننده‌های ثانویه دیتابیس لوکال (بنفش)</string>
+    <string name="transmit_neural_alert">◈ ارسال فرمان یادآوری ◈</string>
+    <string name="execute_real_missions">اقدامات فیزیکی محلی</string>
+
+    <!-- Premium Checkout Sim -->
+    <string name="premium_benefit_1_title">سپر پایداری استریک</string>
+    <string name="premium_benefit_1_desc">یک‌بار در هفته از استریک تمرکز شما دفاع می‌کند. اگر یک روز فراموش کنید، سپر صدمه را جذب نموده و تسلسل کار سالم می‌ماند.</string>
+    <string name="premium_benefit_2_title">۱۰٪+ ظرفیت دائمی تکانه</string>
+    <string name="premium_benefit_2_desc">بهبود اثر انباشتی در مأموریت‌ها، اسپرینت‌ها و کارهای با اهمیت بالا به صورت ممتد در طول زمان.</string>
+    <string name="premium_benefit_3_title">پوسته آتشفشان بنفش ویژه (Obsidian Theme)</string>
+    <string name="premium_benefit_3_desc">رابط کاربری مجلل و تیره رنگ بنفش تیره منحصراً با تهیه مجوز کاربری.</string>
+    <string name="premium_arm_yours">به جریان کاری و پیشروی ممتد در مسیر اهداف اعتبار ورزید.</string>
+    <string name="premium_confirmed_title">مجوز حرفه‌ای سیستم‌عامل صادر گردید</string>
+    <string name="premium_active_protocol">کد لایسنس فعال: %s</string>
+    <string name="premium_unlocked_info">تمام مربیان فکری اختصاصی، پیکربندی‌های پیشرفته اتاق جنگ، مأموریت‌ساز خودکار و تم‌های ویژه کاملاً همسو گشته‌اند.</string>
+    <string name="premium_emergency_disable">غیرفعال‌سازی موقت لایسنس لوکال</string>
+    <string name="premium_choose_uplink">◆ سطح مجوز و همسویی را مشخص فرمایید ◆</string>
+    <string name="premium_unlock_plan">[ فعال‌سازی مجوز سطح: %s ]</string>
+    <string name="premium_billed_securely">ارتباط تایید پرداختی امن از درگاه کافه بازار</string>
+    <string name="premium_activated_title">ارتقای نسخه و بارگذاری ویژگی‌های مأموران فکری</string>
+    <string name="premium_activated_desc">اقدامات با متبحر بومی برای [%s] به ساختار سیستم محلی تزریق گشت.</string>
+    <string name="premium_acknowledged">بازگشت عملیات اصلی</string>
+    <string name="premium_back_btn">← بازگشت</string>
+    <string name="premium_bazaar_title">کافه بازار</string>
+    <string name="premium_billing_portal">تایید و پرداخت مستقیم</string>
+    <string name="premium_product_name">محصول: لایسنس بهره‌برداری کامل از سیستم‌عامل وریور</string>
+    <string name="premium_developer_label">ارائه‌دهندگان: تیم وریور</string>
+    <string name="premium_price_label">بهای پرداختی:</string>
+    <string name="premium_price_value">۴۹,۰۰۰ تومان</string>
+    <string name="premium_simulation_note">محیط سندباکس پرداخت امن بازار در جریان است. تایید طرح لایسنس فوراً تمامی قابلیت‌ها را بازگشایی می‌دارد.</string>
+    <string name="premium_cancel_btn">رد کردن</string>
+    <string name="premium_pay_btn">تایید نهایی و نصب</string>
+
+    <!-- Specific Premium Plans -->
+    <string name="plan_monthly_name">همراهی ماهانه لیگ پس (League Pass)</string>
+    <string name="plan_monthly_price">۱۹,۰۰۰ تومان / ماهانه</string>
+    <string name="plan_monthly_desc">دیتابیس رقابتی هفتگی، گزارش رتبه‌بندی درون‌مرزی و جوایز دوره‌ای.</string>
+
+    <string name="plan_yearly_name">همراهی سالانه لیگ پس (League Pass)</string>
+    <string name="plan_yearly_price">۱۴۹,۰۰۰ تومان / سالانه</string>
+    <string name="plan_yearly_desc">رابط ممتد با سایر مأموران در رقابت‌های جهانی در تمام ۱۲ دوره فصل سالانه.</string>
+
+    <string name="plan_lifetime_name">نسخه سازمانی مادام‌العمر (Enterprise)</string>
+    <string name="plan_lifetime_price">۹۹,۰۰۰ تومان (پرداخت یک‌باره)</string>
+    <string name="plan_lifetime_desc">پرداخت برای همیشگی: اتصال دائم به مشاورین خلاق (مربیان فکری)، حل‌کننده‌های ممیزی اهداف و مخازن ابری.</string>
+
+    <!-- System Voice Locked strings -->
+    <string name="system_voice_locked_title">مشاوره تیمی غیرفعال است</string>
+    <string name="system_voice_locked_msg">اتاق جنگ فکری مربیان مجازی منوط به سطح پیشروی متناوب شماست. برای آغاز گپ با مربیان، به سطح ۴ ترفیع یابید.</string>
+    <string name="system_voice_locked_req">کالیبراسیون و انطباق</string>
+    <string name="system_voice_locked_progress">سطح بهره‌وری %1$d / سطح ۴</string>
+    <string name="system_voice_locked_action">توسعه هوشی و مهارتی</string>
+
+    <!-- Focus Protocol -->
+    <string name="focus_enforcement_title">اجرای اجباری قفل توجه تفکر</string>
+    <string name="focus_neural_active">⚡ پروتکل تمرکز و سکون برای جلسات با موفقیت قفل شد</string>
+    <string name="focus_stay_warning">فرآیند را باز نگه‌دارید. گریز از صفحه جاری منجر به اختلال در پردازش تلماتری شده و با جریمه آماری روبه‌رو می‌شوید.</string>
+    <string name="focus_another_locked">🔒 گام کار پیشین متوقف نشده است</string>
+    <string name="focus_active_target">در حال اجرا: \"%1$s\". قبل از آغاز ماژول جدید، ابتدا کار را به سرانجام کلاپت برسانید.</string>
+    <string name="focus_select_duration">تعیین زمان‌سنج برای شدت جریان کار (دقیقه):</string>
+    <string name="focus_start_btn">▶ شروع سکوت تمرکز تفکر</string>
+
+    <!-- Dungeon Focus -->
+    <string name="dungeon_focus_locked">🔒 قفل اسپرینت فعال است: %1$s</string>
+    <string name="dungeon_boss_stream_active">⚡ ارزیابی و کیفیت سنجی گام‌ها به صورت حساس فعال است</string>
+    <string name="dungeon_boss_focus_warning">روی مأموریت قفل بمانید. تداوم کار برای پیروزی در اسپرینت الزامی است.</string>
+    <string name="dungeon_boss_start_focus">▶ آغاز اسپرینت تمرکزی چک‌پوینت</string>
+
+    <!-- Leagues Screen -->
+    <string name="leagues_sync_failure">خطای سازماندهی مجدد لیدربرد: %1$s</string>
+    <string name="leagues_restore_progress">پورتک ارتباطی تماشای امتیازات</string>
+    <string name="leagues_breach_penalty">جریمه نقض قوانین: کسر ۱۵- LP از امتیاز ممتد لیگ.</string>
+    <string name="leagues_division_matrix">◈ جدول مربیان فکری تقسیم‌بندی شده ◈</string>
+    <string name="leagues_rank_ascended">بخش تقسیم‌بندی ارتقا پیدا کرد</string>
+    <string name="leagues_prev">قبلی</string>
+    <string name="leagues_ascension_reward">پاداش ارتقای لیگ: متناسب با ضریب‌های همسویی ویژگی‌ها.</string>
+    <string name="leagues_secure_link">[ همبستگی و ثبت رده در بخش منطقه‌ای ]</string>
+
+    <!-- Skill Detail Panel -->
+    <string name="skill_auto_unlock">⚡ بازگشایی خودکار با اولین تجربه مأموریت</string>
+    <string name="skill_cognitive_shield">◈ محافظ پایداری عزم فعال و پیشروست</string>
+    <string name="skill_linked_protocols">فعالیت‌های همسو و زنجیره</string>
+    <string name="skill_completed_count">%1$d تکمیل گشته</string>
+    <string name="skill_no_missions_linked">پروتک فعال مأموریتی یافت نشد. یک کار همسو الحاق کنید.</string>
+    <string name="skill_missions_to_rank">≈ %1$d تا گام کار پر اهمیت تا ترفیع سطح</string>
+    <string name="skill_ascension_rank">◈ پایه ارتقا داده شده: سطح %1$d</string>
+    <string name="skill_ascend_node_btn">ارتقای سطح هسته مهارتی (+۱ سطح)</string>
+    <string name="skill_ascension_locked_desc">برخورد با سد قفل صعود. مأموریت را به سطح ۱۰ برسانید تا با ریست گره، ۲۵٪ ضریب همسویی مادام‌العمر بگیرید.</string>
+
+    <!-- Skill Tree Screen -->
+    <string name="skill_add_routine">ثبت عادت و انباشت مهارت</string>
+    <string name="skill_highlight_suggestions">توصیه‌های مستقیم راهنمای ماتریکس:</string>
+    <string name="skill_parent_label">گره ریشه (پیش‌نیاز):</string>
+    <string name="skill_register_node">کامپایل و همبستگی گره</string>
+
+    <!-- Home Screen -->
+    <string name="home_next_action">[ اولویت مأموریت فوری ]</string>
+    <string name="label_level">سطح کارآیی %d</string>
+    <string name="profile_xp_display">[ %1$d / %2$d XP ]</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_edit">تغییر</string>
+    <string name="profile_set_btn">+ ثبت</string>
+
+    <!-- Create Dungeon -->
+    <string name="dungeons_stage_protocols">تبیین گام کارهای اسپرینت اهداف (اختیاری)</string>
+
+    <!-- AI Mission Generator -->
+    <string name="ai_offline_title">◈ شروع بومی پردازش محلی دیتابیس ◈</string>
+    <string name="ai_offline_desc">مدل‌سازی با قطع اتصال بیرونی جهت حفاظت از یکپارچگی اطلاعات محلی کالیبره گشته. فرمول‌های بومی RPG فعال است.</string>
+
+    <!-- System Voice -->
+    <string name="system_voice_uplink_phase">مرحله پایداری واسط اتصالات</string>
+
+    <!-- First Mission Onboarding -->
+    <string name="first_mission_header">[ سیستم‌عامل WARRIOR — استقرار مأموریت ریشه ]</string>
+    <string name="first_mission_title">وریر مأمور، اولین گام و عادت منتظر شماست.</string>
+    <string name="first_mission_desc">یک کار حیاتی که امروز بدون چون و چرا باید به ثمر برسانید را تبیین فرمایید.</string>
+    <string name="first_mission_label">مأموریت کلیدی تمرکز</string>
+    <string name="first_mission_placeholder">مثلاً: ۱ ساعت پیاده‌سازی مدل ESM2 پروتئینی</string>
+    <string name="first_mission_btn_open">▶ آغاز متمرکز روند کار</string>
+
+    <!-- Body/Muscle Tracking & Workout Templates -->
+    <string name="workout_push">پروتکل کار با وزنه - بالاتنه فشاری</string>
+    <string name="workout_pull">پروتکل کار با وزنه - بالاتنه کششی</string>
+    <string name="workout_legs">پروتکل تمرینات ممتد پا</string>
+    <string name="workout_full_body">پروتکل کار با وزنه - کل فیزیک بدن</string>
+    <string name="workout_run_cardio">پروتکل ممتد دویدن و هوازی فیزیکال</string>
+    <string name="workout_custom">پروتکل متفرقه تمرینی شخصی‌ساز</string>
+    <string name="home_combat_readiness_summary">%1$s مهیا شد (%2$d%%) · %3$s به میزان %4$d روز نیازمند ریکاوری مطلوب است (%5$d%%)</string>
+
+    <!-- Phase Phase 2/Phase 5 Integration -->
+    <string name="command_rule_breach_alert">⚡ نقض پروتکل قوانین آهنین شناسایی شد ⚡</string>
+    <string name="command_rule_prefix">[ OS هشدار ] نقض صریح قانون طلایی: %s</string>
+    <string name="command_daily_calibration">کالیبراسیون و اصلاح مستمر ممتد — مقتبس از تراز اهداف بلوپرینت زیست شخصی</string>
+    <string name="command_milestone_days_left">%d روز پایداری تا هدف کلیدی باقیست</string>
+    <string name="command_milestone_never_set">بدون برنامه‌ریزی نقطه عطف مشخص</string>
+    <string name="command_milestone_btn_resolve">حل و اتمام ارزیابی</string>
+    <string name="command_milestone_btn_new">تنظیم هدف و نقطه عطف پیش‌رو</string>
+    <string name="command_milestone_target_date">سررسید هدف: %s</string>
+    <string name="command_milestone_title">نقطه اهرم استراتژیک کلید کار (BLUEPRINT MILESTONE)</string>
+    <string name="command_relationships_title">روابط کلیدی استراتژیک روزمره</string>
+    <string name="command_relationship_days_since">%d روز سپری گشته از همسویی ممتد</string>
+    <string name="command_relationship_never_interacted">فاقد سوابق ثبت تلو متری کار</string>
+    <string name="command_relationship_log_interaction_btn">ثبت تلو متری ارتباط مستقیم</string>
+    <string name="command_relationship_set_talking_point">طرح گفتگوی آماده‌شده همسو</string>
+    <string name="command_relationship_dialog_title">ثبت تلو متری گپ و به‌روزرسانی طرح استراتژیک</string>
+    <string name="command_relationship_btn_save">تعهد به ثبت</string>
+    <string name="command_relationship_btn_cancel">رها کردن</string>
+    <string name="command_iron_rules_self_report_title">خودارزیابی انتهای شب عملکرد قوانین طلایی</string>
+    <string name="command_iron_rules_self_report_desc">آیا امروز بدون بهانه‌تراشی تک‌تک قوانین آهنین را به طور دقیق رعایت کردید؟</string>
+
+    <!-- Phase 7 Financial Checkpoint -->
+    <string name="financial_title">صفحه ردیابی اهداف مالی و واریزها</string>
+    <string name="financial_subtitle">کنترل مداوم درآمد بر اساس اهداف بلوپرینت</string>
+    <string name="financial_income_diagnostic">تشخیص سلامت درآمد</string>
+    <string name="financial_diagnostic_on_track">◈ ماه %d: کاملاً همسو و در مسیر</string>
+    <string name="financial_diagnostic_off_track">◈ ماه %d: فاقد همسویی و خارج از مسیر</string>
+    <string name="financial_diagnostic_prompt_off_track">عیب‌یابی کنید: آیا شیوه کارهای عملیاتی نادرست است یا اهداف نامتعادل؟ قوانین آهنین و شاخص‌های مالی را کالیبره کنید.</string>
+    <string name="financial_month_label">ماه مأمور %d</string>
+    <string name="financial_target_label">تعهد درآمدی هدف</string>
+    <string name="financial_actual_label">درآمد وصول شده واقعی</string>
+    <string name="financial_update_actual">بازتخصیص بهینه درآمد واقعی</string>
+    <string name="financial_update_target">تنظیمات واحد پولی و میزان واریزها</string>
+    <string name="financial_update_btn">ثبت رسمی به‌روزرسانی</string>
+    <string name="financial_currency_label">واحد ارز</string>
+    <string name="financial_amount_label">مبلغ شاخص</string>
+
+    <!-- New Career Blueprint Categories -->
+    <string name="category_ml_and_computational_biology">یادگیری ماشین و زیست محاسباتی</string>
+    <string name="category_public_research_project">پروژه تحقیقاتی عمومی</string>
+    <string name="category_english_and_outreach">زبان تمرکزی و ارتباطات مستقیم</string>
+    <string name="category_income_and_commercial_intelligence">درآمد و فوت‌وفن تجاری</string>
+    <string name="category_relocation_progress">پیشرفت مهاجرت استراتژیک</string>
+    <string name="category_physical_mastery">آمادگی و پایداری فیزیکی</string>
+
+    <!-- New Career Blueprint Skills (Parents & Children) -->
+    <string name="skill_ml_and_computational_biology">یادگیری ماشین و زیست محاسباتی</string>
+    <string name="skill_esm2_and_protein_modeling">مدل‌سازی پروتیئن ESM2</string>
+    <string name="skill_cobrapy_and_metabolic_modeling">شبیه‌سازی متابولیک COBRApy</string>
+    <string name="skill_pytorch_deployment">توسعه و میزبانی PyTorch</string>
+    <string name="skill_fastapi__streamlit">توسعه FastAPI و رابط Streamlit</string>
+
+    <string name="skill_public_research_project">پروژه‌های کلان پژوهش همگانی</string>
+    <string name="skill_terminator_efficiency_research">سنجش راندمان ترمیناتور ترنسکریپشن</string>
+    <string name="skill_github_portfolio">رزومه و پورتفولیوی گیت‌هاب</string>
+    <string name="skill_preprint_writing">کتابت مقالات تخصصی پی‌پاپیر</string>
+
+    <string name="skill_english_and_outreach">زبان غریبه و ارتباطات مستقیم</string>
+    <string name="skill_linkedin_direct_outreach">اتصالات کاری لینکدین متمادی</string>
+    <string name="skill_technical_english_writing">نگارش انگلیسی مهندسی مطلوب</string>
+    <string name="skill_client_communication">ارتباط و چانه‌زنی با فریلنسرها</string>
+
+    <string name="skill_income_and_commercial_intelligence">راه‌های درآمدی و امور تجارتی</string>
+    <string name="skill_problem_discovery_conversations">گپ‌های شناسایی معضلات کاری شرکتی</string>
+    <string name="skill_consulting_delivery">پردزاش امور مشاوره‌های تخصصی</string>
+    <string name="skill_monthly_income_diagnostic">تحلیل دوره‌ای درآمدی</string>
+
+    <string name="skill_relocation_progress">برنامه‌های راهبرد مهاجرتی</string>
+    <string name="skill_phd_applications_path_a">پذیرش دکتری مستقیم (رویکرد الف)</string>
+    <string name="skill_highly_skilled_migrant_visa_path_b">ویزای نخبگان و مهندسی (رویکرد ب)</string>
+    <string name="skill_dubai_bridge_prep_backup">پل موازی دبی (رویکرد احتیاطی ج)</string>
+
+    <string name="skill_physical_mastery">آمادگی و پایداری فیزیکی</string>
+    <string name="skill_strength_training">پرورش ماهیچه و وزنه‌برداری پویا</string>
+    <string name="skill_sleep_quality">مدیریت غلظت خواب عمیق</string>
+    <string name="skill_daily_hygiene">رعایت روزانه آداب بهداشتی</string>
+</resources>

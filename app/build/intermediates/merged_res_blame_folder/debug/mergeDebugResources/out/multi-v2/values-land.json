@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.axiom.app-mergeDebugResources-76:/values-land/values-land.xml",
+            "map": [
+                {
+                    "source": "/Users/sajadalireza/.gradle/caches/9.5.1/transforms/cc68c623fc0e22297a9c5329ad5333d1/transformed/appcompat-1.6.1/res/values-land/values-land.xml",
+                    "from": {
+                        "startLines": "2,3,4",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,125,196",
+                        "endColumns": "69,70,67",
+                        "endOffsets": "120,191,259"
+                    }
+                }
+            ]
+        }
+    ]
+}
