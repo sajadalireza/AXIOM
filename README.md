@@ -20,3 +20,10 @@ View your app in AI Studio: https://ai.studio/apps/fce70e32-9531-41b4-ace2-6f4d0
 5. Run the app on an emulator or physical device
 # WARRIOR1
 # WARRIOR3
+
+## AXIOM Control Documents
+
+- [Control Document Index](docs/product/INDEX.md)
+- [Product Constitution](docs/product/PRODUCT_CONSTITUTION.md)
+- [Upgrade Master Plan](docs/product/UPGRADE_MASTER_PLAN.md)
+- [Execution Workflow](docs/product/EXECUTION_WORKFLOW.md)
