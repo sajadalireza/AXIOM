@@ -30,12 +30,16 @@ The bundle was regenerated during recovery coordination. The Product Owner appro
 | Identity | Value |
 |---|---|
 | Repository | `sajadalireza/AXIOM` |
-| Visibility | `private` |
+| Visibility during recovery | `private` |
+| Current visibility | `public` |
+| Visibility decision | `PUBLIC-FOR-FREE-BRANCH-PROTECTION` |
 | Default branch | `main` |
 | Commit | `7a8491f61eda4ba57016a452e057a5e7d84a5c5a` |
 | Tree | `62a7ab6324d76080041c8446dfc1bc08438555f2` |
 | Parent | `0acb161da6abdaa0c2592bac4368617135a50832` |
 | Immutable baseline tag | `axiom-baseline-wp000r-7a8491f` |
+
+The visibility change occurred after WP-000R recovery and did not alter recovered Git objects, commit identities, refs, tags, or the baseline tree. Public visibility was selected because paid private-repository ruleset enforcement was unavailable. Returning to private visibility without equivalent paid enforcement would reactivate the WP-000 governance blocker.
 
 ## Verified Refs
 
@@ -45,6 +49,26 @@ The bundle was regenerated during recovery coordination. The Product Owner appro
 - `refs/tags/v5` → `d4dc15ad88564fcf3a80609ed1e3b3ff033e943f`
 - `refs/tags/v6` → `5e78051af24b2f945d58cede43d9824d404dfc21`
 - `refs/tags/axiom-baseline-wp000r-7a8491f` → `7a8491f61eda4ba57016a452e057a5e7d84a5c5a`
+
+## Current WP-000 Ruleset Evidence
+
+| Field | Verified value |
+|---|---|
+| Ruleset name | `Protect main — WP-000` |
+| Ruleset ID | `20441513` |
+| Target | Default branch (`main`) |
+| Enforcement | `active` |
+| Bypass actors | none |
+| Current owner bypass | `never` |
+| Required approvals | `1` |
+| Dismiss stale reviews | enabled |
+| Require review-thread resolution | enabled |
+| Branch deletion | restricted |
+| Non-fast-forward / force push | blocked |
+| Required status checks | none configured |
+| Allowed merge methods | `merge`, `squash`, `rebase` |
+
+No CI PASS is claimed. No required status check is configured because no stable CI check context has been independently observed.
 
 ## Security Review Record
 
@@ -59,6 +83,8 @@ The bundle was regenerated during recovery coordination. The Product Owner appro
 - Acceptance scope: exact fingerprint only
 - General secret detection: remains enabled
 
+Public visibility increases the importance of continued secret scanning. The exact false-positive exception must not be broadened.
+
 ## Recovery Invariants Verified
 
 - Dirty ZIP worktree content was not imported.
@@ -68,9 +94,12 @@ The bundle was regenerated during recovery coordination. The Product Owner appro
 - No history rewrite or force push was introduced.
 - Remote commit, tree, parent graph, and reachable objects were independently verified.
 - Immutable rollback tag exists.
+- The later visibility change did not modify the recovered object graph.
 
 ## Repository Links
 
+- Repository: https://github.com/sajadalireza/AXIOM
+- Ruleset: https://github.com/sajadalireza/AXIOM/rules/20441513
 - Baseline tag: https://github.com/sajadalireza/AXIOM/tree/axiom-baseline-wp000r-7a8491f
 - Baseline commit: https://github.com/sajadalireza/AXIOM/commit/7a8491f61eda4ba57016a452e057a5e7d84a5c5a
 - WP-000 issue: https://github.com/sajadalireza/AXIOM/issues/1
@@ -78,4 +107,4 @@ The bundle was regenerated during recovery coordination. The Product Owner appro
 
 ## Retention Rule
 
-Both bundle hashes, both controlled package hashes, the reachable-object manifest hash, the Product Owner exception, and the reviewed Gitleaks fingerprint must remain permanently in the governance evidence record. Historical records must not be rewritten to conceal the deviation.
+Both bundle hashes, both controlled package hashes, the reachable-object manifest hash, the Product Owner exception, the visibility decision, the ruleset identity, and the reviewed Gitleaks fingerprint must remain permanently in the governance evidence record. Historical records must not be rewritten to conceal the bundle deviation or the private-to-public visibility transition.
