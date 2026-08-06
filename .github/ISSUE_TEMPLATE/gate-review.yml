@@ -1,0 +1,178 @@
+name: Gate Review
+description: Create a planned evidence-gated review record. This form never authorizes the next Work Packet.
+title: 'Gx Gate Review — '
+labels:
+- type:gate-review
+- state:planned
+- evidence:required
+body:
+- type: markdown
+  attributes:
+    value: '## Evidence-gated review
+
+      A GO recommendation is invalid without a complete Exit Criteria evidence map, four structured reviews, a weighted score
+      of at least 9.5, and confirmation that no Hard Cap is active.
+
+      Do not include secrets, credentials, private goals, reflection text, health or financial details, or other sensitive
+      personal text.
+
+      '
+- type: input
+  id: gate-id-title
+  attributes:
+    label: Gate ID and title
+    placeholder: Gx — Canonical Gate title
+  validations:
+    required: true
+- type: dropdown
+  id: owning-gate
+  attributes:
+    label: Owning Gate
+    description: Select the canonical Gate under review. Apply the matching Gate label only through a controlled classification
+      step.
+    options:
+    - G0 — Product & Scope Lock
+    - G1 — Repository Integrity
+    - G2 — First-Win Vertical Slice
+    - G3 — Core Loop & Data Truth
+    - G4 — Instrumented Beta
+    - G5 — Retention Proof
+    - G6 — Monetization Proof
+    - G7 — Progressive Expansion
+  validations:
+    required: true
+- type: input
+  id: accountable-reviewer
+  attributes:
+    label: Accountable reviewer
+    description: Name the reviewer accountable for the evidence map and recommendation.
+  validations:
+    required: true
+- type: input
+  id: accountable-owner
+  attributes:
+    label: Accountable owner
+    description: Name the owner accountable for the Gate outcome and follow-up state.
+  validations:
+    required: true
+- type: input
+  id: reviewed-range
+  attributes:
+    label: Reviewed Work Packet range
+    placeholder: WP-XXX through WP-YYY
+  validations:
+    required: true
+- type: input
+  id: exact-baseline
+  attributes:
+    label: Exact baseline
+    placeholder: branch@40-character-SHA
+  validations:
+    required: true
+- type: input
+  id: reviewed-head
+  attributes:
+    label: Exact reviewed head
+    placeholder: branch@40-character-SHA
+  validations:
+    required: true
+- type: textarea
+  id: non-goals
+  attributes:
+    label: Non-goals
+    description: State work, implementation, and future-packet activation that this Gate Review does not authorize.
+  validations:
+    required: true
+- type: textarea
+  id: exit-criteria-map
+  attributes:
+    label: Exit Criteria evidence map
+    description: Map every Exit Criterion to concrete repository, test, runtime, user, or operational evidence.
+    placeholder: '| Exit Criterion | Evidence | Result |
+
+      |---|---|---|
+
+      '
+  validations:
+    required: true
+- type: textarea
+  id: unresolved-findings
+  attributes:
+    label: Unresolved findings
+    description: List severity, owner, affected packet, repair requirement, and blocking status. Enter "none" only after verification.
+  validations:
+    required: true
+- type: textarea
+  id: review-a
+  attributes:
+    label: Review A — Correctness and canonical-source fidelity
+    description: Record evidence, findings, and PASS/FAIL.
+  validations:
+    required: true
+- type: textarea
+  id: review-b
+  attributes:
+    label: Review B — Architecture and security
+    description: Record evidence, findings, and PASS/FAIL.
+  validations:
+    required: true
+- type: textarea
+  id: review-c
+  attributes:
+    label: Review C — Product, UX, and lean scope
+    description: Record evidence, findings, and PASS/FAIL.
+  validations:
+    required: true
+- type: textarea
+  id: review-d
+  attributes:
+    label: Review D — Evidence and operability
+    description: Record evidence, reversibility, incident findings, and PASS/FAIL.
+  validations:
+    required: true
+- type: input
+  id: weighted-score
+  attributes:
+    label: Weighted score
+    description: Record the calculated score and rubric reference.
+    placeholder: 0.0 / 10
+  validations:
+    required: true
+- type: textarea
+  id: active-hard-caps
+  attributes:
+    label: Active Hard Caps
+    description: List every active Hard Cap or state "none" with supporting evidence.
+  validations:
+    required: true
+- type: dropdown
+  id: recommendation
+  attributes:
+    label: Recommendation
+    options:
+    - GO
+    - CONDITIONAL GO
+    - NO-GO
+  validations:
+    required: true
+- type: textarea
+  id: rollback-repair
+  attributes:
+    label: Rollback or repair requirements
+    description: Define the rollback, minimum repair packets, owners, dependencies, and re-entry evidence.
+  validations:
+    required: true
+- type: checkboxes
+  id: gate-attestations
+  attributes:
+    label: Gate decision attestations
+    options:
+    - label: I confirm that a GO recommendation is unsupported unless all Exit Criteria pass, the score is at least 9.5, and
+        no Hard Cap is active.
+      required: true
+    - label: I confirm that this review does not automatically authorize or activate the next Work Packet.
+      required: true
+    - label: I confirm that no secret, credential, private reflection, or sensitive personal text is included.
+      required: true
+  validations:
+    required: true
