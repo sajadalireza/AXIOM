@@ -1,0 +1,161 @@
+name: Work Packet
+description: Create a planned Work Packet record. Creating this Issue does not authorize or activate the Work Packet.
+title: "WP-XXX — "
+labels:
+  - type:work-packet
+  - state:planned
+  - evidence:required
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Controlled creation notice
+        Creating this Issue does not authorize or activate the Work Packet.
+        Do not include secrets, tokens, credentials, private goals, reflection text, health or financial details, or other sensitive personal text.
+        Activation requires a separate explicit Product Owner decision and controlled state transition.
+  - type: input
+    id: work-packet-id
+    attributes:
+      label: Work Packet ID
+      description: Use the canonical identifier, for example WP-101.
+      placeholder: WP-XXX
+    validations:
+      required: true
+  - type: input
+    id: canonical-title
+    attributes:
+      label: Canonical title
+      description: Use the exact approved Work Packet title.
+      placeholder: WP-XXX — Canonical title
+    validations:
+      required: true
+  - type: dropdown
+    id: owning-gate
+    attributes:
+      label: Owning Gate
+      description: Select the canonical Gate. Apply the matching Gate label only through a controlled classification step.
+      options:
+        - G0 — Product & Scope Lock
+        - G1 — Repository Integrity
+        - G2 — First-Win Vertical Slice
+        - G3 — Core Loop & Data Truth
+        - G4 — Instrumented Beta
+        - G5 — Retention Proof
+        - G6 — Monetization Proof
+        - G7 — Progressive Expansion
+    validations:
+      required: true
+  - type: input
+    id: accountable-owner
+    attributes:
+      label: Accountable owner
+      description: Name the single accountable owner.
+      placeholder: GitHub username or approved owner identifier
+    validations:
+      required: true
+  - type: textarea
+    id: predecessor-dependencies
+    attributes:
+      label: Predecessor and dependencies
+      description: Identify the predecessor, blocking dependencies, required Gate decisions, and linked Issues.
+      placeholder: |
+        Predecessor:
+        Dependencies:
+        Required decisions:
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: State the smallest measurable outcome this packet must achieve.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Exact scope
+      description: Define the bounded vertical slice, affected surfaces, and authorized files or GitHub objects.
+    validations:
+      required: true
+  - type: textarea
+    id: non-goals
+    attributes:
+      label: Non-goals
+      description: State what must not change or be implemented in this packet.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Must Acceptance Criteria
+      description: Provide concrete pass/fail criteria. A completion claim without satisfied criteria is invalid.
+      placeholder: |
+        - [ ] Must criterion 1
+        - [ ] Must criterion 2
+    validations:
+      required: true
+  - type: textarea
+    id: evidence-plan
+    attributes:
+      label: Evidence plan
+      description: List exact commands, logs, runtime observations, links, artifacts, and read-backs required before acceptance.
+    validations:
+      required: true
+  - type: textarea
+    id: migration-impact
+    attributes:
+      label: Migration impact
+      description: State the migration or schema impact, including "none" only when supported by the scope.
+    validations:
+      required: true
+  - type: textarea
+    id: analytics-impact
+    attributes:
+      label: Analytics impact
+      description: State event, payload, consent, telemetry, or dashboard impact. Do not include sensitive payload examples.
+    validations:
+      required: true
+  - type: textarea
+    id: privacy-impact
+    attributes:
+      label: Privacy impact
+      description: State data handling, consent, retention, disclosure, and sensitive-text boundaries.
+    validations:
+      required: true
+  - type: textarea
+    id: rollback
+    attributes:
+      label: Rollback
+      description: Provide the pre-merge and post-merge rollback path, including data recovery when applicable.
+    validations:
+      required: true
+  - type: textarea
+    id: risks-hard-caps
+    attributes:
+      label: Initial risks and Hard Caps
+      description: Identify known risks, stop conditions, and Hard Caps that block acceptance.
+    validations:
+      required: true
+  - type: dropdown
+    id: activation-status
+    attributes:
+      label: Activation status
+      description: This creation form records planned work only. Authorization or activation must occur later through an explicit Product Owner decision.
+      options:
+        - NOT AUTHORIZED — planned Issue only
+    validations:
+      required: true
+  - type: checkboxes
+    id: creation-attestations
+    attributes:
+      label: Creation attestations
+      options:
+        - label: I confirm that this Issue creation does not authorize or activate the Work Packet.
+          required: true
+        - label: I confirm that no secret, token, credential, private reflection, or sensitive personal text is included.
+          required: true
+        - label: I confirm that completion cannot be claimed without the required evidence, score, Must Acceptance results, and Hard-Cap evaluation.
+          required: true
+    validations:
+      required: true
