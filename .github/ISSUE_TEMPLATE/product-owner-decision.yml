@@ -1,0 +1,110 @@
+name: Product Owner Decision
+description: Record a bounded governance decision and its exact mutation authority.
+title: "PRODUCT OWNER DECISION — "
+labels:
+  - type:decision
+  - decision:required
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Decision record
+        Use this form to resolve a bounded question. A decision must identify evidence, mutation boundaries, prohibited operations, invariants, rollback, and the resulting controlled state.
+        Do not include secrets, tokens, credentials, private goals, reflection text, health or financial details, or other sensitive personal text.
+  - type: input
+    id: decision-id
+    attributes:
+      label: Decision identifier
+      placeholder: DECISION X — DESCRIPTIVE IDENTIFIER
+    validations:
+      required: true
+  - type: input
+    id: triggering-packet-gate
+    attributes:
+      label: Triggering Work Packet or Gate
+      placeholder: WP-XXX or Gx
+    validations:
+      required: true
+  - type: textarea
+    id: decision-question
+    attributes:
+      label: Decision question
+      description: State the single bounded Product Owner question.
+    validations:
+      required: true
+  - type: textarea
+    id: current-evidence
+    attributes:
+      label: Current evidence
+      description: Cite the live repository state, Issues, artifacts, tests, and unresolved conflicts.
+    validations:
+      required: true
+  - type: textarea
+    id: available-options
+    attributes:
+      label: Available options
+      description: Present bounded alternatives and material trade-offs.
+    validations:
+      required: true
+  - type: textarea
+    id: selected-decision
+    attributes:
+      label: Selected decision
+      description: Record the explicit selected option and rationale.
+    validations:
+      required: true
+  - type: textarea
+    id: authorized-boundary
+    attributes:
+      label: Authorized mutation boundary
+      description: List the exact files, Issues, labels, Milestones, branches, commands, or objects that may change.
+    validations:
+      required: true
+  - type: textarea
+    id: prohibited-operations
+    attributes:
+      label: Prohibited operations
+      description: List operations and surfaces that remain forbidden.
+    validations:
+      required: true
+  - type: textarea
+    id: invariants
+    attributes:
+      label: Invariants
+      description: State conditions that must remain true throughout execution.
+    validations:
+      required: true
+  - type: textarea
+    id: rollback
+    attributes:
+      label: Rollback
+      description: State the dry run, backup or branch strategy, rollback command, and evidence needed before destructive recovery.
+    validations:
+      required: true
+  - type: textarea
+    id: resulting-state
+    attributes:
+      label: Resulting state
+      description: Define the expected state of the active packet, WIP, Issues, branch, and repository after execution.
+    validations:
+      required: true
+  - type: textarea
+    id: next-exact-action
+    attributes:
+      label: Next exact action
+      description: State the one bounded action that follows successful verification.
+    validations:
+      required: true
+  - type: checkboxes
+    id: decision-attestations
+    attributes:
+      label: Decision attestations
+      options:
+        - label: I confirm that authority is limited to the exact mutation boundary above.
+          required: true
+        - label: I confirm that unstated mutations, packet activation, and compensating writes require a new decision.
+          required: true
+        - label: I confirm that no secret, credential, private reflection, or sensitive personal text is included.
+          required: true
+    validations:
+      required: true
