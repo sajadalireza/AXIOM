@@ -1,121 +1,145 @@
 name: Repair Packet
 description: Create a bounded planned repair record linked to a verified finding.
-title: "RP-XXX — "
+title: 'RP-XXX — '
 labels:
-  - type:repair
-  - state:planned
-  - evidence:required
+- type:repair
+- state:planned
+- evidence:required
 body:
-  - type: markdown
-    attributes:
-      value: |
-        ## Bounded repair notice
-        Creating a Repair Issue does not activate it, suspend the current Work Packet, or supersede any controlled Issue.
-        Activation or supersession requires an explicit Product Owner decision.
-        Do not include secrets, credentials, private goals, reflection text, health or financial details, or other sensitive personal text.
-  - type: textarea
-    id: source-finding
-    attributes:
-      label: Source finding
-      description: Quote or link the verified finding, evidence record, test failure, incident, or review item.
-    validations:
+- type: markdown
+  attributes:
+    value: '## Bounded repair notice
+
+      Creating a Repair Issue does not activate it, suspend the current Work Packet, or supersede any controlled Issue.
+
+      Activation or supersession requires an explicit Product Owner decision.
+
+      Do not include secrets, credentials, private goals, reflection text, health or financial details, or other sensitive
+      personal text.
+
+      '
+- type: textarea
+  id: source-finding
+  attributes:
+    label: Source finding
+    description: Quote or link the verified finding, evidence record, test failure, incident, or review item.
+  validations:
+    required: true
+- type: input
+  id: source-packet-review
+  attributes:
+    label: Source Work Packet or review
+    placeholder: WP-XXX, Gate Review Issue, or evidence link
+  validations:
+    required: true
+- type: dropdown
+  id: owning-gate
+  attributes:
+    label: Owning Gate
+    description: Select the Gate that owns the source finding. Apply the matching Gate label only through a controlled classification
+      step.
+    options:
+    - G0 — Product & Scope Lock
+    - G1 — Repository Integrity
+    - G2 — First-Win Vertical Slice
+    - G3 — Core Loop & Data Truth
+    - G4 — Instrumented Beta
+    - G5 — Retention Proof
+    - G6 — Monetization Proof
+    - G7 — Progressive Expansion
+  validations:
+    required: true
+- type: dropdown
+  id: severity
+  attributes:
+    label: Severity
+    options:
+    - S0 — Critical integrity, security, or irreversible-loss risk
+    - S1 — High-severity release or Gate blocker
+    - S2 — Material but bounded defect
+    - S3 — Low-severity improvement or documentation concern
+  validations:
+    required: true
+- type: input
+  id: accountable-owner
+  attributes:
+    label: Accountable owner
+    placeholder: GitHub username or approved owner identifier
+  validations:
+    required: true
+- type: textarea
+  id: bounded-objective
+  attributes:
+    label: Bounded objective
+    description: State the smallest repair outcome that clears the source finding.
+  validations:
+    required: true
+- type: textarea
+  id: exact-scope
+  attributes:
+    label: Exact scope
+    description: Define the authorized behavioral or documentation slice.
+  validations:
+    required: true
+- type: textarea
+  id: non-goals
+  attributes:
+    label: Non-goals
+    description: State adjacent work that remains outside this repair.
+  validations:
+    required: true
+- type: textarea
+  id: affected-surfaces
+  attributes:
+    label: Affected files or GitHub objects
+    description: List the exact files, Issues, labels, Milestones, branches, or other controlled objects.
+  validations:
+    required: true
+- type: textarea
+  id: acceptance-criteria
+  attributes:
+    label: Must Acceptance Criteria
+    description: Define concrete pass/fail conditions for clearing the finding.
+    placeholder: '- [ ] Must criterion 1
+
+      - [ ] Must criterion 2
+
+      '
+  validations:
+    required: true
+- type: textarea
+  id: verification-evidence
+  attributes:
+    label: Verification evidence
+    description: List required failing-before/passing-after tests, read-backs, logs, reviews, and runtime evidence.
+  validations:
+    required: true
+- type: textarea
+  id: rollback
+  attributes:
+    label: Rollback
+    description: Define pre-merge and post-merge rollback, including data recovery when applicable.
+  validations:
+    required: true
+- type: textarea
+  id: dependency-reentry
+  attributes:
+    label: Dependency and re-entry condition
+    description: Name blocking dependencies, the active Work Packet relationship, and exact evidence required before re-entry.
+  validations:
+    required: true
+- type: checkboxes
+  id: repair-attestations
+  attributes:
+    label: Repair attestations
+    options:
+    - label: I confirm that this Repair Issue is planned and does not automatically activate itself.
       required: true
-  - type: input
-    id: source-packet-review
-    attributes:
-      label: Source Work Packet or review
-      placeholder: WP-XXX, Gate Review Issue, or evidence link
-    validations:
+    - label: I confirm that this Repair Issue does not supersede or release the current WIP-consuming Issue.
       required: true
-  - type: dropdown
-    id: severity
-    attributes:
-      label: Severity
-      options:
-        - S0 — Critical integrity, security, or irreversible-loss risk
-        - S1 — High-severity release or Gate blocker
-        - S2 — Material but bounded defect
-        - S3 — Low-severity improvement or documentation concern
-    validations:
+    - label: I confirm that completion cannot be claimed without verification evidence and Must Acceptance results.
       required: true
-  - type: input
-    id: accountable-owner
-    attributes:
-      label: Accountable owner
-      placeholder: GitHub username or approved owner identifier
-    validations:
+    - label: I confirm that no secret, credential, private reflection, or sensitive personal text is included.
       required: true
-  - type: textarea
-    id: bounded-objective
-    attributes:
-      label: Bounded objective
-      description: State the smallest repair outcome that clears the source finding.
-    validations:
-      required: true
-  - type: textarea
-    id: exact-scope
-    attributes:
-      label: Exact scope
-      description: Define the authorized behavioral or documentation slice.
-    validations:
-      required: true
-  - type: textarea
-    id: non-goals
-    attributes:
-      label: Non-goals
-      description: State adjacent work that remains outside this repair.
-    validations:
-      required: true
-  - type: textarea
-    id: affected-surfaces
-    attributes:
-      label: Affected files or GitHub objects
-      description: List the exact files, Issues, labels, Milestones, branches, or other controlled objects.
-    validations:
-      required: true
-  - type: textarea
-    id: acceptance-criteria
-    attributes:
-      label: Must Acceptance Criteria
-      description: Define concrete pass/fail conditions for clearing the finding.
-      placeholder: |
-        - [ ] Must criterion 1
-        - [ ] Must criterion 2
-    validations:
-      required: true
-  - type: textarea
-    id: verification-evidence
-    attributes:
-      label: Verification evidence
-      description: List required failing-before/passing-after tests, read-backs, logs, reviews, and runtime evidence.
-    validations:
-      required: true
-  - type: textarea
-    id: rollback
-    attributes:
-      label: Rollback
-      description: Define pre-merge and post-merge rollback, including data recovery when applicable.
-    validations:
-      required: true
-  - type: textarea
-    id: dependency-reentry
-    attributes:
-      label: Dependency and re-entry condition
-      description: Name blocking dependencies, the active Work Packet relationship, and exact evidence required before re-entry.
-    validations:
-      required: true
-  - type: checkboxes
-    id: repair-attestations
-    attributes:
-      label: Repair attestations
-      options:
-        - label: I confirm that this Repair Issue is planned and does not automatically activate itself.
-          required: true
-        - label: I confirm that this Repair Issue does not supersede or release the current WIP-consuming Issue.
-          required: true
-        - label: I confirm that completion cannot be claimed without verification evidence and Must Acceptance results.
-          required: true
-        - label: I confirm that no secret, credential, private reflection, or sensitive personal text is included.
-          required: true
-    validations:
-      required: true
+  validations:
+    required: true
