@@ -6,8 +6,9 @@ This index is the authoritative entry point for AXIOM product and execution cont
 
 - Repository: `sajadalireza/AXIOM`
 - Owner: Product Owner (`sajadalireza`)
-- Control-document baseline: `WP-002`
-- Effective date: `2026-08-06`
+- Control-document baseline: `WP-004`
+- Current reviewed repository baseline: `main@1a0fca7b4799a71e18c7364afb87c2a3a7bdc319`
+- Effective date: `2026-08-07`
 - Change mechanism: GitHub Issue + protected Pull Request + Product Owner decision
 
 ## Canonical Control Documents
@@ -19,6 +20,10 @@ This index is the authoritative entry point for AXIOM product and execution cont
 | 2 | [AXIOM Canonical Product Vocabulary](CANONICAL_VOCABULARY.md) | 1.0 | 2026-08-06 | Product Owner | `DECISION A — CONSTITUTION-PRESERVING MISSION`, recorded in WP-002 Issue #6 |
 | 3 | [AXIOM Execution Workflow](EXECUTION_WORKFLOW.md) | 1.0 | 2026-08-05 | Product Owner | `AXIOM_Execution_Workflow_v1.0.md`, supplied by the Product Owner |
 | 4 | [AXIOM Upgrade Master Plan](UPGRADE_MASTER_PLAN.md) | 1.0 | 2026-08-05 | Product Owner | `AXIOM_Upgrade_Master_Plan_v1.0.md`, supplied by the Product Owner |
+| 5 | [Module Disposition and Freeze Map](MODULE_DISPOSITION.md) and [machine-readable disposition](MODULE_DISPOSITION.csv) | WP-003 final | 2026-08-06 | Product Owner | Accepted WP-003 module disposition evidence; 52 canonical modules with one controlled disposition each |
+| 6 | [Issue Hierarchy](../governance/ISSUE_HIERARCHY.md), [Work Packet Dependencies](../governance/WORK_PACKET_DEPENDENCIES.md), and [Global WIP Policy](../governance/WIP_POLICY.md) | WP-004 final | 2026-08-06 | Product Owner | Accepted WP-004 GitHub-native hierarchy, dependency, activation, and WIP controls |
+
+The WP-003 and WP-004 rows extend the repository-native authority catalog with already accepted G0 artifacts. They do not redefine the Product Constitution, canonical vocabulary, Gate roadmap, or implementation authority.
 
 ## Controlled Migration and Execution Plans
 
@@ -33,8 +38,10 @@ This index is the authoritative entry point for AXIOM product and execution cont
 3. `CANONICAL_VOCABULARY.md` defines product-domain terms consistently with the Product Constitution and may not amend it.
 4. `EXECUTION_WORKFLOW.md` governs how the upgrade program and Work Packets are executed.
 5. `UPGRADE_MASTER_PLAN.md` governs the Gate roadmap, sequencing, metrics, and current upgrade plan.
-6. Controlled migration plans apply canonical meaning to bounded changes but do not independently redefine the product or authorize implementation outside an accepted Work Packet.
-7. The latest valid Checkpoint Capsule records execution state but does not silently amend these documents.
+6. `MODULE_DISPOSITION.md` and `MODULE_DISPOSITION.csv` apply the accepted product identity and vocabulary to the 52-module freeze/disposition map; they do not authorize implementation by themselves.
+7. The WP-004 governance documents apply the accepted roadmap to GitHub-native Issue identity, dependency, activation, and WIP controls; live GitHub state remains authoritative for current operational state as specified by `ISSUE_HIERARCHY.md`.
+8. Controlled migration plans apply canonical meaning to bounded changes but do not independently redefine the product or authorize implementation outside an accepted Work Packet.
+9. The latest valid Checkpoint Capsule records execution state but does not silently amend these documents.
 
 If two canonical documents conflict, execution must stop and the conflict must be resolved through an explicit Product Owner Decision Record. A lower-precedence document must not silently override a higher-precedence document.
 

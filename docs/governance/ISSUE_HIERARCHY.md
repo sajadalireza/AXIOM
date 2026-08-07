@@ -21,13 +21,15 @@ Source order:
 
 A conflict between canonical sources stops execution. This document does not amend the Product Constitution, canonical vocabulary, module dispositions, or Gate roadmap.
 
+Current-state rows and dashboard examples below are synchronization aids, not an authorization source. Live GitHub state plus the applicable explicit Product Owner transition record controls current operational state.
+
 ## Gate hierarchy and Milestones
 
 | Gate | Milestone title | Purpose |
 |---|---|---|
 | G0 | G0 — Product & Scope Lock | Lock canonical repository identity, Product Constitution, vocabulary, module disposition, execution hierarchy, and G0 Gate evidence. |
 | G1 | G1 — Repository Integrity | Establish reproducible, secure, and auditable repository and build integrity. |
-| G2 | G2 — First-Win Vertical Slice | Deliver and verify the First-Win vertical slice with data integrity, consent, accessibility, and rollback. |
+| G2 | G2 — First-Win Vertical Slice | Deliver and verify the First-Win vertical slice with data integrity, consent, accessibility and rollback. |
 | G3 | G3 — Core Loop & Data Truth | Gate-level placeholder for Core Loop and Data Truth work. No Work Packet decomposition is authorized. |
 | G4 | G4 — Instrumented Beta | Gate-level placeholder for Instrumented Beta work. No Work Packet decomposition is authorized. |
 | G5 | G5 — Retention Proof | Gate-level placeholder for Retention Proof work. No Work Packet decomposition is authorized. |
@@ -157,8 +159,8 @@ Assignment supports accountability but does not authorize or activate work.
 | WP-001 | #4 | G0 | closed |
 | WP-002 | #6 | G0 | closed |
 | WP-003 | #8 | G0 | closed |
-| WP-004 | #15 | G0 | active |
-| WP-005 | #16 | G0 | planned |
+| WP-004 | #15 | G0 | closed |
+| WP-005 | #16 | G0 | active |
 | WP-101 | #17 | G1 | planned |
 | WP-102 | #18 | G1 | planned |
 | WP-103 | #19 | G1 | planned |
@@ -176,7 +178,7 @@ Assignment supports accountability but does not authorize or activate work.
 | WP-208 | #31 | G2 | planned |
 | WP-209 | #32 | G2 | planned |
 
-This mapping is complete for the authorized G0 through G2 decomposition. No G3 through G7 Work Packet identity is authorized by this document.
+This mapping is complete for the authorized G0 through G2 decomposition. The state snapshot is synchronized to the WP-005 G0 Gate Review baseline; live GitHub state remains authoritative. No G3 through G7 Work Packet identity is authorized by this document.
 
 ## Permanent incident exclusions
 
@@ -191,7 +193,7 @@ They:
 - remain without program labels or Milestones;
 - must not be reused, reopened, relabeled, repurposed, or reconciled into the canonical mapping.
 
-## Creation, authorization, and activation
+## Creation, authorization, activation, and handoff
 
 These are separate controls:
 
@@ -200,6 +202,7 @@ These are separate controls:
 3. **Activation** requires an explicit Product Owner decision, replacement of the single state label with a WIP-consuming state, and a successful WIP preflight.
 4. **Acceptance** does not authorize or activate the successor.
 5. **Closure** is formal and evidence-gated.
+6. **Controlled handoff**, when explicitly authorized because the integration cannot update predecessor and successor transactionally, follows `WIP_POLICY.md`: predecessor closure may create one transient WIP=`0` state followed immediately by successor activation; WIP must never exceed `1`, and final steady-state WIP must return to exactly `1`.
 
 Creating an Issue, branch name, Milestone, template, predecessor link, or successor link does not authorize or activate a Work Packet.
 
@@ -211,7 +214,7 @@ Creating an Issue, branch name, Milestone, template, predecessor link, or succes
 is:issue is:open label:"state:active","state:blocked","state:review","state:accepted"
 ```
 
-Expected current result: exactly one Issue, `#15`.
+Expected steady-state result: exactly one Issue. At the WP-005 G0 Gate Review baseline, that Issue is `#16`.
 
 ### Active Work Packet control
 
@@ -219,7 +222,7 @@ Expected current result: exactly one Issue, `#15`.
 is:issue is:open label:"type:work-packet" label:"state:active"
 ```
 
-Expected current result: exactly `#15`.
+At the WP-005 G0 Gate Review baseline, expected result: `0`; the sole active controlled Issue `#16` is a Gate Review.
 
 ### Active non-Work-Packet control
 
@@ -227,7 +230,7 @@ Expected current result: exactly `#15`.
 is:issue is:open label:"state:active" -label:"type:work-packet"
 ```
 
-Expected current result: `0`.
+At the WP-005 G0 Gate Review baseline, expected result: exactly `#16`.
 
 ### Planned backlog
 
@@ -235,15 +238,15 @@ Expected current result: `0`.
 is:issue is:open label:"state:planned"
 ```
 
-Expected current result: `17`, Issues `#16` through `#32`.
+At the WP-005 G0 Gate Review baseline, expected result: `16`, Issues `#17` through `#32`.
 
-### Historical completed Work Packets
+### Historical completed G0 Work Packets
 
 ```text
 is:issue is:closed label:"type:work-packet" label:"state:closed" label:"gate:G0"
 ```
 
-Expected current result: Issues `#1`, `#4`, `#6`, and `#8`.
+At the WP-005 G0 Gate Review baseline, expected result: Issues `#1`, `#4`, `#6`, `#8`, and `#15`.
 
 ### Integrity review
 
@@ -254,4 +257,4 @@ Before any activation, verify:
 - Issues `#10` through `#14` remain excluded;
 - no G3 through G7 Work Packet Issue exists;
 - the dependency graph in `WORK_PACKET_DEPENDENCIES.md` is complete and acyclic;
-- the global WIP query returns exactly one current Issue.
+- the global WIP query satisfies the steady-state WIP rule or an explicitly authorized controlled handoff in `WIP_POLICY.md`.
