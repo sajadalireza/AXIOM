@@ -9,7 +9,11 @@
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 .DS_Store
-/build
+/metadata.json
+/metadata-[0-9]*.json
+**/build/
+*.apk
+*.aab
 /captures
 .externalNativeBuild
 .cxx

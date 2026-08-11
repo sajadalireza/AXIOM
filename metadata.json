@@ -1,6 +1,0 @@
-{
-  "name": "WARRIOR",
-  "description": "WARRIOR: Awakening Protocol - A gamified personal development RPG.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
