@@ -1,7 +1,4 @@
-import java.net.URL
-import java.net.HttpURLConnection
-import java.net.URI
-import java.io.InputStream
+import java.security.MessageDigest
 
 plugins {
     alias(libs.plugins.android.application)
@@ -188,87 +185,43 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
-tasks.register("preBuildFonts") {
-    doFirst {
-        println("========================================")
-        println("WARRIOR1 PRE-BUILD: Downloading fonts...")
-        println("========================================")
-    }
-    
+val vendoredFontChecksums = mapOf(
+    "src/main/res/font/fira_code_medium.ttf" to "97091f90623661fb4f7979c10d188f30f4806d8ce326b0bc8d1acc79dcc20d8f",
+    "src/main/res/font/fira_code_regular.ttf" to "5992ab9640e2df491b2f609467b1de60e8bc39b2c28db184342a0592d98f6117",
+    "src/main/res/font/fraunces_italic_variable.ttf" to "b24448c43702fac4ee856781d461a0dfba8d8e594b6e8e190234b75fed2c0e01",
+    "src/main/res/font/fraunces_variable.ttf" to "177ff6c0f14e5550a3c624247cd1189611d4eb65d000b14944c63d967958abbb",
+    "src/main/res/font/outfit_variable.ttf" to "fc7287273e66929776e2ba54f144fe699080bec29f61bf649d70d871468aeade"
+)
+
+tasks.register("verifyVendoredFonts") {
+    group = "verification"
+    description = "Fails when a required vendored font is missing or differs from its pinned SHA-256."
+    inputs.files(vendoredFontChecksums.keys.map { file(it) })
+
     doLast {
-        val destDir = file("src/main/res/font")
-        if (!destDir.exists()) {
-            destDir.mkdirs()
-        }
-        val fonts = mapOf(
-            "outfit_light.ttf" to "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-Light.ttf",
-            "outfit_regular.ttf" to "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-Regular.ttf",
-            "outfit_medium.ttf" to "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-Medium.ttf",
-            "outfit_semibold.ttf" to "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-SemiBold.ttf",
-            "outfit_bold.ttf" to "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-Bold.ttf",
-            "fraunces_regular.ttf" to "https://cdn.jsdelivr.net/gh/googlefonts/fraunces@main/fonts/ttf/Fraunces-Regular.ttf",
-            "fraunces_medium.ttf" to "https://cdn.jsdelivr.net/gh/googlefonts/fraunces@main/fonts/ttf/Fraunces-Medium.ttf",
-            "fraunces_bold.ttf" to "https://cdn.jsdelivr.net/gh/googlefonts/fraunces@main/fonts/ttf/Fraunces-Bold.ttf",
-            "fraunces_black.ttf" to "https://cdn.jsdelivr.net/gh/googlefonts/fraunces@main/fonts/ttf/Fraunces-Black.ttf",
-            "fraunces_italic.ttf" to "https://cdn.jsdelivr.net/gh/googlefonts/fraunces@main/fonts/ttf/Fraunces-Italic.ttf",
-            "fira_code_regular.ttf" to "https://cdn.jsdelivr.net/npm/firacode@6.2.0/distr/ttf/FiraCode-Regular.ttf",
-            "fira_code_medium.ttf" to "https://cdn.jsdelivr.net/npm/firacode@6.2.0/distr/ttf/FiraCode-Medium.ttf",
-            "jetbrains_mono_regular.ttf" to "https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono@master/fonts/ttf/JetBrainsMono-Regular.ttf",
-            "jetbrains_mono_medium.ttf" to "https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono@master/fonts/ttf/JetBrainsMono-Medium.ttf",
-            "jetbrains_mono_bold.ttf" to "https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono@master/fonts/ttf/JetBrainsMono-Bold.ttf"
-        )
-        var downloadedCount = 0
-        var failedCount = 0
-        
-        fonts.forEach { (name, urlStr) ->
-            val destFile = file("src/main/res/font/$name")
-            if (!destFile.exists() || destFile.length() < 1000) {
-                println("  ⬇ Downloading $name...")
-                try {
-                    val url = URI(urlStr).toURL()
-                    val conn = url.openConnection() as HttpURLConnection
-                    conn.connectTimeout = 15000
-                    conn.readTimeout = 15000
-                    conn.setRequestProperty("User-Agent", "Mozilla/5.0")
-                    conn.connect()
-                    
-                    if (conn.responseCode in 200..299) {
-                        conn.inputStream.use { input ->
-                            destFile.outputStream().use { output ->
-                                input.copyTo(output)
-                            }
-                        }
-                        println("  ✓ Downloaded $name (${destFile.length() / 1024} KB)")
-                        downloadedCount++
-                    } else {
-                        throw Exception("HTTP ${conn.responseCode}")
-                    }
-                } catch (e: Exception) {
-                    println("  ✗ Failed to download $name: ${e.message}")
-                    failedCount++
-                    // Write a minimum-valid sfnt/TTF signature file to satisfy packaging check
-                    if (!destFile.exists()) {
-                        destFile.writeBytes(byteArrayOf(
-                            0x00, 0x01, 0x00, 0x00, // sfnt version
-                            0x00, 0x01,             // numTables = 1
-                            0x00, 0x10,             // searchRange = 16
-                            0x00, 0x00,             // entrySelector = 0
-                            0x00, 0x00              // rangeShift = 0
-                        ) + ByteArray(512))
-                    }
+        vendoredFontChecksums.forEach { (path, expectedChecksum) ->
+            val fontFile = file(path)
+            check(fontFile.isFile) { "Missing vendored font: $path" }
+
+            val digest = MessageDigest.getInstance("SHA-256")
+            fontFile.inputStream().use { input ->
+                val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                while (true) {
+                    val bytesRead = input.read(buffer)
+                    if (bytesRead < 0) break
+                    digest.update(buffer, 0, bytesRead)
                 }
-            } else {
-                println("  ✓ $name already exists")
+            }
+            val actualChecksum = digest.digest().joinToString("") { "%02x".format(it) }
+            check(actualChecksum == expectedChecksum) {
+                "Vendored font checksum mismatch for $path: expected $expectedChecksum, got $actualChecksum"
             }
         }
-        println("========================================")
-        println("Font download complete: $downloadedCount downloaded, $failedCount failed")
-        println("========================================")
     }
 }
 
 tasks.matching { it.name == "preBuild" }.configureEach {
-    dependsOn("preBuildFonts")
+    dependsOn("verifyVendoredFonts")
 }
 
 tasks.register("renamePackages") {
