@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import android.util.Log
 import com.axiom.app.core.ai.GEMINI_MODEL_NAME
+import com.axiom.app.core.ai.DirectGeminiGateway
 import com.google.ai.client.generativeai.GenerativeModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -87,16 +88,18 @@ class WeeklyAnalyticsViewModel @Inject constructor(
             val fallbackSummary = "You completed $missionsLast7Days missions, maintained a $streakVal-day streak, and hit your sleep KPI $sleepHits/7 days this week."
             
             try {
-                val key = preferences.geminiApiKeyFlow.first()
-                if (!key.isNullOrBlank()) {
+                // WP-104 SEC-104-001: route the direct Gemini call through the egress
+                // gateway. When direct egress is disabled (the default), the provider is
+                // never constructed or contacted and the key is not used — the screen
+                // falls back to the local non-AI summary below.
+                val prompt = "Write a concise, motivational 1-line summary of a warrior's performance this week. Stats: Completed $missionsLast7Days missions, current streak: $streakVal days, hit sleep targets: $sleepHits/7 days. Keep it short and direct under 20 words. Do not include intro or outro, write in third person, starting with 'You completed...'"
+                val text = DirectGeminiGateway.withDirectGemini(preferences.geminiApiKeyFlow.first()) { key ->
                     val model = GenerativeModel(modelName = GEMINI_MODEL_NAME, apiKey = key)
-                    val prompt = "Write a concise, motivational 1-line summary of a warrior's performance this week. Stats: Completed $missionsLast7Days missions, current streak: $streakVal days, hit sleep targets: $sleepHits/7 days. Keep it short and direct under 20 words. Do not include intro or outro, write in third person, starting with 'You completed...'"
-                    val response = model.generateContent(prompt)
-                    val text = response.text?.trim()
-                    if (!text.isNullOrBlank()) {
-                        _aiSummary.value = text
-                        return@launch
-                    }
+                    model.generateContent(prompt).text?.trim()
+                }
+                if (!text.isNullOrBlank()) {
+                    _aiSummary.value = text
+                    return@launch
                 }
             } catch (e: Exception) {
                 Log.e("WeeklyAnalyticsViewModel", "AI weekly summary failed, model=$GEMINI_MODEL_NAME", e)

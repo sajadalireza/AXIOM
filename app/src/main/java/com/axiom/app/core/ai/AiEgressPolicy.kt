@@ -1,5 +1,6 @@
 package com.axiom.app.core.ai
 
+import androidx.annotation.VisibleForTesting
 import com.axiom.app.core.FeatureFlags
 
 /**
@@ -16,8 +17,14 @@ import com.axiom.app.core.FeatureFlags
  */
 object AiEgressPolicy {
 
+    // Single source of truth. Production always reads the compile-time flag; the seam
+    // below exists ONLY so tests can exercise the allowed path without a second flag or
+    // parallel security mechanism (WP-104 SEC-104-001 regression coverage).
+    @Volatile
+    private var allowedProvider: () -> Boolean = { FeatureFlags.DIRECT_GEMINI_EGRESS_ENABLED }
+
     /** True only when the direct BYO-key Gemini path is explicitly permitted. */
-    fun isDirectGeminiAllowed(): Boolean = FeatureFlags.DIRECT_GEMINI_EGRESS_ENABLED
+    fun isDirectGeminiAllowed(): Boolean = allowedProvider()
 
     /**
      * Fail-closed guard. Throws before any key lookup / network call when direct
@@ -25,6 +32,18 @@ object AiEgressPolicy {
      */
     fun requireDirectGeminiAllowed() {
         if (!isDirectGeminiAllowed()) throw DirectAiEgressDisabledException()
+    }
+
+    /** Test-only override of the egress decision. Not for production use. */
+    @VisibleForTesting
+    fun setAllowedForTest(provider: () -> Boolean) {
+        allowedProvider = provider
+    }
+
+    /** Restores the production decision (reads [FeatureFlags.DIRECT_GEMINI_EGRESS_ENABLED]). */
+    @VisibleForTesting
+    fun resetForTest() {
+        allowedProvider = { FeatureFlags.DIRECT_GEMINI_EGRESS_ENABLED }
     }
 }
 

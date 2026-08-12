@@ -8,7 +8,7 @@ IDs, classes, and fingerprints.
 
 | ID | Sev | Finding | Status | Resolution |
 |----|-----|---------|--------|------------|
-| SEC-104-001 | S2 | Direct client→Gemini egress + user PII (name) in prompt, no boundary | RESOLVED (contained) | `AiEgressPolicy` default-disabled/fail-closed guard on every direct-Gemini entry point; `hunter.name` removed from outbound context |
+| SEC-104-001 | S2 | Direct client→Gemini egress + user PII (name) in prompt, no boundary | RESOLVED (contained) | `AiEgressPolicy` default-disabled/fail-closed guard on every direct-Gemini entry point; all direct call sites (`SystemVoiceEngine`, `WeeklyAnalyticsViewModel`) route through the policy — the analytics summary path now runs through the shared `DirectGeminiGateway` choke point so a disabled build performs zero provider construction/contact; `hunter.name` removed from outbound context |
 | SEC-104-002 | S1* | Backend key baked into APK; build accepted `service_role` | RESOLVED | `SupabaseKeyPolicy` classifier + fail-closed build guard (`assertSupabaseClientKeySafe`); only `sb_publishable_*`/legacy `anon` (or empty) permitted; `service_role`/`sb_secret_`/malformed rejected at build |
 | SEC-104-003 | S3 | Gemini key stored as plaintext DataStore | RESOLVED | `GeminiKeyStore`/`AndroidGeminiKeyStore` (AndroidKeyStore AES/GCM; ciphertext in `noBackupFilesDir`); one-time fail-safe migration removes legacy plaintext |
 | SEC-104-004 | S3 | Debug HTTP `Level.BODY` logging exposed anon key/payloads | RESOLVED | `SupabaseClient` → `Level.BASIC` (debug) / `NONE` (release) + `redactHeader("Authorization"/"apikey")` |
@@ -33,3 +33,15 @@ migration are covered by an instrumentation test (`connectedDebugAndroidTest`).
 - **Direct BYO Gemini architecture is temporary** — a future approved server boundary / Firebase App Check migration remains deferred.
 
 No secret value is stored in this document or in the evidence package.
+
+## Post-review repair (PR #38 final review follow-up)
+Final read-only PR review found one ungated direct-Gemini call site missed by the
+initial SEC-104-001 pass: `WeeklyAnalyticsViewModel.loadAiSummary()` constructed
+`GenerativeModel` and called `generateContent` from a screen-load/`init{}` flow
+without consulting `AiEgressPolicy`, so a build with a stored BYO key could egress
+non-identifying weekly stats to Google even while direct egress was disabled. The
+prior `f25c782` acceptance is **SUPERSEDED — FAILED FINAL PR REVIEW DUE TO UNGATED
+ANALYTICS GEMINI PATH**. Repair introduces `DirectGeminiGateway` (a single
+fail-closed choke point), routes the analytics path through it, and adds a
+provider-invocation-counting regression test (zero invocations when disabled).
+Static re-scan: ungated production Gemini call sites = 0.
