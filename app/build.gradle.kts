@@ -1,4 +1,5 @@
 import java.security.MessageDigest
+import java.util.Base64
 
 plugins {
     alias(libs.plugins.android.application)
@@ -51,6 +52,47 @@ fun Project.getEnvValue(key: String): String {
     return ""
 }
 
+/**
+ * WP-104 SEC-104-002 — fail-closed classifier for the Supabase client credential.
+ * Mirrors com.axiom.app.core.security.SupabaseKeyPolicy (build scripts can't import app
+ * classes). Only PUBLIC keys may be baked into an APK. Never prints the key value.
+ */
+fun classifySupabaseClientKey(raw: String): String {
+    val key = raw.trim()
+    if (key.isEmpty()) return "EMPTY"
+    if (key.startsWith("sb_publishable_")) return "PUBLISHABLE"
+    if (key.startsWith("sb_secret_")) return "SECRET"
+    val parts = key.split(".")
+    if (parts.size == 3) {
+        val role = try {
+            val seg = parts[1]
+            val pad = when (seg.length % 4) { 2 -> "$seg=="; 3 -> "$seg="; else -> seg }
+            val json = String(Base64.getUrlDecoder().decode(pad))
+            Regex("\"role\"\\s*:\\s*\"([^\"]+)\"").find(json)?.groupValues?.get(1)
+        } catch (e: Exception) { null }
+        return when (role) {
+            "anon" -> "LEGACY_ANON"
+            "service_role" -> "SERVICE_ROLE"
+            else -> "UNKNOWN"
+        }
+    }
+    return "MALFORMED"
+}
+
+fun Project.assertSupabaseClientKeySafe(): String {
+    val cls = classifySupabaseClientKey(getEnvValue("SUPABASE_KEY"))
+    val safe = cls == "EMPTY" || cls == "PUBLISHABLE" || cls == "LEGACY_ANON"
+    if (!safe) {
+        throw GradleException(
+            "AXIOM WP-104: unsafe Supabase client key rejected (class=$cls). " +
+                "Only an 'anon' JWT or 'sb_publishable_' key may ship in an Android build; " +
+                "'sb_secret_'/'service_role'/unknown keys are forbidden. Key value not shown."
+        )
+    }
+    return cls
+}
+
+
 android {
     namespace = "com.axiom.app"
     compileSdk = 36
@@ -62,6 +104,9 @@ android {
         versionCode = 3
         versionName = "1.2.0"
 
+        // WP-104 SEC-104-002: fail the build if an elevated/unsafe Supabase key is supplied.
+        val supabaseKeyClass = project.assertSupabaseClientKeySafe()
+        println("SUPABASE_KEY client-safety class: $supabaseKeyClass")
         buildConfigField("String", "SUPABASE_URL", "\"${project.getEnvValue("SUPABASE_URL")}\"")
         buildConfigField("String", "SUPABASE_KEY", "\"${project.getEnvValue("SUPABASE_KEY")}\"")
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${project.getEnvValue("GOOGLE_WEB_CLIENT_ID")}\"")

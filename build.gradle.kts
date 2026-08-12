@@ -36,12 +36,16 @@ tasks.register("diagnoseSupabase") {
         }
         
         println("Raw SUPABASE_URL: '$url'")
+        // WP-104 SEC-104-002/004: never print the key (even partially). Show only a
+        // non-reversible SHA-256 fingerprint prefix + length so diagnostics stay safe.
         val visibleKey = if (key.isNotEmpty()) {
-            if (key.length >= 16) key.take(8) + "..." + key.takeLast(8) else "set but too short"
+            val fp = java.security.MessageDigest.getInstance("SHA-256")
+                .digest(key.toByteArray()).joinToString("") { "%02x".format(it) }.take(12)
+            "set (len=${key.length}, sha256=$fp…)"
         } else {
             "not set"
         }
-        println("Raw SUPABASE_KEY: '$visibleKey'")
+        println("SUPABASE_KEY: $visibleKey")
         
         if (url.isEmpty()) {
             println("❌ ERROR: SUPABASE_URL is not set!")
@@ -111,7 +115,7 @@ fun testEndpoint(baseUrl: String, apiKey: String, path: String) {
         
         if (code == 401) {
             println("👉 DIAGNOSIS (HTTP 401): Your API key is invalid or lacks access to this API gateway.")
-            println("   Verify that your key is the 'anon' or 'service_role' key. Also verify it contains exactly the JWT characters from Supabase Dashboard (Settings -> API).")
+            println("   Verify that your key is the 'anon' (or modern sb_publishable_) PUBLIC client key. Never ship an 'sb_secret_' or 'service_role' key in an Android build. Also verify it contains exactly the JWT characters from Supabase Dashboard (Settings -> API).")
         } else if (code == 403) {
             println("👉 DIAGNOSIS (HTTP 403): Unauthorized / Row Level Security (RLS) block.")
             println("   Ensure your 'activation_codes' table has policies enabled allowing SELECT/UPDATE for Anon users, or disable RLS for testing.")
