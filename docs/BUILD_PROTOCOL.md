@@ -49,7 +49,7 @@ This document describes the comprehensive build protocol for the WARRIOR1 Androi
 
 **Artifacts**:
 - `app-debug/*.apk` (Debug builds)
-- `app-release-unsigned/*.apk` (Release builds)
+- `app/build/outputs/apk/release/AXIOM.apk` (Signed release builds)
 - `lint-report/lint-results*.html` (Lint reports)
 
 ### 2. Test Protocol (`test-protocol.yml`)
@@ -169,24 +169,23 @@ GOOGLE_WEB_CLIENT_ID=your-client-id.apps.googleusercontent.com
 
 ## Font Management
 
-The build system automatically downloads required fonts from CDN via the `preBuildFonts` task.
+Required fonts are vendored in `app/src/main/res/font/`; builds never download or generate font files.
 
 ### Fonts Included
-- **Outfit** (Light, Regular, Medium, SemiBold, Bold)
-- **Fraunces** (Regular, Medium, Bold, Black, Italic)
-- **Fira Code** (Regular, Medium)
-- **JetBrains Mono** (Regular, Medium, Bold)
+- **Outfit** variable font
+- **Fraunces** upright and italic variable fonts
+- **Fira Code** Regular and Medium
 
-The fonts are downloaded during pre-build and stored in `app/src/main/res/font/`.
+`Inter` and `JetBrainsMono` remain compatibility aliases for Outfit and Fira Code in the Compose theme. Official source pins, SHA-256 values, and SIL OFL 1.1 notices are packaged under `app/src/main/assets/licenses/fonts/`.
 
 ## Build Customization
 
 ### Custom Gradle Tasks
 
-#### preBuildFonts
-Automatically downloads fonts before build:
+#### verifyVendoredFonts
+Verifies every vendored font against its pinned SHA-256 without network access. Android `preBuild` runs this task automatically:
 ```bash
-./gradlew preBuildFonts
+./gradlew verifyVendoredFonts
 ```
 
 #### renamePackages
@@ -214,7 +213,7 @@ Automatic string rebranding:
 # Debug build
 ./gradlew assembleDebug
 
-# Release build (unsigned)
+# Signed release build (requires keystore configuration)
 ./gradlew assembleRelease
 
 # Run tests
@@ -226,19 +225,19 @@ Automatic string rebranding:
 # Build with custom JVM memory
 ./gradlew assembleDebug -Dorg.gradle.jvmargs="-Xmx4096m"
 
-# Download fonts
-./gradlew preBuildFonts
+# Verify vendored font integrity
+./gradlew verifyVendoredFonts
 ```
 
 ## Troubleshooting
 
 ### Build Failures
 
-#### Font Download Error
+#### Vendored Font Integrity Error
 ```
-error: resource font/fraunces_medium (aka com.axiom.app:font/fraunces_medium) not found.
+Missing vendored font: src/main/res/font/fira_code_medium.ttf
 ```
-**Solution**: Run `./gradlew preBuildFonts` or the fonts will auto-download during preBuild.
+**Solution**: Restore the required font from its immutable source recorded in `app/src/main/assets/licenses/fonts/README.md`. Do not create a fallback file. For an intentional asset update, update the binary, checksum, source pin, and license evidence together.
 
 #### Supabase Connection Error
 ```
