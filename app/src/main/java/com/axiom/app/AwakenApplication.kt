@@ -79,6 +79,13 @@ class AwakenApplication : Application(), Configuration.Provider {
         // any relationship with the app at all.
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                // WP-104 SEC-104-003: migrate any legacy plaintext Gemini key into the
+                // encrypted keystore and remove the plaintext. Idempotent + fail-safe.
+                preferences.migrateGeminiKeyIfNeeded()
+            } catch (t: Throwable) {
+                com.axiom.app.core.AppInitDiagnostics.logException(t, "GEMINI_KEY_MIGRATION")
+            }
+            try {
                 if (preferences.firstMissionDoneFlow.first()) {
                     AxiomNotificationManager.scheduleStreakReminder(this@AwakenApplication, hour = 21, minute = 0)
                     com.axiom.app.core.AppInitDiagnostics.log("STARTUP_INIT", "Streak reminders scheduled.")

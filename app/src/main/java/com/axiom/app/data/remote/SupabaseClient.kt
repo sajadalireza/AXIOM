@@ -283,7 +283,12 @@ object SupabaseClient {
         .build()
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = if (com.axiom.app.BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+        // WP-104 SEC-104-004: never log request/response bodies or credential headers.
+        // BASIC = method/url/status only; release stays NONE. Redactors are belt-and-
+        // suspenders so the anon key can never surface even if the level is raised.
+        redactHeader("Authorization")
+        redactHeader("apikey")
+        level = if (com.axiom.app.BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC
         else HttpLoggingInterceptor.Level.NONE
     }
 

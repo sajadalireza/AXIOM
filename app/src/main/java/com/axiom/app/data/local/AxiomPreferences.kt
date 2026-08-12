@@ -46,7 +46,11 @@ open class AxiomPreferences @Inject constructor(
         private val BRIEFING_SKILL_TREE = booleanPreferencesKey("briefing_skill_tree")
         private val BRIEFING_SHADOW = booleanPreferencesKey("briefing_shadow")
         private val BRIEFING_SYSTEM_VOICE = booleanPreferencesKey("briefing_system_voice")
+        // Legacy plaintext key (WP-104 SEC-104-003): migrated into the encrypted
+        // GeminiKeyStore and then removed. Retained only as a migration source.
         private val GEMINI_API_KEY  = stringPreferencesKey("gemini_api_key")
+        // Reactive presence flag for the encrypted Gemini key (value lives in GeminiKeyStore).
+        private val GEMINI_KEY_PRESENT = booleanPreferencesKey("gemini_key_present")
         private val DAILY_BRIEFING  = stringPreferencesKey("daily_briefing_text")
         private val BRIEFING_DATE   = stringPreferencesKey("daily_briefing_date")
         private val BRIEFING_LANG   = stringPreferencesKey("daily_briefing_lang")
@@ -835,18 +839,65 @@ open class AxiomPreferences @Inject constructor(
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
     }
 
+    // WP-104 SEC-104-003: AndroidKeyStore-backed AES/GCM secure store for the BYO Gemini key.
+    private val geminiKeyStore: com.axiom.app.core.security.GeminiKeyStore =
+        com.axiom.app.core.security.AndroidGeminiKeyStore(context)
+
+    // Read-only: prefers the encrypted store; falls back to any not-yet-migrated legacy
+    // plaintext so an existing key is never lost before migration runs. No writes here.
     val geminiApiKeyFlow: Flow<String?> = context.dataStore.data
-        .map { it[GEMINI_API_KEY]?.takeIf { k -> k.isNotBlank() } }
+        .map { prefs ->
+            val legacy = prefs[GEMINI_API_KEY]?.takeIf { k -> k.isNotBlank() }
+            when {
+                geminiKeyStore.hasKey() -> geminiKeyStore.retrieve()
+                legacy != null -> legacy
+                else -> null
+            }
+        }
 
     val dailyBriefingFlow: Flow<String?> = context.dataStore.data
         .map { it[DAILY_BRIEFING] }
 
     suspend fun setGeminiApiKey(key: String) {
-        context.dataStore.edit { it[GEMINI_API_KEY] = key.trim() }
+        // Never persist plaintext: encrypt via keystore, drop any legacy plaintext.
+        geminiKeyStore.store(key.trim())
+        context.dataStore.edit {
+            it.remove(GEMINI_API_KEY)
+            it[GEMINI_KEY_PRESENT] = true
+        }
     }
 
     suspend fun clearGeminiApiKey() {
-        context.dataStore.edit { it.remove(GEMINI_API_KEY) }
+        geminiKeyStore.clear()
+        context.dataStore.edit {
+            it.remove(GEMINI_API_KEY)
+            it[GEMINI_KEY_PRESENT] = false
+        }
+    }
+
+    /**
+     * WP-104 SEC-104-003 one-time migration of a legacy plaintext Gemini key into the
+     * encrypted store. Idempotent and fail-safe: the legacy plaintext is removed ONLY
+     * after the encrypted write is verified, so a failure never destroys the only key.
+     */
+    suspend fun migrateGeminiKeyIfNeeded() {
+        val legacy = context.dataStore.data.first()[GEMINI_API_KEY]?.takeIf { it.isNotBlank() }
+            ?: return
+        if (geminiKeyStore.hasKey()) {
+            // Already migrated (or a newer key exists): just drop the stale plaintext.
+            context.dataStore.edit { it.remove(GEMINI_API_KEY) }
+            return
+        }
+        runCatching {
+            geminiKeyStore.store(legacy)
+            check(geminiKeyStore.retrieve() == legacy) { "verify failed" }
+        }.onSuccess {
+            context.dataStore.edit {
+                it.remove(GEMINI_API_KEY)
+                it[GEMINI_KEY_PRESENT] = true
+            }
+        }
+        // onFailure: legacy plaintext intentionally preserved (fail-safe, never logged).
     }
 
     suspend fun saveDailyBriefing(text: String) {
