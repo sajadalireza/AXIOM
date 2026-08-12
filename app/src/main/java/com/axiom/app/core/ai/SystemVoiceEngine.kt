@@ -38,6 +38,8 @@ class SystemVoiceEngine @Inject constructor(
 
     // Model is rebuilt on each call so a newly-saved key takes effect immediately.
     private suspend fun getModel(): GenerativeModel {
+        // WP-104 SEC-104-001: fail closed BEFORE any key lookup or network use.
+        AiEgressPolicy.requireDirectGeminiAllowed()
         val key = preferences.geminiApiKeyFlow.first()
             ?: throw NoApiKeyException()
         val mode = preferences.systemVoiceModeFlow.first()
@@ -83,14 +85,22 @@ class SystemVoiceEngine @Inject constructor(
         val diffMs = now - lastComplete
         val inactiveDays = if (lastComplete == 0L) 0 else (diffMs / (1000 * 60 * 60 * 24)).toInt()
 
-        return "Hunter: ${hunter.name} | Level ${hunter.level} | Rank ${hunter.rankLabel} | " +
-            "Streak: $streakDays days | XP: ${hunter.currentXP}/${hunter.xpToNextLevel} | " +
-            "Days since last protocol submission: $inactiveDays days"
+        // WP-104: name/identity deliberately excluded from outbound context.
+        return AiPromptContext.hunterContext(
+            level = hunter.level,
+            rankLabel = hunter.rankLabel,
+            streakDays = streakDays,
+            currentXP = hunter.currentXP,
+            xpToNextLevel = hunter.xpToNextLevel,
+            inactiveDays = inactiveDays
+        )
     }
 
     private suspend fun generate(prompt: String): String = try {
         getModel().generateContent(prompt).text
             ?: "[ SYSTEM ] No signal received from dimensional interface."
+    } catch (e: DirectAiEgressDisabledException) {
+        "[ SYSTEM ] Direct link disabled. Dimensional interface offline."
     } catch (e: NoApiKeyException) {
         "[ SYSTEM ] API key not configured. Set your key in the SYSTEM tab."
     } catch (e: Exception) {
@@ -289,8 +299,10 @@ class SystemVoiceEngine @Inject constructor(
         }
 
         return try {
+            // WP-104 SEC-104-001: name deliberately excluded from the outbound prompt
+            // (the on-device fallback above may still address the hunter by name).
             val modelText = getModel().generateContent(
-                "Hunter $hunterName has ranked up from $oldRank to $newRank.\n" +
+                "A hunter has ranked up from $oldRank to $newRank.\n" +
                 "Deliver a rank-up announcement in System voice."
             ).text
             if (modelText.isNullOrBlank()) {
@@ -383,7 +395,8 @@ class SystemVoiceEngine @Inject constructor(
         streakDays: Int,
         question: String
     ): Flow<String> {
-        val isOffline = com.axiom.app.core.FeatureFlags.FORCE_OFFLINE_MODE || !hasApiKey()
+        val isOffline = !AiEgressPolicy.isDirectGeminiAllowed() ||
+            com.axiom.app.core.FeatureFlags.FORCE_OFFLINE_MODE || !hasApiKey()
         if (isOffline) {
             return flow {
                 val fallbackResponse = askSystem(hunter, streakDays, question)
@@ -490,7 +503,7 @@ class SystemVoiceEngine @Inject constructor(
         }
 
         val prompt = """
-Hunter ${hunter.name} (Level ${hunter.level}, Rank ${hunter.rankLabel}) has this goal: "$goal"
+Hunter (Level ${hunter.level}, Rank ${hunter.rankLabel}) has this goal: "$goal"
 Available skills: ${skills.filter { it.isUnlocked }.map { it.name }.joinToString(", ")}
 
 Generate exactly 3 missions as a valid JSON array. No markdown, no explanation.
@@ -505,6 +518,7 @@ Make missions progressively harder: easy → medium → hard.
         """.trimIndent()
 
         return try {
+            AiEgressPolicy.requireDirectGeminiAllowed()
             val key  = preferences.geminiApiKeyFlow.first() ?: throw NoApiKeyException()
             val model = GenerativeModel(modelName = GEMINI_MODEL_NAME, apiKey = key)
             val raw   = model.generateContent(prompt).text ?: return fallback()
