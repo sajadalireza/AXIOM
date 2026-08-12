@@ -49,7 +49,7 @@ This document describes the comprehensive build protocol for the WARRIOR1 Androi
 
 **Artifacts**:
 - `app-debug/*.apk` (Debug builds)
-- `app-release-unsigned/*.apk` (Release builds)
+- `app/build/outputs/apk/release/AXIOM.apk` (Signed release builds)
 - `lint-report/lint-results*.html` (Lint reports)
 
 ### 2. Test Protocol (`test-protocol.yml`)
