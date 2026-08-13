@@ -1,6 +1,5 @@
 package com.axiom.app.data
 
-import com.axiom.app.data.local.AxiomPreferences
 import com.axiom.app.domain.model.*
 import com.axiom.app.domain.repository.*
 import kotlinx.coroutines.flow.first
@@ -14,7 +13,7 @@ class SeedDataHelper @Inject constructor(
     private val muscleGroupRepository: MuscleGroupRepository,
     private val warriorProfileRepository: WarriorProfileRepository,
     private val hunterRepository: HunterRepository,
-    private val preferences: AxiomPreferences
+    private val preferences: SeedPreferences
 ) {
     private fun cleanId(name: String): String {
         return name.lowercase().trim()

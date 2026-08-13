@@ -103,6 +103,34 @@ abstract class AppModule {
     ): DailyHabitLogRepository
 
     companion object {
+        /**
+         * WP-202: adapt the concrete [com.axiom.app.data.local.AxiomPreferences] to the
+         * narrow [com.axiom.app.data.SeedPreferences] seam consumed by
+         * [com.axiom.app.data.SeedDataHelper]. AxiomPreferences already exposes every
+         * member with matching signatures; this thin delegate lets unit tests substitute
+         * a pure-JVM fake without touching AxiomPreferences itself.
+         */
+        @Provides
+        @Singleton
+        fun provideSeedPreferences(
+            prefs: com.axiom.app.data.local.AxiomPreferences
+        ): com.axiom.app.data.SeedPreferences = object : com.axiom.app.data.SeedPreferences {
+            override val skillTreeSeededFlow get() = prefs.skillTreeSeededFlow
+            override suspend fun setSkillTreeSeeded(value: Boolean) = prefs.setSkillTreeSeeded(value)
+            override val muscleGroupsSeededFlow get() = prefs.muscleGroupsSeededFlow
+            override suspend fun setMuscleGroupsSeeded(value: Boolean) = prefs.setMuscleGroupsSeeded(value)
+            override val alirezaProfileSeededFlow get() = prefs.alirezaProfileSeededFlow
+            override suspend fun setAlirezaProfileSeeded(value: Boolean) = prefs.setAlirezaProfileSeeded(value)
+            override val setupCompleteFlow get() = prefs.setupCompleteFlow
+            override suspend fun setSetupComplete() = prefs.setSetupComplete()
+            override val firstMissionDoneFlow get() = prefs.firstMissionDoneFlow
+            override suspend fun setFirstMissionDone(value: Boolean) = prefs.setFirstMissionDone(value)
+            override val blueprintSetupCompleteFlow get() = prefs.blueprintSetupCompleteFlow
+            override suspend fun setBlueprintSetupComplete(value: Boolean) = prefs.setBlueprintSetupComplete(value)
+            override val financialModuleEnabledFlow get() = prefs.financialModuleEnabledFlow
+            override suspend fun setFinancialModuleEnabled(value: Boolean) = prefs.setFinancialModuleEnabled(value)
+        }
+
         @Provides
         @Singleton
         fun provideAxiomDatabase(
