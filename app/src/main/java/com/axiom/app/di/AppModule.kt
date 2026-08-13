@@ -152,7 +152,8 @@ abstract class AppModule {
                 com.axiom.app.db.migrations.MIGRATION_12_13,
                 com.axiom.app.db.migrations.MIGRATION_13_14,
                 com.axiom.app.db.migrations.MIGRATION_14_15,
-                com.axiom.app.db.migrations.MIGRATION_15_16
+                com.axiom.app.db.migrations.MIGRATION_15_16,
+                com.axiom.app.db.migrations.MIGRATION_16_17
             )
             // No fallbackToDestructiveMigration: an unresolved migration path
             // must crash loudly (Room throws IllegalStateException) instead of

@@ -31,9 +31,13 @@ import com.axiom.app.data.local.entity.*
         KPIMissStreakEntity::class,
         IronRuleViolationLogEntity::class,
         DailyHabitLogEntity::class,
-        WeeklyReviewEntity::class
+        WeeklyReviewEntity::class,
+        // WP-204 — additive First-Win persistence primitives (Room v17)
+        FirstWinSessionEntity::class,
+        CompletionReceiptEntity::class,
+        EventQueueEntity::class
     ],
-    version = 16,
+    version = 17,
     exportSchema = true
 )
 abstract class AxiomDatabase : RoomDatabase() {
@@ -50,4 +54,9 @@ abstract class AxiomDatabase : RoomDatabase() {
     abstract fun kpiProgressDao(): KPIProgressDao
     abstract fun dailyHabitLogDao(): DailyHabitLogDao
     abstract fun weeklyReviewDao(): com.axiom.app.data.local.dao.WeeklyReviewDao
+
+    // WP-204 — First-Win persistence primitives
+    abstract fun firstWinSessionDao(): FirstWinSessionDao
+    abstract fun completionReceiptDao(): CompletionReceiptDao
+    abstract fun eventQueueDao(): EventQueueDao
 }
