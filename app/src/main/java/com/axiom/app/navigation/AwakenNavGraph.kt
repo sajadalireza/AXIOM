@@ -89,28 +89,17 @@ fun AwakenNavGraph(
             )
         }
         composable(Screen.Splash.route) {
-            // firstMissionDone gates before blueprintSetupComplete: the delight-first
-            // flow (codename reveal -> celebration -> instant-XP first mission) must
-            // complete before the "deepen your profile" wizard, for every user —
-            // regardless of whether SplashScreen found an existing Hunter profile row.
-            val nextRoute = when {
-                !firstMissionDone -> Screen.Onboarding.route
-                !blueprintSetupComplete -> Screen.BlueprintWizard.route
-                else -> Screen.Home.route
-            }
+            // WP-202 routing repair: the LaunchDestination resolved by
+            // LaunchRouteResolver (awaits startup readiness, then reads persisted
+            // state) is the SOLE authority for the one-shot Splash exit. The
+            // stale-at-launch collectAsState flags below are passed for honesty
+            // but splashExitRoute deliberately ignores them, so a completed user
+            // can never be re-routed to Onboarding by an initialValue=false race.
             com.axiom.app.presentation.onboarding.SplashScreen(
-                onNavigateToHome = {
-                    navController.navigate(nextRoute) {
-                        popUpTo(Screen.Splash.route) { inclusive = true }
-                    }
-                },
-                onNavigateToOnboarding = {
-                    navController.navigate(nextRoute) {
-                        popUpTo(Screen.Splash.route) { inclusive = true }
-                    }
-                },
-                onNavigateToSetup = {
-                    navController.navigate(Screen.Setup.route) {
+                onDestinationResolved = { resolved ->
+                    navController.navigate(
+                        splashExitRoute(resolved, firstMissionDone, blueprintSetupComplete)
+                    ) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 }

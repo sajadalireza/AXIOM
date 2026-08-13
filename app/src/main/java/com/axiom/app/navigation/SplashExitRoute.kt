@@ -18,17 +18,23 @@ import com.axiom.app.presentation.onboarding.LaunchDestination
  * initial `false` values classify the completed user as ONBOARDING, and the
  * one-shot navigation locks that wrong destination — re-onboarding the user.
  *
- * This function currently mirrors that buggy authority (the [resolved] argument
- * is intentionally IGNORED) so a deterministic JVM test can pin the defect.
- * The GREEN repair makes [resolved] authoritative here.
+ * GREEN repair (WP-202 PROMPT 30): [resolved] is now the SOLE authority for the
+ * one-shot Splash-exit route. The [firstMissionDone] / [blueprintSetupComplete]
+ * flags — collected at the NavGraph level via
+ * `collectAsStateWithLifecycle(initialValue = false)` — are accepted for call-site
+ * honesty (they are the stale-at-launch values that used to override the route)
+ * but are deliberately NOT consulted: the resolver's [LaunchDestination] can never
+ * again be replaced by their initial `false` values. This closes the WP-201
+ * launch-race at the Splash → NavGraph handoff.
  */
+@Suppress("UNUSED_PARAMETER")
 fun splashExitRoute(
     resolved: LaunchDestination,
     firstMissionDone: Boolean,
     blueprintSetupComplete: Boolean,
-): String = when {
-    // BUG: 'resolved' ignored; route recomputed from stale-at-launch flags.
-    !firstMissionDone -> Screen.Onboarding.route
-    !blueprintSetupComplete -> Screen.BlueprintWizard.route
-    else -> Screen.Home.route
+): String = when (resolved) {
+    LaunchDestination.SETUP -> Screen.Setup.route
+    LaunchDestination.ONBOARDING -> Screen.Onboarding.route
+    LaunchDestination.BLUEPRINT_WIZARD -> Screen.BlueprintWizard.route
+    LaunchDestination.HOME -> Screen.Home.route
 }

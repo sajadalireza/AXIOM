@@ -71,9 +71,7 @@ class SplashViewModel @Inject constructor(
 
 @Composable
 fun SplashScreen(
-    onNavigateToHome: () -> Unit,
-    onNavigateToOnboarding: () -> Unit,
-    onNavigateToSetup: () -> Unit,
+    onDestinationResolved: (LaunchDestination) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SplashViewModel = hiltViewModel()
 ) {
@@ -159,15 +157,13 @@ fun SplashScreen(
 
         coroutineScope.launch {
             try {
-                when (viewModel.resolveDestination()) {
-                    LaunchDestination.SETUP -> onNavigateToSetup()
-                    LaunchDestination.HOME -> onNavigateToHome()
-                    LaunchDestination.ONBOARDING,
-                    LaunchDestination.BLUEPRINT_WIZARD -> onNavigateToOnboarding()
-                }
+                // The resolver's LaunchDestination is authoritative: hand it up
+                // verbatim so the one-shot Splash exit routes to exactly what was
+                // resolved (no NavGraph-level recomputation from stale flags).
+                onDestinationResolved(viewModel.resolveDestination())
             } catch (e: Exception) {
                 e.printStackTrace()
-                onNavigateToSetup()
+                onDestinationResolved(LaunchDestination.SETUP)
             }
         }
     }
