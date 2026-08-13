@@ -22,13 +22,11 @@ package com.axiom.app.presentation.onboarding
  *       WITHOUT deleting later earned flags.
  *  - F: no destructive repair — this layer only classifies and routes.
  *
- * Pure and deterministic: no clock, no I/O, no coroutine timing.
- *
- * NOTE (RED skeleton, WP-203): the [evaluate] body below intentionally
- * replicates the PRE-FIX production classifier — it ignores `hunterExists` and
- * silently normalizes impossible states. This makes the accompanying matrix
- * test fail on exactly the defect rows (10, 11, 12, invalid rows). The GREEN
- * commit replaces this body with the real contract logic.
+ * Pure and deterministic: no clock, no I/O, no coroutine timing. This layer
+ * only CLASSIFIES and maps to an existing route — it never mutates Room or
+ * DataStore, never resets progress, never fabricates completion (Decision F).
+ * No eligibility state is persisted (that belongs to WP-204); the result is
+ * recomputed from authoritative facts on every launch.
  */
 enum class EligibilityState {
     NEEDS_SETUP,
@@ -70,25 +68,78 @@ data class EligibilityResult(
 object EligibilityStateMachine {
 
     fun evaluate(snapshot: EligibilitySnapshot): EligibilityResult {
-        // RED skeleton: pre-fix behavior — Hunter-blind, silently normalizing.
-        val destination = when {
-            !snapshot.setupComplete -> LaunchDestination.SETUP
-            !snapshot.firstMissionDone -> LaunchDestination.ONBOARDING
-            !snapshot.blueprintSetupComplete -> LaunchDestination.BLUEPRINT_WIZARD
-            else -> LaunchDestination.HOME
+        val (setup, hunter, firstMission, blueprint) = snapshot
+
+        // Prerequisite 1 — setup. Nothing downstream is legitimate without it.
+        // Later flags are NOT deleted (Decision E/F); we recover toward SETUP and
+        // carry a bounded reason so the impossible order is explicit, not silent.
+        if (!setup) {
+            val reason = when {
+                hunter -> InvalidReason.HUNTER_WITHOUT_SETUP
+                firstMission || blueprint -> InvalidReason.DOWNSTREAM_WITHOUT_SETUP
+                else -> InvalidReason.NONE
+            }
+            val state = if (reason == InvalidReason.NONE) {
+                EligibilityState.NEEDS_SETUP
+            } else {
+                EligibilityState.INVALID
+            }
+            return EligibilityResult(state, reason, LaunchDestination.SETUP, isRecovery = false)
         }
-        val state = when (destination) {
-            LaunchDestination.SETUP -> EligibilityState.NEEDS_SETUP
-            LaunchDestination.ONBOARDING -> EligibilityState.NEEDS_HUNTER
-            LaunchDestination.BLUEPRINT_WIZARD -> EligibilityState.NEEDS_BLUEPRINT
-            LaunchDestination.HOME -> EligibilityState.ESTABLISHED
+
+        // Prerequisite 2 — Hunter entity. `hunterExists` is a prerequisite, never
+        // evidence of completion (Decision A): a missing Hunter can never route Home.
+        if (!hunter) {
+            return if (firstMission || blueprint) {
+                // Earned progress but Hunter gone (Decision B): explicit, streak-safe
+                // recovery — never HOME, never destructive. Re-eval after recreation
+                // normally yields ESTABLISHED.
+                EligibilityResult(
+                    EligibilityState.HUNTER_RECOVERY,
+                    InvalidReason.NONE,
+                    LaunchDestination.ONBOARDING,
+                    isRecovery = true,
+                )
+            } else {
+                // Genuinely fresh Hunter creation (Decision C): normal, not recovery.
+                EligibilityResult(
+                    EligibilityState.NEEDS_HUNTER,
+                    InvalidReason.NONE,
+                    LaunchDestination.ONBOARDING,
+                    isRecovery = false,
+                )
+            }
         }
-        return EligibilityResult(
-            state = state,
-            reason = InvalidReason.NONE,
-            destination = destination,
-            isRecovery = false,
-        )
+
+        // Setup + Hunter present — classify by downstream earned progress.
+        return when {
+            !firstMission && !blueprint -> EligibilityResult(
+                EligibilityState.NEEDS_FIRST_MISSION,
+                InvalidReason.NONE,
+                LaunchDestination.ONBOARDING,
+                isRecovery = false,
+            )
+            // Blueprint before first mission is an impossible order (Decision E):
+            // recover toward the first mission, preserve the blueprint flag.
+            !firstMission && blueprint -> EligibilityResult(
+                EligibilityState.INVALID,
+                InvalidReason.BLUEPRINT_BEFORE_FIRST_MISSION,
+                LaunchDestination.ONBOARDING,
+                isRecovery = false,
+            )
+            firstMission && !blueprint -> EligibilityResult(
+                EligibilityState.NEEDS_BLUEPRINT,
+                InvalidReason.NONE,
+                LaunchDestination.BLUEPRINT_WIZARD,
+                isRecovery = false,
+            )
+            else -> EligibilityResult(
+                EligibilityState.ESTABLISHED,
+                InvalidReason.NONE,
+                LaunchDestination.HOME,
+                isRecovery = false,
+            )
+        }
     }
 
     /**
@@ -96,8 +147,7 @@ object EligibilityStateMachine {
      * downstream progress. Recovery/resumed users (any earned flag) must keep
      * their streak. Pure — driven by the earned-progress facts only, so it is
      * correct even after a Hunter has just been (re)created.
-     *
-     * RED skeleton: always true (mirrors the current unconditional setStreak(0)).
      */
-    fun shouldInitializeStreak(snapshot: EligibilitySnapshot): Boolean = true
+    fun shouldInitializeStreak(snapshot: EligibilitySnapshot): Boolean =
+        !snapshot.firstMissionDone && !snapshot.blueprintSetupComplete
 }
