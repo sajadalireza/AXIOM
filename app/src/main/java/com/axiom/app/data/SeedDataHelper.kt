@@ -3,10 +3,18 @@ package com.axiom.app.data
 import com.axiom.app.domain.model.*
 import com.axiom.app.domain.repository.*
 import kotlinx.coroutines.flow.first
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * Neutral fresh-install seeder (WP-202). Seeds only non-personal reference catalogs.
+ *
+ * [warriorProfileRepository] and [hunterRepository] are intentionally retained even though
+ * the neutral bootstrap does not write to them: they are the observation surface for the
+ * [com.axiom.app.data.NeutralBootstrapTest] neutrality regression, which asserts that a
+ * fresh bootstrap leaves the hunter profile and every personal blueprint collection empty.
+ * Any future re-introduction of personal seeding here trips that test.
+ */
 @Singleton
 class SeedDataHelper @Inject constructor(
     private val skillRepository: SkillRepository,
@@ -144,107 +152,26 @@ class SeedDataHelper @Inject constructor(
         preferences.setMuscleGroupsSeeded(true)
     }
 
-    suspend fun seedDefaultProfileIfNeeded() {
-        val seeded = preferences.alirezaProfileSeededFlow.first()
-        if (seeded) return
-
-        // 1. Ensure basic parent skills exist in DB
+    /**
+     * WP-202 (PO Decisions 1–5): fresh-install bootstrap. Seeds ONLY neutral reference
+     * catalogs (skill taxonomy + muscle groups); it must never seed personal blueprint
+     * content (thesis, tracks, KPIs, iron rules, hard truths, affirmations, schedules,
+     * milestones, named relationships) nor fake user-earned flags (setupComplete,
+     * financialModuleEnabled, blueprintSetupComplete, firstMissionDone).
+     *
+     * The Hunter profile and starter content are created later by the user-triggered
+     * onboarding flow ([com.axiom.app.domain.usecase.InitializeAxiomUseCase]); seeding a
+     * Hunter here would trip that use case's `existingProfile != null` early-return and
+     * break the first-win starter missions/dungeon.
+     *
+     * Existing users are unaffected: each catalog seeder self-guards on its own
+     * `*_SEEDED` flag, so an established install performs no writes and loses no data.
+     *
+     * The former personal payload now lives only in the `src/test` dev fixture
+     * `PersonalBlueprintTestFixture` and never ships or auto-executes.
+     */
+    suspend fun seedReferenceCatalogsIfNeeded() {
         seedSkillsIfNeeded()
         seedMuscleGroupsIfNeeded()
-
-        // 2. Create Default Hunter Profile (starts at Rank D or E, let's say D-Rank)
-        val hunter = Hunter(
-            id = "default_hunter_id",
-            name = "Warrior",
-            level = 1,
-            rankLabel = "D-Rank",
-            totalXP = 0L,
-            currentXP = 0,
-            xpToNextLevel = 100,
-            progressPercent = 0.0f,
-            rankColor = 0xFFD4A843, // Golden/Yellow
-            rankGlyph = "D",
-            personalThesis = BlueprintV51Data.DRIVING_THESIS
-        )
-        hunterRepository.updateHunterProfile(hunter)
-
-        // 3. Create Default Warrior Blueprint Profile
-        val warriorProfile = WarriorProfile(
-            id = "default",
-            codename = "Warrior",
-            oneLineThesis = BlueprintV51Data.DRIVING_THESIS,
-            rareProfileDescription = BlueprintV51Data.RARE_PROFILE_DESCRIPTION
-        )
-        warriorProfileRepository.saveProfile(warriorProfile)
-
-        // 4. Create Cores and Pillars Tracks
-        BlueprintV51Data.CORE_TRACKS.forEach { warriorProfileRepository.saveTrack(it) }
-        BlueprintV51Data.PILLARS.forEach { warriorProfileRepository.saveTrack(it) }
-
-        // 5. Create Schedule blocks
-        BlueprintV51Data.SCHEDULE_BLOCKS.forEach { warriorProfileRepository.saveScheduleBlock(it) }
-
-        // 6. Create Custom KPIs
-        BlueprintV51Data.CUSTOM_KPIS.forEach { warriorProfileRepository.saveCustomKPI(it) }
-
-        // 7. Create Iron Rules
-        BlueprintV51Data.IRON_RULES.forEach { warriorProfileRepository.saveIronRule(it) }
-
-        // 8. Create Hard Truths and Affirmations
-        BlueprintV51Data.HARD_TRUTHS.forEach { warriorProfileRepository.saveHardTruthOrAffirmation(it) }
-        BlueprintV51Data.AFFIRMATIONS.forEach { warriorProfileRepository.saveHardTruthOrAffirmation(it) }
-
-        // 9. Major Milestones
-        val milestone = MajorMilestone(
-            id = "milestone_vehicle_decision",
-            label = "Vehicle Decision — Path A vs Path B",
-            targetDate = System.currentTimeMillis() + (10L * 30L * 24L * 60L * 60L * 1000L), // 10 months
-            description = "Make the vital decision between Path A (Academia/Munich research) or Path B (direct commercial venture)."
-        )
-        warriorProfileRepository.saveMajorMilestone(milestone)
-
-        // 10. Key Relationships
-        val relationships = listOf(
-            KeyRelationship(
-                id = "rel_mentor",
-                label = "Academic Guidance",
-                category = "Mentor",
-                lastInteractionAt = null,
-                preparedTalkingPoint = "German laboratory opportunities, yeast cofactor regeneration paper feedback, or Munich co-author requests."
-            ),
-            KeyRelationship(
-                id = "rel_connector",
-                label = "German Biotech Peer",
-                category = "Connector",
-                lastInteractionAt = null,
-                preparedTalkingPoint = "How researchers in Germany deploy COBRApy to Streamlit for biologists, or Munich networking."
-            ),
-            KeyRelationship(
-                id = "rel_peer",
-                label = "Iran ML Peer",
-                category = "Peer",
-                lastInteractionAt = null,
-                preparedTalkingPoint = "BioPython sequence parsers, PyTorch optimization tips, and Tehran ML meetups."
-            ),
-            KeyRelationship(
-                id = "rel_buyer",
-                label = "Biotech Client",
-                category = "Buyer",
-                lastInteractionAt = null,
-                preparedTalkingPoint = "Under-utilized carbon sources in yeast fermentation, optimization, or computational model validation."
-            )
-        )
-        for (rel in relationships) {
-            warriorProfileRepository.saveKeyRelationship(rel)
-        }
-
-        // 11. Enable Financial Checkpoints & Mark Blueprint Wizard as Complete
-        preferences.setFinancialModuleEnabled(true)
-        preferences.setBlueprintSetupComplete(false)
-        preferences.setFirstMissionDone(false) // Let the wizard onboard the user
-        preferences.setSetupComplete()
-
-        // 12. Set Seeding Flag to avoid future duplicates
-        preferences.setAlirezaProfileSeeded(true)
     }
 }

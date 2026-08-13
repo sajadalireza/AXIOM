@@ -113,8 +113,9 @@ class MainActivity : ComponentActivity() {
                     axiomViewModel.notifyDailyLoginBonus()
                 }
 
-                // Seed default profile on launch if not done yet
-                seedDataHelper.seedDefaultProfileIfNeeded()
+                // WP-202: seed neutral reference catalogs on launch (no personal data,
+                // no faked completion). Self-guards; safe on every launch.
+                seedDataHelper.seedReferenceCatalogsIfNeeded()
 
                 // Seed fallback if profile exists but no skills
                 val profile = hunterRepository.getDirectHunterProfile()

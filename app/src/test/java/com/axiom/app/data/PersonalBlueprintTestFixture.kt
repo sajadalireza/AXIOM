@@ -5,7 +5,8 @@ import com.axiom.app.domain.model.MajorMilestone
 
 /**
  * WP-202 (PO Decision 2): the identifiably-personal blueprint payload that USED to be
- * seeded automatically for every fresh install by [SeedDataHelper.seedDefaultProfileIfNeeded].
+ * seeded automatically for every fresh install by the old `seedDefaultProfileIfNeeded`
+ * bootstrap (now neutralized to [SeedDataHelper.seedReferenceCatalogsIfNeeded]).
  *
  * It is relocated here into the `src/test` source set so that:
  *  - it NEVER ships in any APK (test source is excluded from all app variants), and

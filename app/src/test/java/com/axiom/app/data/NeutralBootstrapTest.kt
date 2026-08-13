@@ -10,16 +10,15 @@ import org.junit.Test
 /**
  * WP-202 fresh-install neutrality regression.
  *
- * Product Owner Decision 1: a fresh install may contain ONLY minimal non-personal state
- * — reference/catalog data (skills, muscle groups) and technical defaults. Personal seed
- * data on a fresh install must be exactly 0: no personal thesis, tracks/pillars, KPIs,
- * iron rules, hard truths, affirmations, personal schedules, milestones, named
- * relationships, or auto-completed setup/entitlement flags.
+ * Pins the fresh-install neutrality contract for [SeedDataHelper.seedReferenceCatalogsIfNeeded]:
+ * it seeds reference catalogs (skills, muscle groups) and nothing else. Personal seed data
+ * on a fresh install must be exactly 0 — no hunter profile, WarriorProfile, tracks/pillars,
+ * KPIs, iron rules, hard truths, affirmations, schedules, milestones, named relationships,
+ * or auto-completed setup/entitlement flags.
  *
- * RED expectation (personal bootstrap still in place): TESTS A, B, C, E FAIL because
- * [SeedDataHelper.seedDefaultProfileIfNeeded] seeds a personal Warrior profile, blueprint
- * collections, and fakes setupComplete/financial flags. TESTS D and F pass in both states
- * (reference catalogs present; existing-user data preserved).
+ * TESTS A, B, C, E assert the absence of personal seed data; TESTS D and F assert the
+ * present-and-preserved invariants (reference catalogs seeded; existing-user data intact).
+ * (These four were the RED-failing assertions before the bootstrap was neutralized.)
  */
 class NeutralBootstrapTest {
 
@@ -37,7 +36,7 @@ class NeutralBootstrapTest {
         val hunter = FakeHunterRepository()
         val helper = newHelper(FakeSeedPreferences(), hunter = hunter)
 
-        helper.seedDefaultProfileIfNeeded()
+        helper.seedReferenceCatalogsIfNeeded()
 
         assertNull("Fresh bootstrap must not seed a hunter profile", hunter.profile)
     }
@@ -48,7 +47,7 @@ class NeutralBootstrapTest {
         val warrior = FakeWarriorProfileRepository()
         val helper = newHelper(FakeSeedPreferences(), warrior = warrior)
 
-        helper.seedDefaultProfileIfNeeded()
+        helper.seedReferenceCatalogsIfNeeded()
 
         assertEquals("tracks", 0, warrior.getAllTracks().size)
         assertEquals("scheduleBlocks", 0, warrior.getAllScheduleBlocks().size)
@@ -65,7 +64,7 @@ class NeutralBootstrapTest {
         val prefs = FakeSeedPreferences()
         val helper = newHelper(prefs)
 
-        helper.seedDefaultProfileIfNeeded()
+        helper.seedReferenceCatalogsIfNeeded()
 
         assertFalse("setupComplete must be user-earned", prefs.setupComplete)
         assertFalse("firstMissionDone must be user-earned", prefs.firstMissionDone)
@@ -80,7 +79,7 @@ class NeutralBootstrapTest {
         val muscles = FakeMuscleGroupRepository()
         val helper = newHelper(FakeSeedPreferences(), skills = skills, muscles = muscles)
 
-        helper.seedDefaultProfileIfNeeded()
+        helper.seedReferenceCatalogsIfNeeded()
 
         assertEquals("skill catalog (6 parents + 18 children)", 24, skills.getAllSkills().first().size)
         assertEquals("muscle group catalog", 8, muscles.getAllMuscleGroups().first().size)
@@ -92,7 +91,7 @@ class NeutralBootstrapTest {
         val warrior = FakeWarriorProfileRepository()
         val helper = newHelper(FakeSeedPreferences(), warrior = warrior)
 
-        helper.seedDefaultProfileIfNeeded()
+        helper.seedReferenceCatalogsIfNeeded()
 
         assertNull("Fresh bootstrap must not seed the personal WarriorProfile", warrior.getProfile("default"))
     }
@@ -112,7 +111,7 @@ class NeutralBootstrapTest {
         }
 
         val helper = newHelper(prefs, warrior = warrior)
-        helper.seedDefaultProfileIfNeeded()
+        helper.seedReferenceCatalogsIfNeeded()
 
         assertEquals("existing milestones preserved", 1, warrior.getAllMajorMilestones().size)
         assertEquals("existing relationships preserved", 4, warrior.getAllKeyRelationships().size)
