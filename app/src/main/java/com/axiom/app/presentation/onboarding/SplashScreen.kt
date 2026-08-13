@@ -23,7 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.axiom.app.R
-import com.axiom.app.domain.repository.HunterRepository
+import com.axiom.app.core.startup.StartupReadiness
 import com.axiom.app.ui.components.xion.XionLivingEyeAvatar
 import com.axiom.app.ui.components.xion.XionMood
 import com.axiom.app.ui.theme.*
@@ -35,15 +35,28 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    private val hunterRepository: HunterRepository,
     private val ensureAnonymousSessionUseCase: com.axiom.app.domain.usecase.EnsureAnonymousSessionUseCase,
-    private val preferences: com.axiom.app.data.local.AxiomPreferences
+    private val preferences: com.axiom.app.data.local.AxiomPreferences,
+    private val startupReadiness: StartupReadiness
 ) : ViewModel() {
-    suspend fun checkSetupComplete(): Boolean {
-        return preferences.setupCompleteFlow.first()
-    }
-    suspend fun checkProfileExists(): Boolean {
-        return hunterRepository.getDirectHunterProfile() != null
+    /**
+     * Resolves the launch destination from authoritative startup flags.
+     *
+     * WP-201: awaits startup readiness before reading state, so the route is
+     * independent of Splash animation / seeding coroutine timing.
+     */
+    suspend fun resolveDestination(): LaunchDestination {
+        val resolver = LaunchRouteResolver(
+            awaitStartupReady = { startupReadiness.await() },
+            readState = {
+                LaunchInputs(
+                    setupComplete = preferences.setupCompleteFlow.first(),
+                    firstMissionDone = preferences.firstMissionDoneFlow.first(),
+                    blueprintSetupComplete = preferences.blueprintSetupCompleteFlow.first()
+                )
+            }
+        )
+        return resolver.resolve()
     }
     fun ensureAnonymousSessionInBackground() {
         viewModelScope.launch {
@@ -146,16 +159,11 @@ fun SplashScreen(
 
         coroutineScope.launch {
             try {
-                val setupDone = viewModel.checkSetupComplete()
-                if (!setupDone) {
-                    onNavigateToSetup()
-                    return@launch
-                }
-                val exists = viewModel.checkProfileExists()
-                if (exists) {
-                    onNavigateToHome()
-                } else {
-                    onNavigateToOnboarding()
+                when (viewModel.resolveDestination()) {
+                    LaunchDestination.SETUP -> onNavigateToSetup()
+                    LaunchDestination.HOME -> onNavigateToHome()
+                    LaunchDestination.ONBOARDING,
+                    LaunchDestination.BLUEPRINT_WIZARD -> onNavigateToOnboarding()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

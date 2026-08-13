@@ -77,6 +77,9 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var skillRepository: SkillRepository
 
+    @Inject
+    lateinit var startupReadiness: com.axiom.app.core.startup.StartupReadiness
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -124,6 +127,11 @@ class MainActivity : ComponentActivity() {
                 }
             } catch (e: Throwable) {
                 e.printStackTrace()
+            } finally {
+                // WP-201: signal authoritative startup readiness exactly once,
+                // even on failure, so launch routing never blocks indefinitely
+                // and never reads pre-bootstrap state.
+                startupReadiness.markReady()
             }
         }
 
