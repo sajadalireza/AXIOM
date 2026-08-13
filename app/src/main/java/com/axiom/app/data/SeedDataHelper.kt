@@ -9,11 +9,14 @@ import javax.inject.Singleton
 /**
  * Neutral fresh-install seeder (WP-202). Seeds only non-personal reference catalogs.
  *
- * [warriorProfileRepository] and [hunterRepository] are intentionally retained even though
- * the neutral bootstrap does not write to them: they are the observation surface for the
- * [com.axiom.app.data.NeutralBootstrapTest] neutrality regression, which asserts that a
- * fresh bootstrap leaves the hunter profile and every personal blueprint collection empty.
- * Any future re-introduction of personal seeding here trips that test.
+ * [warriorProfileRepository] and [hunterRepository] are injected but deliberately never
+ * written to: keeping them as constructor dependencies preserves the bootstrap's *capability*
+ * to seed personal data, which is exactly what the [com.axiom.app.data.NeutralBootstrapTest]
+ * neutrality regression pins. Tests A/B/E construct fakes, pass them into this constructor, and
+ * assert the hunter profile and every personal blueprint collection stay empty after bootstrap;
+ * any re-introduced personal write here mutates those same injected fakes and fails the test.
+ * Dropping these params would compile fine but make A/B/E vacuous — so they are load-bearing for
+ * the regression, not dead code.
  */
 @Singleton
 class SeedDataHelper @Inject constructor(
