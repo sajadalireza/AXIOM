@@ -134,6 +134,12 @@ jobs:
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" > /dev/null
       - name: Regenerate Room schema
         run: ./gradlew :app:kspDebugKotlin --stacktrace --no-daemon
+      - name: TEMP WP-204 export generated schemas
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: wp204-generated-schemas
+          path: app/schemas/com.axiom.app.data.local.AxiomDatabase/*.json
+          if-no-files-found: error
       - name: Fail on uncommitted schema drift
         run: |
           # Detects both modified tracked schemas and newly generated untracked ones.

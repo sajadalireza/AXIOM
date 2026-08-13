@@ -58,4 +58,41 @@ class MigrationTest {
         assert(cursor.getString(nameIndex) == "Test Warrior")
         cursor.close()
     }
+
+    /**
+     * WP-204 — v16 → v17 additive First-Win migration preserves existing rows and
+     * creates the three new empty tables. Validated by Room's own schema check
+     * (`validateDroppedAndCreatedTables = true`), which proves the migrated schema
+     * matches the exported 17.json identity. NOTE: instrumented — requires a
+     * connected device/emulator; CI has no such job and it is not executed in the
+     * WP-204 evidence run (see JVM `MigrationV16V17SqliteTest` for the executed proof).
+     */
+    @Test
+    @Throws(IOException::class)
+    fun migrate16To17PreservesData() {
+        var db = helper.createDatabase(TEST_DB, 16)
+        db.execSQL("INSERT INTO hunter_profile (id, name, level, rankLabel, totalXP, currentXP, xpToNextLevel, progressPercent, rankColor, rankGlyph, personalThesis) VALUES ('1', 'Test Warrior', 3, 'HUNTER', 500, 20, 100, 0.2, 0, '', '')")
+        db.close()
+
+        db = helper.runMigrationsAndValidate(
+            TEST_DB,
+            17,
+            true,
+            com.axiom.app.db.migrations.MIGRATION_16_17
+        )
+
+        val hunter = db.query("SELECT name, level FROM hunter_profile WHERE id='1'")
+        assert(hunter.moveToFirst())
+        assert(hunter.getString(hunter.getColumnIndex("name")) == "Test Warrior")
+        assert(hunter.getInt(hunter.getColumnIndex("level")) == 3)
+        hunter.close()
+
+        // New tables exist and start empty.
+        for (table in listOf("first_win_session", "completion_receipt", "event_queue")) {
+            val c = db.query("SELECT COUNT(*) FROM $table")
+            assert(c.moveToFirst())
+            assert(c.getInt(0) == 0)
+            c.close()
+        }
+    }
 }
