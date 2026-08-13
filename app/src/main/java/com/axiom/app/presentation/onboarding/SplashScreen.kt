@@ -23,7 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.axiom.app.R
-import com.axiom.app.domain.repository.HunterRepository
+import com.axiom.app.core.startup.StartupReadiness
 import com.axiom.app.ui.components.xion.XionLivingEyeAvatar
 import com.axiom.app.ui.components.xion.XionMood
 import com.axiom.app.ui.theme.*
@@ -35,19 +35,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    private val hunterRepository: HunterRepository,
     private val ensureAnonymousSessionUseCase: com.axiom.app.domain.usecase.EnsureAnonymousSessionUseCase,
-    private val preferences: com.axiom.app.data.local.AxiomPreferences
+    private val preferences: com.axiom.app.data.local.AxiomPreferences,
+    private val startupReadiness: StartupReadiness
 ) : ViewModel() {
     /**
      * Resolves the launch destination from authoritative startup flags.
      *
-     * WP-201 (RED): no startup-readiness gate — reads state as soon as called,
-     * so it can observe pre-bootstrap state and misroute depending on timing.
+     * WP-201: awaits startup readiness before reading state, so the route is
+     * independent of Splash animation / seeding coroutine timing.
      */
     suspend fun resolveDestination(): LaunchDestination {
         val resolver = LaunchRouteResolver(
-            awaitStartupReady = {},
+            awaitStartupReady = { startupReadiness.await() },
             readState = {
                 LaunchInputs(
                     setupComplete = preferences.setupCompleteFlow.first(),

@@ -41,15 +41,16 @@ object LaunchClassifier {
 /**
  * Resolves the launch destination from authoritative startup state.
  *
- * WP-201 (RED): this implementation reads launch state WITHOUT waiting for
- * bootstrap/seeding to finish, so route evaluation can observe pre-bootstrap
- * state and pick the wrong destination depending on coroutine timing.
+ * WP-201: [resolve] awaits startup readiness BEFORE reading launch state, so
+ * route evaluation always observes post-bootstrap state. The same user state
+ * therefore maps to the same destination regardless of coroutine timing.
  */
 class LaunchRouteResolver(
     private val awaitStartupReady: suspend () -> Unit,
     private val readState: suspend () -> LaunchInputs,
 ) {
     suspend fun resolve(): LaunchDestination {
+        awaitStartupReady()
         val inputs = readState()
         return LaunchClassifier.classify(inputs)
     }
