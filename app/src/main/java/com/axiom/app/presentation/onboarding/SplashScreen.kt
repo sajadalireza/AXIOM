@@ -37,26 +37,31 @@ import javax.inject.Inject
 class SplashViewModel @Inject constructor(
     private val ensureAnonymousSessionUseCase: com.axiom.app.domain.usecase.EnsureAnonymousSessionUseCase,
     private val preferences: com.axiom.app.data.local.AxiomPreferences,
+    private val hunterRepository: com.axiom.app.domain.repository.HunterRepository,
     private val startupReadiness: StartupReadiness
 ) : ViewModel() {
     /**
-     * Resolves the launch destination from authoritative startup flags.
+     * Resolves the launch destination from authoritative startup facts.
      *
-     * WP-201: awaits startup readiness before reading state, so the route is
+     * WP-201: awaits startup readiness BEFORE reading any state, so the route is
      * independent of Splash animation / seeding coroutine timing.
+     * WP-202: the returned [LaunchDestination] is the single navigation authority
+     * handed verbatim to the one-shot Splash exit (no NavGraph recomputation).
+     * WP-203: routing now consults the four-fact [EligibilityStateMachine] — the
+     * Hunter entity (`hunterExists`) is read as a first-class fact so a missing
+     * Hunter after earned progress recovers (never routes HOME into a null-Hunter
+     * shimmer). Pure classification only; no Room/DataStore mutation here.
      */
     suspend fun resolveDestination(): LaunchDestination {
-        val resolver = LaunchRouteResolver(
-            awaitStartupReady = { startupReadiness.await() },
-            readState = {
-                LaunchInputs(
-                    setupComplete = preferences.setupCompleteFlow.first(),
-                    firstMissionDone = preferences.firstMissionDoneFlow.first(),
-                    blueprintSetupComplete = preferences.blueprintSetupCompleteFlow.first()
-                )
-            }
+        // WP-201 gate: block until startup work is done, THEN read facts.
+        startupReadiness.await()
+        val snapshot = EligibilitySnapshot(
+            setupComplete = preferences.setupCompleteFlow.first(),
+            hunterExists = hunterRepository.getDirectHunterProfile() != null,
+            firstMissionDone = preferences.firstMissionDoneFlow.first(),
+            blueprintSetupComplete = preferences.blueprintSetupCompleteFlow.first(),
         )
-        return resolver.resolve()
+        return EligibilityStateMachine.evaluate(snapshot).destination
     }
     fun ensureAnonymousSessionInBackground() {
         viewModelScope.launch {

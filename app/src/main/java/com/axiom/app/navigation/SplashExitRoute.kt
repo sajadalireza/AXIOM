@@ -1,6 +1,7 @@
 package com.axiom.app.navigation
 
 import com.axiom.app.presentation.onboarding.LaunchDestination
+import com.axiom.app.presentation.onboarding.PostHunterRoute
 
 /**
  * Single source of truth for the one-shot Splash-exit navigation route.
@@ -37,4 +38,23 @@ fun splashExitRoute(
     LaunchDestination.ONBOARDING -> Screen.Onboarding.route
     LaunchDestination.BLUEPRINT_WIZARD -> Screen.BlueprintWizard.route
     LaunchDestination.HOME -> Screen.Home.route
+}
+
+/**
+ * WP-203 recovery-loop repair — the post-Hunter-creation companion to
+ * [splashExitRoute]. Maps the authoritative [PostHunterRoute] (produced by
+ * [com.axiom.app.presentation.onboarding.PostHunterRouteResolver] from a fresh
+ * re-read of persisted eligibility) to its [Screen] route.
+ *
+ * This closes the same stale-`collectAsStateWithLifecycle(initialValue = false)`
+ * race one layer deeper than WP-202: `AwakeningComplete.onBegin` previously
+ * recomputed its exit from those stale flags and replayed First Mission for a
+ * completed recovery user. Routing now flows only from re-read eligibility.
+ */
+fun postHunterExitRoute(route: PostHunterRoute): String = when (route) {
+    PostHunterRoute.HOME -> Screen.Home.route
+    PostHunterRoute.FIRST_MISSION -> Screen.FirstMission.route
+    PostHunterRoute.BLUEPRINT -> Screen.BlueprintWizard.route
+    PostHunterRoute.ONBOARDING -> Screen.Onboarding.route
+    PostHunterRoute.SETUP -> Screen.Setup.route
 }

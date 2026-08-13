@@ -41,6 +41,7 @@ import com.axiom.app.ui.components.*
 import com.axiom.app.ui.theme.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -51,10 +52,24 @@ class OnboardingViewModel @Inject constructor(
     private val preferences: AxiomPreferences
 ) : ViewModel() {
     suspend fun beginAwakening(name: String) {
+        // WP-203 Decision D — streak safety. Read the earned-progress facts BEFORE
+        // any (re)initialization so a HUNTER_RECOVERY / resumed user is never
+        // re-zeroed. `shouldInitializeStreak` is true only for a genuinely fresh
+        // user (no first mission, no blueprint); recovery/resumed keep their streak.
+        val snapshot = EligibilitySnapshot(
+            setupComplete = preferences.setupCompleteFlow.first(),
+            hunterExists = false, // irrelevant to the streak guard; keyed on earned progress
+            firstMissionDone = preferences.firstMissionDoneFlow.first(),
+            blueprintSetupComplete = preferences.blueprintSetupCompleteFlow.first(),
+        )
+        val shouldInitStreak = EligibilityStateMachine.shouldInitializeStreak(snapshot)
+
         initializeAxiomUseCase(customName = name.trim())
         seedDataHelper.seedSkillsIfNeeded()
         seedDataHelper.seedMuscleGroupsIfNeeded()
-        preferences.setStreak(0)
+        if (shouldInitStreak) {
+            preferences.setStreak(0)
+        }
     }
 }
 

@@ -41,13 +41,44 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import com.axiom.app.data.local.AxiomPreferences
+import com.axiom.app.domain.repository.HunterRepository
+import com.axiom.app.presentation.onboarding.EligibilitySnapshot
+import com.axiom.app.presentation.onboarding.PostHunterRoute
+import com.axiom.app.presentation.onboarding.PostHunterRouteResolver
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class AwakenNavViewModel @Inject constructor(
-    val preferences: AxiomPreferences
-) : ViewModel()
+    val preferences: AxiomPreferences,
+    private val hunterRepository: HunterRepository,
+) : ViewModel() {
+
+    /**
+     * WP-203 recovery-loop repair: single post-Hunter route authority. Re-reads
+     * persisted eligibility (DataStore flags + Hunter entity existence) AFTER a
+     * Hunter is (re)created, then routes from [EligibilityStateMachine] rather
+     * than from stale lifecycle-collected UI defaults. Never consults the
+     * NavGraph's `initialValue = false` flows.
+     */
+    private val postHunterRouteResolver = PostHunterRouteResolver(
+        readSnapshot = {
+            EligibilitySnapshot(
+                setupComplete = preferences.setupCompleteFlow.first(),
+                hunterExists = hunterRepository.getDirectHunterProfile() != null,
+                firstMissionDone = preferences.firstMissionDoneFlow.first(),
+                blueprintSetupComplete = preferences.blueprintSetupCompleteFlow.first(),
+            )
+        },
+    )
+
+    /** Terminal, authoritative re-read → resolved next onboarding step. */
+    suspend fun resolvePostHunterRoute(): PostHunterRoute =
+        postHunterRouteResolver.resolve()
+}
 
 @Composable
 fun AwakenNavGraph(
@@ -134,11 +165,19 @@ fun AwakenNavGraph(
             )
         }
         composable(Screen.AwakeningComplete.route) {
+            // WP-203 recovery-loop repair: the next step after a Hunter is
+            // (re)created is derived from an AUTHORITATIVE re-read of persisted
+            // eligibility, NOT from the stale `initialValue = false` flags above.
+            // A completed recovery user resolves to HOME (no First Mission /
+            // Blueprint replay); a genuinely fresh user resolves to FirstMission.
+            val scope = rememberCoroutineScope()
             com.axiom.app.presentation.onboarding.AwakeningCompleteScreen(
                 onBegin = {
-                    val nextRoute = if (firstMissionDone) Screen.Home.route else Screen.FirstMission.route
-                    navController.navigate(nextRoute) {
-                        popUpTo(Screen.AwakeningComplete.route) { inclusive = true }
+                    scope.launch {
+                        val nextRoute = postHunterExitRoute(viewModel.resolvePostHunterRoute())
+                        navController.navigate(nextRoute) {
+                            popUpTo(Screen.AwakeningComplete.route) { inclusive = true }
+                        }
                     }
                 }
             )
