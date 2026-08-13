@@ -2,6 +2,7 @@ package com.axiom.app.presentation.onboarding
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
@@ -70,14 +71,14 @@ class LaunchRaceRegressionTest {
      *    only after startup readiness is signalled. A correct resolver awaits
      *    readiness, so it observes the post-seed state either way.
      */
-    private suspend fun resolveWithOrdering(seedBeforeRead: Boolean): LaunchDestination {
+    private suspend fun resolveWithOrdering(seedBeforeRead: Boolean): LaunchDestination = coroutineScope {
         val state = FakeStartupState() // fresh: nothing seeded yet
         val ready = CompletableDeferred<Unit>()
         val resolver = LaunchRouteResolver(
             awaitStartupReady = { ready.await() },
             readState = { state.snapshot() }
         )
-        return if (seedBeforeRead) {
+        if (seedBeforeRead) {
             state.applyDefaultProfileSeed()
             ready.complete(Unit)
             resolver.resolve()
