@@ -793,6 +793,28 @@ open class AxiomPreferences @Inject constructor(
         }
     }
 
+    /**
+     * WP-205 §8/§10 — post-commit COMPATIBILITY MIRROR of the canonical Room streak.
+     *
+     * Room [com.axiom.app.data.local.entity.StreakEntity] is the durable authority; this
+     * copies the already-committed resulting streak into DataStore for legacy readers. It does
+     * NOT recompute the daily rule (that ran inside the atomic transaction) — it only reflects
+     * truth. A failure here leaves the Room commit valid (§10); a later retry re-derives the
+     * same values from Room and never re-awards. Never writes a lower current streak, so a
+     * stale mirror can only be corrected upward, never zeroed.
+     */
+    suspend fun mirrorCompletionStreak(streak: Int, longest: Int, lastCompleteMillis: Long) {
+        context.dataStore.edit { prefs ->
+            val existing = prefs[STREAK] ?: 0
+            prefs[STREAK] = maxOf(existing, streak)
+            val existingLongest = prefs[LONGEST_STREAK] ?: 0
+            prefs[LONGEST_STREAK] = maxOf(existingLongest, longest)
+            if (lastCompleteMillis > 0L) {
+                prefs[LAST_COMPLETE_TIMESTAMP] = lastCompleteMillis
+            }
+        }
+    }
+
     suspend fun checkOffDailyProtocol(): Boolean {
         var streakUpdated = false
         context.dataStore.edit { prefs ->

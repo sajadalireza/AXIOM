@@ -36,8 +36,31 @@ object AtomicCompletionWriteSequence {
         insertRichReceipt: suspend () -> Unit,
         insertPendingEvent: suspend () -> Unit,
     ): AtomicCompletionOutcome {
-        // WP-205 GREEN not yet implemented — RED until the atomic ordering is filled in.
-        throw NotImplementedError("WP-205 AtomicCompletionWriteSequence.run not implemented")
+        // IDEMPOTENCY GATE (first-win only): if a rich receipt already exists for this
+        // logical completion, re-award NOTHING. Runs before any mutation so a duplicate
+        // command performs zero writes (no mission transition, no XP, no streak, no second
+        // receipt/event). Short-circuit relies on Kotlin && so a non-first-win completion
+        // never even probes the receipt table.
+        if (isFirstWin && receiptAlreadyExists()) return AtomicCompletionOutcome.ALREADY_RECORDED
+
+        // ECONOMY WRITES — canonical order. Every step here is a Room write inside the
+        // enclosing transaction; a throw in any of them rolls back all prior writes.
+        writeMissionCompleted()
+        writeSkillAwards()
+        writeHunterAward()
+        upsertStreak()
+        writeShadowIfUnlocked()
+        writeDungeonIfPresent()
+
+        // FIRST-WIN-ONLY durable proof + causal event, written LAST so the award is
+        // fully materialized before the receipt/event that attest to it. Non-first-win
+        // completions run the same atomic economy but write no first-win receipt/event.
+        if (isFirstWin) {
+            insertRichReceipt()
+            insertPendingEvent()
+        }
+
+        return AtomicCompletionOutcome.AWARDED
     }
 }
 

@@ -58,8 +58,9 @@ class FirstMissionViewModel @Inject constructor(
                 // produces a real reward — this is the critical first-session moment.
                 val xpResult = completeMissionUseCase(missionId, actualHours = 0.5f)
 
-                // Mark onboarding done
-                preferences.setFirstMissionDone(true)
+                // WP-205: first-mission-done is now flipped inside CompleteMissionUseCase PHASE C
+                // (gated by the first-win receipt), so completion + onboarding flag are one atomic
+                // authority. No separate setFirstMissionDone here.
                 com.axiom.app.core.AnalyticsLogger.log("onboarding_completed")
 
                 // Feed the existing XP float animation with the real XP gained

@@ -24,6 +24,13 @@ abstract class AppModule {
         impl: HunterRepositoryImpl
     ): HunterRepository
 
+    // WP-205 — single atomic-completion transactional boundary (owns database.withTransaction).
+    @Binds
+    @Singleton
+    abstract fun bindAtomicCompletionRepository(
+        impl: AtomicCompletionRepositoryImpl
+    ): AtomicCompletionRepository
+
     @Binds
     @Singleton
     abstract fun bindMissionRepository(
