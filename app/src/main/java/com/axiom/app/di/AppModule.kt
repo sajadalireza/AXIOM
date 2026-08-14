@@ -24,6 +24,13 @@ abstract class AppModule {
         impl: HunterRepositoryImpl
     ): HunterRepository
 
+    // WP-205 — single atomic-completion transactional boundary (owns database.withTransaction).
+    @Binds
+    @Singleton
+    abstract fun bindAtomicCompletionRepository(
+        impl: AtomicCompletionRepositoryImpl
+    ): AtomicCompletionRepository
+
     @Binds
     @Singleton
     abstract fun bindMissionRepository(
@@ -153,7 +160,8 @@ abstract class AppModule {
                 com.axiom.app.db.migrations.MIGRATION_13_14,
                 com.axiom.app.db.migrations.MIGRATION_14_15,
                 com.axiom.app.db.migrations.MIGRATION_15_16,
-                com.axiom.app.db.migrations.MIGRATION_16_17
+                com.axiom.app.db.migrations.MIGRATION_16_17,
+                com.axiom.app.db.migrations.MIGRATION_17_18
             )
             // No fallbackToDestructiveMigration: an unresolved migration path
             // must crash loudly (Room throws IllegalStateException) instead of

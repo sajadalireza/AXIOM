@@ -441,7 +441,8 @@ class FocusProtocolManager @Inject constructor(
                 val oldHunter = getHunterProfileUseCase().firstOrNull()
                 val oldRank = oldHunter?.rankLabel ?: "E-Rank"
                 val result = completeMissionUseCase(mission.id, 1.0f)
-                preferences.checkOffDailyProtocol()
+                // WP-205: streak transition is owned by CompleteMissionUseCase (canonical Room
+                // streak + post-commit DataStore mirror). No separate checkOffDailyProtocol here.
 
                 if (result != null) {
                     SoundEngine.play(AwakenSound.MISSION_COMPLETE)

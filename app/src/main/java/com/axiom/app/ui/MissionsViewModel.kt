@@ -132,8 +132,9 @@ class MissionsViewModel @Inject constructor(
             )
 
             if (result != null) {
-                // Mark today's protocol complete — keeps streak alive
-                preferences.checkOffDailyProtocol()
+                // Streak is now owned by CompleteMissionUseCase (WP-205 canonical Room streak,
+                // mirrored to DataStore post-commit). No separate checkOffDailyProtocol here —
+                // that would double-count the daily streak transition.
 
                 _xpFloatEvent.value = com.axiom.app.ui.components.XPFloatEvent(
                     xpValue          = result.hunterXPGained,
