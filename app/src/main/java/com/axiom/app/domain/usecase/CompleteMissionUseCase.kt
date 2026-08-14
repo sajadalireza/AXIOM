@@ -377,8 +377,10 @@ class CompleteMissionUseCase @Inject constructor(
             } catch (e: Exception) { }
         }
 
-        deferredCeremonies.forEach { ceremonyEngine.emit(it) }
-        deferredMessages.forEach { systemFeedRepository.emitMessage(it) }
+        // Post-commit, best-effort like every other Phase-C side effect: a throw from a ceremony
+        // or system-message sink must not discard the already-durable XPResult (§5/§13).
+        try { deferredCeremonies.forEach { ceremonyEngine.emit(it) } } catch (e: Exception) { }
+        try { deferredMessages.forEach { systemFeedRepository.emitMessage(it) } } catch (e: Exception) { }
 
         if (result != null && hunter != null) {
             try {

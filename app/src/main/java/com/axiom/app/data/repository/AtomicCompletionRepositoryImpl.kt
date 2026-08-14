@@ -15,7 +15,6 @@ import com.axiom.app.domain.completion.AtomicCompletionWriteSequence
 import com.axiom.app.domain.repository.AtomicCompletionCommand
 import com.axiom.app.domain.repository.AtomicCompletionRepository
 import com.axiom.app.domain.repository.AtomicCompletionResult
-import kotlinx.coroutines.flow.first
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -127,7 +126,7 @@ class AtomicCompletionRepositoryImpl @Inject constructor(
      * true singleton.
      */
     private suspend fun resolveRoomStreak(command: AtomicCompletionCommand): StreakEntity {
-        val existing = database.streakDao().getStreak().first()
+        val existing = database.streakDao().getStreakOnce()
         val today = command.nowMillis.toLocalDate()
 
         val roomDate = existing?.lastActivityDate?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
