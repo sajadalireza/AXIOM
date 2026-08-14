@@ -134,6 +134,14 @@ jobs:
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" > /dev/null
       - name: Regenerate Room schema
         run: ./gradlew :app:kspDebugKotlin --stacktrace --no-daemon
+      - name: Upload generated Room schema (temporary — v18 export retrieval)
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: generated-room-schema
+          path: app/schemas
+          retention-days: 3
+          if-no-files-found: ignore
       - name: Fail on uncommitted schema drift
         run: |
           # Detects both modified tracked schemas and newly generated untracked ones.

@@ -37,7 +37,7 @@ import com.axiom.app.data.local.entity.*
         CompletionReceiptEntity::class,
         EventQueueEntity::class
     ],
-    version = 17,
+    version = 18,
     exportSchema = true
 )
 abstract class AxiomDatabase : RoomDatabase() {
