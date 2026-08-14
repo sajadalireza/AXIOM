@@ -25,7 +25,29 @@ object AnalyticsDispatchEngine {
         consent: AnalyticsConsentSource,
         store: AnalyticsEventStore,
         uploader: AnalyticsUploader
-    ): DrainOutcome = TODO("WP-206 GREEN")
+    ): DrainOutcome {
+        when (consent.current()) {
+            AnalyticsConsentState.DECLINED -> {
+                store.purgeAnalytics()
+                return DrainOutcome.PURGED_DECLINED
+            }
+            AnalyticsConsentState.UNKNOWN -> return DrainOutcome.NO_CONSENT
+            AnalyticsConsentState.GRANTED -> Unit // fall through to drain loop
+        }
+
+        for (event in store.pendingAnalytics()) {
+            // Re-check consent BEFORE every upload so a mid-drain revocation halts egress (§16).
+            if (consent.current() != AnalyticsConsentState.GRANTED) {
+                return DrainOutcome.NO_CONSENT
+            }
+            if (uploader.upload(event)) {
+                store.delete(event.eventId) // delete ONLY after confirmed success (§21)
+            } else {
+                return DrainOutcome.RETRY_LATER // offline/failure keeps the row PENDING
+            }
+        }
+        return DrainOutcome.DRAINED
+    }
 }
 
 /** Immutable snapshot of one queued analytics row handed to the uploader. Carries no raw text. */

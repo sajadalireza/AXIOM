@@ -47,8 +47,21 @@ object AnalyticsPayloadPolicy {
     )
 
     /** Validate a (name, properties) pair. Fail-closed. */
-    fun validate(eventName: String, properties: Map<String, Any?>): PayloadValidation =
-        TODO("WP-206 GREEN")
+    fun validate(eventName: String, properties: Map<String, Any?>): PayloadValidation {
+        val allowed = ALLOWLIST[eventName]
+            ?: return PayloadValidation.Rejected("unknown_event", eventName)
+        for ((key, _) in properties) {
+            // Defense-in-depth blacklist first (§9) — case-insensitive.
+            if (key.lowercase() in SENSITIVE_KEYS) {
+                return PayloadValidation.Rejected("sensitive_key", key)
+            }
+            // Primary allowlist gate (§8) — case-sensitive, fail-closed.
+            if (key !in allowed) {
+                return PayloadValidation.Rejected("not_allowlisted", key)
+            }
+        }
+        return PayloadValidation.Accepted(properties.mapValues { it.value?.toString() ?: "" })
+    }
 }
 
 /** Result of [AnalyticsPayloadPolicy.validate]. */

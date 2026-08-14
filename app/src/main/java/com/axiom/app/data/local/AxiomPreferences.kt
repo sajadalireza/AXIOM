@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.axiom.app.domain.model.CharacterStats
+import com.axiom.app.domain.analytics.AnalyticsConsentState
 import com.axiom.app.ui.theme.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -68,6 +69,9 @@ open class AxiomPreferences @Inject constructor(
         private val SYSTEM_VOICE_MODE = stringPreferencesKey("system_voice_mode")
         private val ACTIVATED = booleanPreferencesKey("activated")
         private val ACTIVATION_CODE = stringPreferencesKey("activation_code")
+        // WP-206 — three-state analytics consent (default UNKNOWN) + last-change timestamp.
+        private val ANALYTICS_CONSENT_STATE = stringPreferencesKey("analytics_consent_state")
+        private val ANALYTICS_CONSENT_UPDATED_AT = longPreferencesKey("analytics_consent_updated_at")
         private val IS_PREMIUM = booleanPreferencesKey("is_premium")
         private val PREMIUM_PLAN = stringPreferencesKey("premium_plan")
         private val EQUIPPED_PASSIVE_SKILL_ID = stringPreferencesKey("equipped_passive_skill_id")
@@ -494,6 +498,34 @@ open class AxiomPreferences @Inject constructor(
             prefs[THEME_MODE] = mode.name
         }
     }
+
+    // ---- WP-206 analytics consent (§5/§15) ----
+    // Canonical state is DataStore-authoritative: current state + last-change timestamp +
+    // deterministic transitions (§4 ruling: no append-only history needed). Reversible — the
+    // setter simply overwrites state and stamps the change time.
+    val analyticsConsentStateFlow: Flow<AnalyticsConsentState> = context.dataStore.data.map { prefs ->
+        try {
+            AnalyticsConsentState.valueOf(prefs[ANALYTICS_CONSENT_STATE] ?: AnalyticsConsentState.UNKNOWN.name)
+        } catch (e: Exception) {
+            AnalyticsConsentState.UNKNOWN
+        }
+    }
+
+    val analyticsConsentUpdatedAtFlow: Flow<Long> = context.dataStore.data.map { prefs ->
+        prefs[ANALYTICS_CONSENT_UPDATED_AT] ?: 0L
+    }
+
+    /** Reversible consent write (§15). Persists the new state and the change timestamp atomically. */
+    suspend fun setAnalyticsConsent(state: AnalyticsConsentState, nowMillis: Long = System.currentTimeMillis()) {
+        context.dataStore.edit { prefs ->
+            prefs[ANALYTICS_CONSENT_STATE] = state.name
+            prefs[ANALYTICS_CONSENT_UPDATED_AT] = nowMillis
+        }
+    }
+
+    /** One-shot consent read for the drain worker / atomic-completion snapshot. */
+    suspend fun analyticsConsentStateOnce(): AnalyticsConsentState = analyticsConsentStateFlow.first()
+
 
     // Language (also saved to SharedPreferences via MainActivity for attachBaseContext)
     val languageFlow: Flow<String> = context.dataStore.data.map { prefs ->

@@ -11,18 +11,25 @@ package com.axiom.app.domain.analytics
 object ConsentDecisionEngine {
 
     /** Per-event routing verdict. Total function of [state]. */
-    fun decide(state: AnalyticsConsentState): QueueDecision = TODO("WP-206 GREEN")
+    fun decide(state: AnalyticsConsentState): QueueDecision = when (state) {
+        AnalyticsConsentState.UNKNOWN -> QueueDecision.HOLD
+        AnalyticsConsentState.GRANTED -> QueueDecision.SEND_ELIGIBLE
+        AnalyticsConsentState.DECLINED -> QueueDecision.DELETE
+    }
 
     /**
      * May an ordinary analytics event be written to the local queue at all?
      * DECLINED → false (do-not-collect, Decision D); UNKNOWN/GRANTED → true (UNKNOWN retains
      * locally without uploading).
      */
-    fun shouldEnqueue(state: AnalyticsConsentState): Boolean = TODO("WP-206 GREEN")
+    fun shouldEnqueue(state: AnalyticsConsentState): Boolean =
+        state != AnalyticsConsentState.DECLINED
 
     /** May queued analytics be uploaded over the network? GRANTED only (§12/§14). */
-    fun shouldUpload(state: AnalyticsConsentState): Boolean = TODO("WP-206 GREEN")
+    fun shouldUpload(state: AnalyticsConsentState): Boolean =
+        state == AnalyticsConsentState.GRANTED
 
     /** Must already-queued analytics be purged now? DECLINED only (§13/§26). */
-    fun shouldPurge(state: AnalyticsConsentState): Boolean = TODO("WP-206 GREEN")
+    fun shouldPurge(state: AnalyticsConsentState): Boolean =
+        state == AnalyticsConsentState.DECLINED
 }

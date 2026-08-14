@@ -39,6 +39,11 @@ interface AtomicCompletionRepository {
  * @param streakBaselineCurrent / streakBaselineLongest / streakLastActivityMillis DataStore streak
  *   snapshot read in PHASE A, used to bootstrap/reconcile the canonical Room streak (§9) without
  *   ever zeroing an existing user.
+ * @param analyticsCollectionAllowed WP-206 Decision D — an IMMUTABLE consent snapshot read BEFORE
+ *   the atomic transaction. When false (consent DECLINED), the first-win causal analytics row is
+ *   NOT enqueued inside the transaction. This preserves the ACID boundary exactly (no DataStore
+ *   read inside `withTransaction`); Room and DataStore consent are NOT claimed to be atomic — a
+ *   post-commit purge (AnalyticsGateway) remains the backstop for a race between snapshot and commit.
  */
 data class AtomicCompletionCommand(
     val idempotencyKey: String,
@@ -54,7 +59,8 @@ data class AtomicCompletionCommand(
     val nowMillis: Long,
     val hunterXpAwarded: Int,
     val skillXpAwarded: Long,
-    val sessionId: String?
+    val sessionId: String?,
+    val analyticsCollectionAllowed: Boolean = true
 )
 
 /**
