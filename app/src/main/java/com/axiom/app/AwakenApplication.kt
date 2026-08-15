@@ -24,6 +24,11 @@ class AwakenApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var preferences: AxiomPreferences
 
+    // WP-206 — the single analytics enqueue/scheduling authority; bound into the AnalyticsLogger
+    // façade at startup so every legacy log() call routes through consent-governed egress.
+    @Inject
+    lateinit var analyticsGateway: com.axiom.app.data.analytics.AnalyticsGateway
+
     override fun onCreate() {
         super.onCreate()
         
@@ -41,6 +46,17 @@ class AwakenApplication : Application(), Configuration.Provider {
         }
 
         com.axiom.app.core.AppInitDiagnostics.log("STARTUP_INIT", "Application onCreate starting...")
+
+        // WP-206 — bind the consent-governed analytics gateway into the AnalyticsLogger façade so
+        // no log() call can perform direct network egress. Fail-safe: never crash startup.
+        try {
+            if (::analyticsGateway.isInitialized) {
+                com.axiom.app.core.AnalyticsLogger.bind(analyticsGateway)
+                com.axiom.app.core.AppInitDiagnostics.log("STARTUP_INIT", "AnalyticsLogger bound to gateway.")
+            }
+        } catch (t: Throwable) {
+            com.axiom.app.core.AppInitDiagnostics.logException(t, "ANALYTICS_GATEWAY_BIND")
+        }
 
         // Manually initialize WorkManager to ensure it uses the injected Hilt workerFactory safely
         try {
@@ -84,6 +100,13 @@ class AwakenApplication : Application(), Configuration.Provider {
                 preferences.migrateGeminiKeyIfNeeded()
             } catch (t: Throwable) {
                 com.axiom.app.core.AppInitDiagnostics.logException(t, "GEMINI_KEY_MIGRATION")
+            }
+            // WP-206 — request an analytics drain at startup. The worker re-reads consent, so this
+            // uploads ONLY if GRANTED (flushes retained backlog) and no-ops otherwise (§39).
+            try {
+                if (::analyticsGateway.isInitialized) analyticsGateway.requestDrain()
+            } catch (t: Throwable) {
+                com.axiom.app.core.AppInitDiagnostics.logException(t, "ANALYTICS_DRAIN_REQUEST")
             }
             try {
                 if (preferences.firstMissionDoneFlow.first()) {

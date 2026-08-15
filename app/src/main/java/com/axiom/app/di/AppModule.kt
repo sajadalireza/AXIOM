@@ -109,6 +109,20 @@ abstract class AppModule {
         impl: DailyHabitLogRepositoryImpl
     ): DailyHabitLogRepository
 
+    // WP-206 — analytics ports. Store (Room event_queue, analytics rows only) + the SINGLE
+    // network egress authority (Supabase). Bound here so the drain worker and gateway resolve them.
+    @Binds
+    @Singleton
+    abstract fun bindAnalyticsEventStore(
+        impl: com.axiom.app.data.analytics.RoomAnalyticsEventStore
+    ): com.axiom.app.domain.analytics.AnalyticsEventStore
+
+    @Binds
+    @Singleton
+    abstract fun bindAnalyticsUploader(
+        impl: com.axiom.app.data.analytics.SupabaseAnalyticsUploader
+    ): com.axiom.app.domain.analytics.AnalyticsUploader
+
     companion object {
         /**
          * WP-202: adapt the concrete [com.axiom.app.data.local.AxiomPreferences] to the

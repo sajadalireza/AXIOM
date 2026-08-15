@@ -94,17 +94,24 @@ class AtomicCompletionRepositoryImpl @Inject constructor(
                     )
                 },
                 insertPendingEvent = {
-                    database.eventQueueDao().insert(
-                        EventQueueEntity(
-                            eventId = UUID.randomUUID().toString(),
-                            idempotencyKey = command.idempotencyKey,
-                            eventType = EVENT_TYPE_FIRST_WIN,
-                            payload = "{\"missionId\":\"${command.completedMission.id}\"," +
-                                "\"hunterXpAwarded\":${command.hunterXpAwarded}}",
-                            status = "PENDING",
-                            createdAt = command.nowMillis
+                    // WP-206 Decision D — skip the first-win causal analytics row when consent was
+                    // DECLINED at snapshot time. This is the ONLY analytics-consent branch inside the
+                    // transaction and it reads an IMMUTABLE command field (no DataStore read here), so
+                    // the ACID boundary is unchanged. Core writes (mission/hunter/skill/streak/receipt)
+                    // always commit; only the optional telemetry row is gated.
+                    if (command.analyticsCollectionAllowed) {
+                        database.eventQueueDao().insert(
+                            EventQueueEntity(
+                                eventId = UUID.randomUUID().toString(),
+                                idempotencyKey = command.idempotencyKey,
+                                eventType = EVENT_TYPE_FIRST_WIN,
+                                payload = "{\"missionId\":\"${command.completedMission.id}\"," +
+                                    "\"hunterXpAwarded\":${command.hunterXpAwarded}}",
+                                status = "PENDING",
+                                createdAt = command.nowMillis
+                            )
                         )
-                    )
+                    }
                 }
             )
         }

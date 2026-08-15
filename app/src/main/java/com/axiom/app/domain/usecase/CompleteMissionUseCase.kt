@@ -319,6 +319,12 @@ class CompleteMissionUseCase @Inject constructor(
         val streakBaselineLongest = preferences.longestStreakFlow.first()
         val streakLastActivityMillis = preferences.lastCompleteTimestampFlow.first()
 
+        // WP-206 Decision D — immutable consent snapshot read BEFORE the atomic transaction. If
+        // DECLINED, the first-win causal analytics row is not enqueued (the ACID write itself is
+        // unchanged; consent is never read inside withTransaction).
+        val analyticsCollectionAllowed = com.axiom.app.domain.analytics.ConsentDecisionEngine
+            .shouldEnqueue(preferences.analyticsConsentStateOnce())
+
         // ================= PHASE B — single atomic Room transaction =================
         val commit = atomicCompletionRepository.commit(
             AtomicCompletionCommand(
@@ -335,7 +341,8 @@ class CompleteMissionUseCase @Inject constructor(
                 nowMillis = now,
                 hunterXpAwarded = hunterXpAwarded,
                 skillXpAwarded = skillXpAwarded,
-                sessionId = null
+                sessionId = null,
+                analyticsCollectionAllowed = analyticsCollectionAllowed
             )
         )
 
