@@ -73,20 +73,48 @@ class AnalyticsDispatchEngineTest {
         assertEquals(2, store.remaining.size)       // nothing deleted
     }
 
-    // §16 — mid-drain revocation halts further uploads.
-    @Test fun granted_thenRevoked_midDrain_stops() = runBlocking {
+    // §16/§26 — mid-drain DECLINED revocation halts egress and purges the remaining backlog.
+    @Test fun granted_thenDeclined_midDrain_purgesRemaining() = runBlocking {
         val store = FakeStore(listOf(ev("a"), ev("b"), ev("c")))
         val consent = FakeConsent(AnalyticsConsentState.GRANTED)
         val up = object : AnalyticsUploader {
             val uploaded = mutableListOf<String>()
             override suspend fun upload(event: QueuedAnalyticsEvent): Boolean {
                 uploaded.add(event.eventId)
-                consent.state = AnalyticsConsentState.DECLINED // user revokes after first upload
+                consent.state = AnalyticsConsentState.DECLINED // revoke after first confirmed upload
                 return true
             }
         }
         val outcome = AnalyticsDispatchEngine.drain(consent, store, up)
-        assertEquals(1, up.uploaded.size)          // only the first row went out
-        assertTrue(outcome != DrainOutcome.DRAINED)
+        assertEquals(DrainOutcome.PURGED_DECLINED, outcome)
+        assertEquals(listOf("a"), up.uploaded)
+        assertEquals(1, store.purgeCalls)
+        assertTrue(store.remaining.isEmpty())
+    }
+
+    // §8/§9 defense-in-depth — a queued row whose payload is NOT allowlisted (e.g. an unsafe
+    // enqueue path bypassing the gateway) is DROPPED at the egress boundary: never uploaded,
+    // never retained. Its allowlisted neighbours still drain normally.
+    @Test fun granted_unsafeRow_droppedNotUploaded() = runBlocking {
+        val unsafe = QueuedAnalyticsEvent("bad", "idem-bad", "mission_completed", mapOf("reflectionText" to "secret diary"))
+        val store = FakeStore(listOf(ev("a"), unsafe, ev("c")))
+        val up = FakeUploader(succeed = true)
+        val outcome = AnalyticsDispatchEngine.drain(FakeConsent(AnalyticsConsentState.GRANTED), store, up)
+        assertEquals(DrainOutcome.DRAINED, outcome)
+        assertEquals(listOf("a", "c"), up.uploaded)      // unsafe row never uploaded
+        assertTrue(store.remaining.isEmpty())            // unsafe row dropped, safe rows deleted after success
+    }
+
+    // Egress gate also protects a hand-built First-Win row: a malformed FIRST_WIN_COMPLETION
+    // payload (unexpected key) is dropped rather than shipped, even though it reaches event_queue
+    // outside AnalyticsGateway.track.
+    @Test fun granted_firstWinWithForbiddenKey_dropped() = runBlocking {
+        val bad = QueuedAnalyticsEvent("fw", "idem-fw", "FIRST_WIN_COMPLETION", mapOf("missionTitle" to "Learn Kotlin"))
+        val store = FakeStore(listOf(bad))
+        val up = FakeUploader(succeed = true)
+        val outcome = AnalyticsDispatchEngine.drain(FakeConsent(AnalyticsConsentState.GRANTED), store, up)
+        assertEquals(DrainOutcome.DRAINED, outcome)
+        assertEquals(0, up.uploaded.size)
+        assertTrue(store.remaining.isEmpty())
     }
 }

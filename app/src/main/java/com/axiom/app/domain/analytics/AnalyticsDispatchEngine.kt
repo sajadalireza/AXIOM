@@ -37,8 +37,27 @@ object AnalyticsDispatchEngine {
 
         for (event in store.pendingAnalytics()) {
             // Re-check consent BEFORE every upload so a mid-drain revocation halts egress (§16).
-            if (consent.current() != AnalyticsConsentState.GRANTED) {
-                return DrainOutcome.NO_CONSENT
+            // DECLINED also purges the not-yet-uploaded analytics backlog immediately; UNKNOWN
+            // retains it locally with upload = 0, matching the top-level consent contract.
+            when (consent.current()) {
+                AnalyticsConsentState.DECLINED -> {
+                    store.purgeAnalytics()
+                    return DrainOutcome.PURGED_DECLINED
+                }
+                AnalyticsConsentState.UNKNOWN -> return DrainOutcome.NO_CONSENT
+                AnalyticsConsentState.GRANTED -> Unit
+            }
+            // Defense-in-depth EGRESS gate (§8/§9): re-validate every row's payload against the
+            // allowlist/blacklist immediately before it can leave the device. This protects any
+            // enqueue path that did not go through AnalyticsGateway.track — notably the WP-205
+            // First-Win causal row, which is written with a hand-built payload inside the atomic
+            // Room transaction. A row that fails validation is DROPPED (deleted, never uploaded,
+            // never retained) so an unsafe payload can neither leak nor block the queue.
+            if (AnalyticsPayloadPolicy.validate(event.eventType, event.properties)
+                is PayloadValidation.Rejected
+            ) {
+                store.delete(event.eventId)
+                continue
             }
             if (uploader.upload(event)) {
                 store.delete(event.eventId) // delete ONLY after confirmed success (§21)

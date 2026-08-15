@@ -45,16 +45,21 @@ class SupabaseAnalyticsUploader @Inject constructor() : AnalyticsUploader {
                 readTimeout = 3000
                 doOutput = true
             }
-            val body = JSONObject().apply {
-                put("event_name", event.eventType)
-                put("app_version", BuildConfig.VERSION_NAME)
-                // Idempotency key travels in properties (backend dedup UNVERIFIED — best-effort).
-                put("properties", JSONObject(event.properties as Map<*, *>).put("idempotency_key", event.idempotencyKey))
+            try {
+                val body = JSONObject().apply {
+                    put("event_name", event.eventType)
+                    put("app_version", BuildConfig.VERSION_NAME)
+                    // Idempotency key travels in properties (backend dedup UNVERIFIED — best-effort).
+                    put("properties", JSONObject(event.properties as Map<*, *>).put("idempotency_key", event.idempotencyKey))
+                }
+                OutputStreamWriter(conn.outputStream).use { it.write(body.toString()) }
+                val code = conn.responseCode
+                code in 200..299
+            } finally {
+                // Always release the socket — including the offline/timeout throw path, which would
+                // otherwise leak connections under the drain worker's retry loop (Review C S3).
+                conn.disconnect()
             }
-            OutputStreamWriter(conn.outputStream).use { it.write(body.toString()) }
-            val code = conn.responseCode
-            conn.disconnect()
-            code in 200..299
         }.getOrElse {
             Log.e("AnalyticsUploader", "upload failed for ${event.eventType}", it)
             false
