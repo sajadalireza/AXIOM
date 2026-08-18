@@ -16,7 +16,7 @@ import com.axiom.app.domain.firstwin.FirstWinSessionStatus
  *  3. NEEDS_HUNTER + COMPLETED session                 -> existing destination
  *       (WP-203 invariant: a missing Hunter never routes directly Home)
  *  4. session status == [FirstWinSessionStatus.COMPLETED] -> HOME
- *  5. any other (non-null) session status            -> FIRST_WIN (resume)
+ *  5. any other or unknown status on an existing session -> FIRST_WIN (resume/fail-closed)
  *  6. no session && NEEDS_HUNTER || NEEDS_FIRST_MISSION -> FIRST_WIN (fresh assignment)
  *  7. otherwise                                      -> existing destination (NEEDS_SETUP / NEEDS_BLUEPRINT / ESTABLISHED)
  *
@@ -51,6 +51,7 @@ object FirstWinLaunchPolicy {
             null -> Unit
             else -> return LaunchDestination.FIRST_WIN
         }
+        if (firstWinSessionExists) return LaunchDestination.FIRST_WIN
 
         // 6. No session — fresh First-Win assignment for first-win-eligible states.
         if (state == EligibilityState.NEEDS_HUNTER || state == EligibilityState.NEEDS_FIRST_MISSION) {
