@@ -1,10 +1,10 @@
 package com.axiom.app.domain.firstwin
 
 /**
- * WP-207 RED — pure, deterministic First-Win position derivation.
+ * WP-207 — pure, deterministic First-Win position derivation (GREEN).
  *
- * Contract (pinned by [FirstWinPositionReducerTest]) — derive the resumable
- * [FirstWinPosition] from typed durable facts, fail-closed, in this precedence:
+ * Derives the resumable [FirstWinPosition] from typed durable facts, fail-closed,
+ * in this precedence:
  *
  *   1. sessionStatus == COMPLETED                        -> HOME
  *        (the ONLY home condition; durable Room proof dominates a stale setup flag)
@@ -24,9 +24,33 @@ package com.axiom.app.domain.firstwin
  * Fail-closed: the authoritative facts (mission / completion_receipt / schedule_blocks)
  * dominate the mirrored [FirstWinSessionStatus]. An advanced status without a committed
  * receipt falls back to DO (mission exists) or AREA (no mission). Pure: no clock, no I/O,
- * no coroutine timing. NOT YET IMPLEMENTED (RED): throws [NotImplementedError] until GREEN.
+ * no coroutine timing — the same facts always yield the same position.
  */
 object FirstWinPositionReducer {
-    fun reduce(facts: FirstWinFacts): FirstWinPosition =
-        TODO("WP-207 RED")
+    fun reduce(facts: FirstWinFacts): FirstWinPosition {
+        // 1. Terminal — the ONLY home condition. Durable Room proof dominates a stale setup flag.
+        if (facts.sessionStatus == FirstWinSessionStatus.COMPLETED) return FirstWinPosition.HOME
+
+        // 2. Setup prerequisite dominates all other non-terminal states.
+        if (!facts.setupComplete) return FirstWinPosition.SETUP
+
+        // 3. Fresh eligible entry — the session row is created on entering/continuing Area.
+        if (!facts.sessionExists) return FirstWinPosition.AREA
+
+        // 4. Assigned but no mission yet — pre-mission draft loss returns to Area.
+        if (!facts.primaryMissionExists) return FirstWinPosition.AREA
+
+        // 5. Mission exists but completion not committed — Do, regardless of advanced status.
+        if (!facts.completionReceiptExists) return FirstWinPosition.DO
+
+        // 6-9. Completion committed — position by lifecycle status (fail-closed).
+        return when (facts.sessionStatus) {
+            null, FirstWinSessionStatus.ACTIVE -> FirstWinPosition.REWARD
+            FirstWinSessionStatus.REWARD_SEEN -> FirstWinPosition.NEXT
+            FirstWinSessionStatus.HANDOFF_WITH_SCHEDULE ->
+                if (facts.nextScheduleExists) FirstWinPosition.HANDOFF else FirstWinPosition.NEXT
+            FirstWinSessionStatus.HANDOFF_WITHOUT_SCHEDULE -> FirstWinPosition.HANDOFF
+            FirstWinSessionStatus.COMPLETED -> FirstWinPosition.HOME // unreachable (rule 1), exhaustive
+        }
+    }
 }
