@@ -120,7 +120,7 @@ class FirstWinLaunchPolicyTest {
 
 
     @Test fun existingSession_withUnknownStatus_failClosedToFirstWin_beforeBlueprint() {
-        val eligibility = EligibilityStateMachine.evaluate(snap(true, true, true, false))
+        val eligibility = eligibility(true, true, true, false)
         assertEquals(
             LaunchDestination.FIRST_WIN,
             FirstWinLaunchPolicy.resolve(eligibility, firstWinSessionStatus = null, firstWinSessionExists = true),
@@ -128,7 +128,7 @@ class FirstWinLaunchPolicyTest {
     }
 
     @Test fun establishedUser_withUnknownExistingSession_failClosedToFirstWin() {
-        val eligibility = EligibilityStateMachine.evaluate(snap(true, true, true, true))
+        val eligibility = eligibility(true, true, true, true)
         assertEquals(
             LaunchDestination.FIRST_WIN,
             FirstWinLaunchPolicy.resolve(eligibility, firstWinSessionStatus = null, firstWinSessionExists = true),
