@@ -55,9 +55,18 @@ class NoWp207MigrationGuardTest {
         return text.substring(firstQuote + 1, endQuote)
     }
 
-    /** Every backtick-quoted identifier in a createSql (table name + columns). */
+    /**
+     * Every backtick-quoted column identifier in a createSql. Room's exported createSql
+     * renders the table name as the `${TABLE_NAME}` placeholder, so placeholder tokens are
+     * excluded here — otherwise a naive backtick scan would misreport the placeholder as a
+     * column and break the exact-column assertion.
+     */
     private fun identifiers(sql: String): Set<String> =
-        Regex("`([^`]+)`").findAll(sql).map { it.groupValues[1] }.toSet()
+        Regex("`([^`]+)`")
+            .findAll(sql)
+            .map { it.groupValues[1] }
+            .filterNot { it.startsWith("\${") }
+            .toSet()
 
     @Test
     fun schemaVersionStays18() {
@@ -78,7 +87,7 @@ class NoWp207MigrationGuardTest {
     @Test
     fun firstWinSessionKeepsExactlyFourColumns() {
         val sql = createSqlFor(locateSchema().readText(), "first_win_session")
-        val columns = identifiers(sql) - "first_win_session"
+        val columns = identifiers(sql)
         assertEquals(
             "first_win_session must keep exactly its WP-204 columns",
             setOf("sessionId", "status", "createdAt", "updatedAt"),
