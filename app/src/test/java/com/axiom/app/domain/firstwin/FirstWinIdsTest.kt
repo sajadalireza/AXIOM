@@ -26,6 +26,11 @@ class FirstWinIdsTest {
     @Test fun sessionId_carriesHunterId_forRecovery() =
         assertTrue(FirstWinIds.sessionId("hunter-1").contains("hunter-1"))
 
+    @Test(expected = IllegalArgumentException::class)
+    fun sessionId_rejectsBlankHunterId() {
+        FirstWinIds.sessionId("   ")
+    }
+
     @Test fun primaryMissionId_deterministic() =
         assertEquals(FirstWinIds.primaryMissionId(sessionA), FirstWinIds.primaryMissionId(sessionA))
 
