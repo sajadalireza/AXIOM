@@ -4,9 +4,9 @@ import com.axiom.app.domain.model.ScheduleBlock
 import javax.inject.Inject
 
 /**
- * Durable next-action scheduling using the existing Room-v18 recurring ScheduleBlock model.
- * The schedule row is inserted before the session CAS, so a crash in between is repaired by
- * idempotently re-entering this use case; the existing row is never replaced on retry.
+ * Durable next-action scheduling using the existing Room-v18 ScheduleBlock plus a real Mission.
+ * The schedule row and linked Mission are inserted before the session CAS, so a crash between
+ * writes is repaired by idempotently re-entering this use case; existing rows are never replaced.
  */
 class ScheduleFirstWinNextActionUseCase @Inject constructor(
     private val missionStore: FirstWinMissionStore,
@@ -47,6 +47,24 @@ class ScheduleFirstWinNextActionUseCase @Inject constructor(
             isNonNegotiable = false,
         )
         val stored = scheduleStore.insertIfAbsent(candidate)
+
+        val nextMission = missionStore.insertIfAbsent(
+            mission.copy(
+                id = FirstWinIds.nextMissionId(sessionId),
+                status = "ACTIVE",
+                dungeonId = null,
+                actualHours = null,
+                createdAt = nowMillis,
+                completedAt = null,
+                isInstantGate = false,
+                scheduleBlockId = stored.id,
+                qualityScore = 1.0,
+                effectiveHours = 0.0,
+            )
+        )
+        check(nextMission.scheduleBlockId == stored.id) {
+            "Scheduled First-Win Mission is not linked to the durable schedule"
+        }
 
         when (lifecycleController.markHandoffWithSchedule(setupComplete, sessionId, nowMillis)) {
             FirstWinLifecycleOutcome.APPLIED,

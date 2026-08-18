@@ -11,9 +11,9 @@ package com.axiom.app.domain.firstwin
  *    their First-Win session (no opaque payload).
  *  - A blank [sessionId] is rejected ([IllegalArgumentException]) — never a silent id.
  *
- * These ids are the typed idempotency/correlation keys used against the existing
- * `missions` / `schedule_blocks` tables (both already INSERT with REPLACE), so no
- * schema change is required.
+ * These ids are typed idempotency/correlation keys used by the narrow First-Win
+ * insert-if-absent stores over the existing `missions` / `schedule_blocks` tables,
+ * so no schema change is required.
  */
 object FirstWinIds {
     private const val PREFIX = "fw"
@@ -33,6 +33,8 @@ object FirstWinIds {
         return "$PREFIX:$sessionId:next"
     }
 
-    fun nextMissionId(sessionId: String): String =
-        TODO("WP-207 RED scheduled Mission identity")
+    fun nextMissionId(sessionId: String): String {
+        require(sessionId.isNotBlank()) { "sessionId must not be blank" }
+        return "$PREFIX:$sessionId:next-mission"
+    }
 }
