@@ -57,6 +57,12 @@ abstract class AppModule {
 
     @Binds
     @Singleton
+    abstract fun bindFirstWinJourneyRuntime(
+        impl: com.axiom.app.presentation.firstwin.DefaultFirstWinJourneyRuntime
+    ): com.axiom.app.presentation.firstwin.FirstWinJourneyRuntime
+
+    @Binds
+    @Singleton
     abstract fun bindMissionRepository(
         impl: MissionRepositoryImpl
     ): MissionRepository

@@ -1,0 +1,103 @@
+package com.axiom.app.presentation.firstwin
+
+import com.axiom.app.domain.firstwin.FirstWinArea
+import com.axiom.app.domain.firstwin.FirstWinPosition
+import com.axiom.app.domain.model.Mission
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Rule
+import org.junit.Test
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class FirstWinViewModelTest {
+    @get:Rule val mainDispatcherRule = MainDispatcherRule()
+
+    private val sessionId = "fw:hunter-1:session"
+    private fun mission() = Mission(
+        id = "mission-1", title = "Read one page", track = "STUDY", rarity = "Normal",
+        skillId = "skill_deep_work", skillName = "Deep Work", xpReward = 10, powerScore = 1f,
+        status = "ACTIVE", dungeonId = null, estimatedHours = 2f / 60f, actualHours = null,
+        createdAt = 1L, completedAt = null, rarityColor = 1L,
+    )
+
+    private class FakeRuntime(
+        var openResult: FirstWinJourneySnapshot,
+        var createResult: FirstWinJourneySnapshot = openResult,
+    ) : FirstWinJourneyRuntime {
+        var openCalls = 0
+        var createCalls = 0
+        var createFailure: Throwable? = null
+        override suspend fun open(): FirstWinJourneySnapshot {
+            openCalls++
+            return openResult
+        }
+        override suspend fun createMission(sessionId: String, area: FirstWinArea, actionTitle: String): FirstWinJourneySnapshot {
+            createCalls++
+            createFailure?.let { throw it }
+            return createResult
+        }
+    }
+
+    @Test fun start_loadsDurablePositionOnce() = runTest {
+        val runtime = FakeRuntime(FirstWinJourneySnapshot(sessionId, FirstWinPosition.AREA, null))
+        val vm = FirstWinViewModel(runtime)
+        vm.start(); advanceUntilIdle()
+        assertEquals(1, runtime.openCalls)
+        assertEquals(FirstWinPosition.AREA, vm.state.value.position)
+        assertEquals(sessionId, vm.state.value.sessionId)
+        assertFalse(vm.state.value.isLoading)
+    }
+
+    @Test fun draftEvents_reusePureDraftReducer() = runTest {
+        val runtime = FakeRuntime(FirstWinJourneySnapshot(sessionId, FirstWinPosition.AREA, null))
+        val vm = FirstWinViewModel(runtime)
+        vm.selectArea(FirstWinArea.STUDY)
+        vm.continueFromArea()
+        vm.setActionTitle("Read one page")
+        assertEquals(FirstWinDraftStep.ACTION, vm.state.value.draft.step)
+        assertEquals(FirstWinArea.STUDY, vm.state.value.draft.selectedArea)
+        assertTrue(vm.state.value.draft.canCreateMission)
+        vm.backToArea()
+        assertEquals(FirstWinDraftStep.AREA, vm.state.value.draft.step)
+    }
+
+    @Test fun createMission_usesRuntimeOnce_andRefreshesToDo() = runTest {
+        val created = mission()
+        val runtime = FakeRuntime(
+            FirstWinJourneySnapshot(sessionId, FirstWinPosition.AREA, null),
+            FirstWinJourneySnapshot(sessionId, FirstWinPosition.DO, created),
+        )
+        val vm = FirstWinViewModel(runtime)
+        vm.selectArea(FirstWinArea.STUDY); vm.continueFromArea(); vm.setActionTitle("Read one page")
+        vm.createMission(); vm.createMission(); advanceUntilIdle()
+        assertEquals(1, runtime.createCalls)
+        assertEquals(FirstWinPosition.DO, vm.state.value.position)
+        assertEquals(created, vm.state.value.mission)
+        assertFalse(vm.state.value.isBusy)
+    }
+
+    @Test fun createFailure_isGeneric_andPreservesDraft() = runTest {
+        val runtime = FakeRuntime(FirstWinJourneySnapshot(sessionId, FirstWinPosition.AREA, null)).apply {
+            createFailure = IllegalStateException("sensitive internal detail")
+        }
+        val vm = FirstWinViewModel(runtime)
+        vm.selectArea(FirstWinArea.WORK); vm.continueFromArea(); vm.setActionTitle("Send one email")
+        vm.createMission(); advanceUntilIdle()
+        assertEquals(FirstWinUiError.CREATE_MISSION, vm.state.value.error)
+        assertEquals("Send one email", vm.state.value.draft.actionTitle)
+        assertFalse(vm.state.value.isBusy)
+    }
+
+    @Test fun resumeDo_keepsDurableMission() = runTest {
+        val existing = mission()
+        val runtime = FakeRuntime(FirstWinJourneySnapshot(sessionId, FirstWinPosition.DO, existing))
+        val vm = FirstWinViewModel(runtime)
+        vm.start(); advanceUntilIdle()
+        assertEquals(FirstWinPosition.DO, vm.state.value.position)
+        assertEquals(existing, vm.state.value.mission)
+    }
+}
