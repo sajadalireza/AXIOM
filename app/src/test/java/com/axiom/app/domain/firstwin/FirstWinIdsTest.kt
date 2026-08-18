@@ -17,6 +17,15 @@ class FirstWinIdsTest {
     private val sessionA = "fw-session-0001"
     private val sessionB = "fw-session-0002"
 
+    @Test fun sessionId_deterministic() =
+        assertEquals(FirstWinIds.sessionId("hunter-1"), FirstWinIds.sessionId("hunter-1"))
+
+    @Test fun sessionId_distinctAcrossHunters() =
+        assertNotEquals(FirstWinIds.sessionId("hunter-1"), FirstWinIds.sessionId("hunter-2"))
+
+    @Test fun sessionId_carriesHunterId_forRecovery() =
+        assertTrue(FirstWinIds.sessionId("hunter-1").contains("hunter-1"))
+
     @Test fun primaryMissionId_deterministic() =
         assertEquals(FirstWinIds.primaryMissionId(sessionA), FirstWinIds.primaryMissionId(sessionA))
 

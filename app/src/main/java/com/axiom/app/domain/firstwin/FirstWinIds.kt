@@ -18,6 +18,9 @@ package com.axiom.app.domain.firstwin
 object FirstWinIds {
     private const val PREFIX = "fw"
 
+    fun sessionId(hunterId: String): String =
+        TODO("WP-207 RED")
+
     fun primaryMissionId(sessionId: String): String {
         require(sessionId.isNotBlank()) { "sessionId must not be blank" }
         return "$PREFIX:$sessionId:mission"
