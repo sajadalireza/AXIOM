@@ -51,6 +51,12 @@ abstract class AppModule {
 
     @Binds
     @Singleton
+    abstract fun bindFirstWinScheduleStore(
+        impl: RoomFirstWinScheduleStore
+    ): com.axiom.app.domain.firstwin.FirstWinScheduleStore
+
+    @Binds
+    @Singleton
     abstract fun bindMissionRepository(
         impl: MissionRepositoryImpl
     ): MissionRepository

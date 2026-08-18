@@ -48,6 +48,9 @@ interface WarriorBlueprintDao {
     @Query("SELECT * FROM schedule_blocks WHERE id = :id LIMIT 1")
     suspend fun getScheduleBlockById(id: String): ScheduleBlockEntity?
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertScheduleBlockIfAbsent(block: ScheduleBlockEntity): Long
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertScheduleBlock(block: ScheduleBlockEntity)
 
