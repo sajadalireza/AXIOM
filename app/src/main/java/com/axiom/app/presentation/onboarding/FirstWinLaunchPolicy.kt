@@ -28,6 +28,7 @@ object FirstWinLaunchPolicy {
     fun resolve(
         eligibility: EligibilityResult,
         firstWinSessionStatus: FirstWinSessionStatus?,
+        firstWinSessionExists: Boolean = firstWinSessionStatus != null,
     ): LaunchDestination {
         val state = eligibility.state
 
