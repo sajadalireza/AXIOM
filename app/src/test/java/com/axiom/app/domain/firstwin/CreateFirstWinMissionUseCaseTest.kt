@@ -15,6 +15,7 @@ class CreateFirstWinMissionUseCaseTest {
     private class FakeMissionStore : FirstWinMissionStore {
         val rows = linkedMapOf<String, Mission>()
         var insertCalls = 0
+        override suspend fun getById(missionId: String): Mission? = rows[missionId]
         override suspend fun insertIfAbsent(mission: Mission): Mission {
             insertCalls++
             return rows.getOrPut(mission.id) { mission }

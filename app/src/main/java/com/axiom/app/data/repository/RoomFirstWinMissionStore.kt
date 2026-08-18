@@ -12,6 +12,9 @@ import javax.inject.Singleton
 class RoomFirstWinMissionStore @Inject constructor(
     private val database: AxiomDatabase,
 ) : FirstWinMissionStore {
+    override suspend fun getById(missionId: String): Mission? =
+        database.missionDao().getMissionById(missionId)?.toDomain()
+
     override suspend fun insertIfAbsent(mission: Mission): Mission {
         database.missionDao().insertMissionIfAbsent(MissionEntity.fromDomain(mission))
         return database.missionDao().getMissionById(mission.id)?.toDomain()
