@@ -42,7 +42,7 @@ class ScheduleFirstWinNextActionUseCase @Inject constructor(
             startTime = startTime,
             title = mission.title,
             actionDescription = mission.title,
-            tag = "Foundation",
+            tag = FIRST_WIN_SCHEDULE_TAG,
             recurrence = recurrence,
             isNonNegotiable = false,
         )
