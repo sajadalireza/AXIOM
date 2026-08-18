@@ -13,11 +13,27 @@ data class FirstWinDraftState(
     val canCreateMission: Boolean get() = selectedArea != null && actionTitle.trim().length >= 3
 }
 
-/** WP-207 RED — pure pre-Mission draft reducer; no durable writes. */
+/** WP-207 — pure pre-Mission draft reducer; no durable writes. */
 object FirstWinDraftReducer {
-    fun fresh(): FirstWinDraftState = TODO("WP-207 RED")
-    fun selectArea(state: FirstWinDraftState, area: FirstWinArea): FirstWinDraftState = TODO("WP-207 RED")
-    fun continueFromArea(state: FirstWinDraftState): FirstWinDraftState = TODO("WP-207 RED")
-    fun setActionTitle(state: FirstWinDraftState, title: String): FirstWinDraftState = TODO("WP-207 RED")
-    fun backToArea(state: FirstWinDraftState): FirstWinDraftState = TODO("WP-207 RED")
+    fun fresh(): FirstWinDraftState = FirstWinDraftState(
+        step = FirstWinDraftStep.AREA,
+        selectedArea = null,
+        actionTitle = "",
+    )
+
+    fun selectArea(state: FirstWinDraftState, area: FirstWinArea): FirstWinDraftState =
+        state.copy(selectedArea = area)
+
+    fun continueFromArea(state: FirstWinDraftState): FirstWinDraftState =
+        if (state.step == FirstWinDraftStep.AREA && state.selectedArea != null) {
+            state.copy(step = FirstWinDraftStep.ACTION, actionTitle = "")
+        } else {
+            state
+        }
+
+    fun setActionTitle(state: FirstWinDraftState, title: String): FirstWinDraftState =
+        if (state.step == FirstWinDraftStep.ACTION) state.copy(actionTitle = title) else state
+
+    fun backToArea(state: FirstWinDraftState): FirstWinDraftState =
+        state.copy(step = FirstWinDraftStep.AREA, actionTitle = "")
 }
