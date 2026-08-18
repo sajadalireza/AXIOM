@@ -32,4 +32,7 @@ object FirstWinIds {
         require(sessionId.isNotBlank()) { "sessionId must not be blank" }
         return "$PREFIX:$sessionId:next"
     }
+
+    fun nextMissionId(sessionId: String): String =
+        TODO("WP-207 RED scheduled Mission identity")
 }

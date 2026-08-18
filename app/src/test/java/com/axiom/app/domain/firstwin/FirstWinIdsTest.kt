@@ -37,23 +37,31 @@ class FirstWinIdsTest {
     @Test fun nextScheduleId_deterministic() =
         assertEquals(FirstWinIds.nextScheduleId(sessionA), FirstWinIds.nextScheduleId(sessionA))
 
+    @Test fun nextMissionId_deterministic() =
+        assertEquals(FirstWinIds.nextMissionId(sessionA), FirstWinIds.nextMissionId(sessionA))
+
     @Test fun primaryMissionId_distinctAcrossSessions() =
         assertNotEquals(FirstWinIds.primaryMissionId(sessionA), FirstWinIds.primaryMissionId(sessionB))
 
     @Test fun nextScheduleId_distinctAcrossSessions() =
         assertNotEquals(FirstWinIds.nextScheduleId(sessionA), FirstWinIds.nextScheduleId(sessionB))
 
-    @Test fun missionIdDiffersFromScheduleId_sameSession() =
+    @Test fun missionIdDiffersFromScheduleId_sameSession() {
         assertNotEquals(FirstWinIds.primaryMissionId(sessionA), FirstWinIds.nextScheduleId(sessionA))
+        assertNotEquals(FirstWinIds.primaryMissionId(sessionA), FirstWinIds.nextMissionId(sessionA))
+        assertNotEquals(FirstWinIds.nextScheduleId(sessionA), FirstWinIds.nextMissionId(sessionA))
+    }
 
     @Test fun ids_areNonBlank() {
         assertTrue(FirstWinIds.primaryMissionId(sessionA).isNotBlank())
         assertTrue(FirstWinIds.nextScheduleId(sessionA).isNotBlank())
+        assertTrue(FirstWinIds.nextMissionId(sessionA).isNotBlank())
     }
 
     @Test fun ids_carrySessionId_forReconciliation() {
         // The id must remain reconcilable to its session (no opaque payload).
         assertTrue(FirstWinIds.primaryMissionId(sessionA).contains(sessionA))
         assertTrue(FirstWinIds.nextScheduleId(sessionA).contains(sessionA))
+        assertTrue(FirstWinIds.nextMissionId(sessionA).contains(sessionA))
     }
 }

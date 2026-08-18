@@ -71,6 +71,11 @@ class ScheduleFirstWinNextActionUseCaseTest {
         assertEquals("09:00", block.startTime)
         assertEquals("DAILY", block.recurrence)
         assertEquals("Review one page", block.title)
+        val nextMission = store.missions[FirstWinIds.nextMissionId(sessionId)]
+            ?: throw AssertionError("scheduled next Mission missing")
+        assertEquals(block.id, nextMission.scheduleBlockId)
+        assertEquals("ACTIVE", nextMission.status)
+        assertEquals("Review one page", nextMission.title)
         assertEquals(FirstWinSessionStatus.HANDOFF_WITH_SCHEDULE.name, store.sessions[sessionId])
     }
 
@@ -82,6 +87,8 @@ class ScheduleFirstWinNextActionUseCaseTest {
         assertEquals(first, second)
         assertEquals("09:00", second.startTime)
         assertEquals(1, store.schedules.size)
+        assertEquals(2, store.missions.size)
+        assertTrue(FirstWinIds.nextMissionId(sessionId) in store.missions)
     }
 
     @Test fun crashAfterScheduleInsert_beforeStatusTransition_isRepairableOnRetry() = runTest {
@@ -94,6 +101,7 @@ class ScheduleFirstWinNextActionUseCaseTest {
         )
         val result = useCase(true, sessionId, "12:00", "MONDAY", 20L)
         assertEquals("08:30", result.startTime)
+        assertTrue(FirstWinIds.nextMissionId(sessionId) in store.missions)
         assertEquals(FirstWinSessionStatus.HANDOFF_WITH_SCHEDULE.name, store.sessions[sessionId])
     }
 
