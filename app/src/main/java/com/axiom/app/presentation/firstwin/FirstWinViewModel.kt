@@ -80,7 +80,6 @@ class FirstWinViewModel @Inject constructor(
 
     fun createMission() {
         val current = _state.value
-        val sessionId = current.sessionId ?: return
         val area = current.draft.selectedArea ?: return
         if (current.isBusy || !current.draft.canCreateMission) return
         val actionTitle = current.draft.actionTitle
@@ -88,6 +87,7 @@ class FirstWinViewModel @Inject constructor(
         _state.update { it.copy(isBusy = true, error = null) }
         viewModelScope.launch {
             try {
+                val sessionId = current.sessionId ?: runtime.open().sessionId
                 val snapshot = runtime.createMission(sessionId, area, actionTitle)
                 _state.update {
                     it.copy(
