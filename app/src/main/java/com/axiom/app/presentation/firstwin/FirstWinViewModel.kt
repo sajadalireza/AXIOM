@@ -30,10 +30,10 @@ class FirstWinViewModel @Inject constructor(
     private val _state = MutableStateFlow(FirstWinEntryUiState())
     val state: StateFlow<FirstWinEntryUiState> = _state.asStateFlow()
 
-    fun start() = TODO("WP-207 RED")
-    fun selectArea(area: FirstWinArea) = TODO("WP-207 RED")
-    fun continueFromArea() = TODO("WP-207 RED")
-    fun setActionTitle(title: String) = TODO("WP-207 RED")
-    fun backToArea() = TODO("WP-207 RED")
-    fun createMission() = TODO("WP-207 RED")
+    fun start(): Unit = TODO("WP-207 RED")
+    fun selectArea(area: FirstWinArea): Unit = TODO("WP-207 RED")
+    fun continueFromArea(): Unit = TODO("WP-207 RED")
+    fun setActionTitle(title: String): Unit = TODO("WP-207 RED")
+    fun backToArea(): Unit = TODO("WP-207 RED")
+    fun createMission(): Unit = TODO("WP-207 RED")
 }
