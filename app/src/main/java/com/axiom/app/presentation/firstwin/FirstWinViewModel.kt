@@ -81,7 +81,11 @@ class FirstWinViewModel @Inject constructor(
     fun createMission() {
         val current = _state.value
         val area = current.draft.selectedArea ?: return
-        if (current.isBusy || !current.draft.canCreateMission) return
+        if (
+            current.isBusy ||
+            (current.position != null && current.position != FirstWinPosition.AREA) ||
+            !current.draft.canCreateMission
+        ) return
         val actionTitle = current.draft.actionTitle
 
         _state.update { it.copy(isBusy = true, error = null) }
