@@ -28,12 +28,15 @@ class FirstWinViewModelTest {
         var openResult: FirstWinJourneySnapshot,
         var createResult: FirstWinJourneySnapshot = openResult,
         var completeResult: FirstWinJourneySnapshot = openResult,
+        var rewardResult: FirstWinJourneySnapshot = openResult,
     ) : FirstWinJourneyRuntime {
         var openCalls = 0
         var createCalls = 0
         var completeCalls = 0
+        var rewardCalls = 0
         var createFailure: Throwable? = null
         var completeFailure: Throwable? = null
+        var rewardFailure: Throwable? = null
         override suspend fun open(): FirstWinJourneySnapshot {
             openCalls++
             return openResult
@@ -47,6 +50,11 @@ class FirstWinViewModelTest {
             completeCalls++
             completeFailure?.let { throw it }
             return completeResult
+        }
+        override suspend fun acknowledgeReward(sessionId: String): FirstWinJourneySnapshot {
+            rewardCalls++
+            rewardFailure?.let { throw it }
+            return rewardResult
         }
     }
 
@@ -136,6 +144,34 @@ class FirstWinViewModelTest {
         assertEquals(FirstWinUiError.COMPLETE_MISSION, vm.state.value.error)
         assertEquals(FirstWinPosition.DO, vm.state.value.position)
         assertEquals(active, vm.state.value.mission)
+        assertFalse(vm.state.value.isBusy)
+    }
+
+
+    @Test fun continueFromReward_acknowledgesOnce_andRefreshesToNext() = runTest {
+        val completed = mission().copy(status = "COMPLETED", completedAt = 2L)
+        val runtime = FakeRuntime(
+            openResult = FirstWinJourneySnapshot(sessionId, FirstWinPosition.REWARD, completed),
+            rewardResult = FirstWinJourneySnapshot(sessionId, FirstWinPosition.NEXT, completed),
+        )
+        val vm = FirstWinViewModel(runtime)
+        vm.start(); advanceUntilIdle()
+        vm.continueFromReward(); vm.continueFromReward(); advanceUntilIdle()
+        assertEquals(1, runtime.rewardCalls)
+        assertEquals(FirstWinPosition.NEXT, vm.state.value.position)
+        assertFalse(vm.state.value.isBusy)
+    }
+
+    @Test fun rewardFailure_isGeneric_andPreservesReward() = runTest {
+        val completed = mission().copy(status = "COMPLETED", completedAt = 2L)
+        val runtime = FakeRuntime(
+            openResult = FirstWinJourneySnapshot(sessionId, FirstWinPosition.REWARD, completed),
+        ).apply { rewardFailure = IllegalStateException("sensitive internal detail") }
+        val vm = FirstWinViewModel(runtime)
+        vm.start(); advanceUntilIdle()
+        vm.continueFromReward(); advanceUntilIdle()
+        assertEquals(FirstWinUiError.ACK_REWARD, vm.state.value.error)
+        assertEquals(FirstWinPosition.REWARD, vm.state.value.position)
         assertFalse(vm.state.value.isBusy)
     }
 

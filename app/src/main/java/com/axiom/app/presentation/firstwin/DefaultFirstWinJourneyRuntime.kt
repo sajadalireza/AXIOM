@@ -50,6 +50,10 @@ class DefaultFirstWinJourneyRuntime @Inject constructor(
         return readSnapshot(sessionId)
     }
 
+    override suspend fun acknowledgeReward(
+        sessionId: String,
+    ): FirstWinJourneySnapshot = TODO("WP-207 RED")
+
     private suspend fun readSnapshot(sessionId: String): FirstWinJourneySnapshot {
         val facts = factsReader.read(
             setupComplete = preferences.setupCompleteFlow.first(),
