@@ -17,4 +17,8 @@ interface FirstWinJourneyRuntime {
         area: FirstWinArea,
         actionTitle: String,
     ): FirstWinJourneySnapshot
+    suspend fun completeMission(
+        sessionId: String,
+        missionId: String,
+    ): FirstWinJourneySnapshot
 }

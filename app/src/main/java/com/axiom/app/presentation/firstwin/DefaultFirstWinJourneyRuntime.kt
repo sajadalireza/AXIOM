@@ -9,6 +9,7 @@ import com.axiom.app.domain.firstwin.FirstWinIds
 import com.axiom.app.domain.firstwin.FirstWinLifecycleController
 import com.axiom.app.domain.firstwin.FirstWinMissionStore
 import com.axiom.app.domain.firstwin.FirstWinPositionReducer
+import com.axiom.app.domain.usecase.CompleteMissionUseCase
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.first
@@ -21,6 +22,7 @@ class DefaultFirstWinJourneyRuntime @Inject constructor(
     private val factsReader: FirstWinFactsReader,
     private val missionStore: FirstWinMissionStore,
     private val createFirstWinMission: CreateFirstWinMissionUseCase,
+    private val completeMissionUseCase: CompleteMissionUseCase,
 ) : FirstWinJourneyRuntime {
     override suspend fun open(): FirstWinJourneySnapshot {
         val hunter = ensureHunter()
@@ -36,6 +38,11 @@ class DefaultFirstWinJourneyRuntime @Inject constructor(
         createFirstWinMission(sessionId, area, actionTitle)
         return readSnapshot(sessionId)
     }
+
+    override suspend fun completeMission(
+        sessionId: String,
+        missionId: String,
+    ): FirstWinJourneySnapshot = TODO("WP-207 RED")
 
     private suspend fun readSnapshot(sessionId: String): FirstWinJourneySnapshot {
         val facts = factsReader.read(

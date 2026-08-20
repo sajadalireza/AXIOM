@@ -27,10 +27,13 @@ class FirstWinViewModelTest {
     private class FakeRuntime(
         var openResult: FirstWinJourneySnapshot,
         var createResult: FirstWinJourneySnapshot = openResult,
+        var completeResult: FirstWinJourneySnapshot = openResult,
     ) : FirstWinJourneyRuntime {
         var openCalls = 0
         var createCalls = 0
+        var completeCalls = 0
         var createFailure: Throwable? = null
+        var completeFailure: Throwable? = null
         override suspend fun open(): FirstWinJourneySnapshot {
             openCalls++
             return openResult
@@ -39,6 +42,11 @@ class FirstWinViewModelTest {
             createCalls++
             createFailure?.let { throw it }
             return createResult
+        }
+        override suspend fun completeMission(sessionId: String, missionId: String): FirstWinJourneySnapshot {
+            completeCalls++
+            completeFailure?.let { throw it }
+            return completeResult
         }
     }
 
@@ -100,4 +108,35 @@ class FirstWinViewModelTest {
         assertEquals(FirstWinPosition.DO, vm.state.value.position)
         assertEquals(existing, vm.state.value.mission)
     }
+
+    @Test fun completeMission_usesRuntimeOnce_andRefreshesToReward() = runTest {
+        val active = mission()
+        val completed = active.copy(status = "COMPLETED", completedAt = 2L)
+        val runtime = FakeRuntime(
+            openResult = FirstWinJourneySnapshot(sessionId, FirstWinPosition.DO, active),
+            completeResult = FirstWinJourneySnapshot(sessionId, FirstWinPosition.REWARD, completed),
+        )
+        val vm = FirstWinViewModel(runtime)
+        vm.start(); advanceUntilIdle()
+        vm.completeMission(); vm.completeMission(); advanceUntilIdle()
+        assertEquals(1, runtime.completeCalls)
+        assertEquals(FirstWinPosition.REWARD, vm.state.value.position)
+        assertEquals(completed, vm.state.value.mission)
+        assertFalse(vm.state.value.isBusy)
+    }
+
+    @Test fun completeFailure_isGeneric_andPreservesDurableDoState() = runTest {
+        val active = mission()
+        val runtime = FakeRuntime(
+            openResult = FirstWinJourneySnapshot(sessionId, FirstWinPosition.DO, active),
+        ).apply { completeFailure = IllegalStateException("sensitive internal detail") }
+        val vm = FirstWinViewModel(runtime)
+        vm.start(); advanceUntilIdle()
+        vm.completeMission(); advanceUntilIdle()
+        assertEquals(FirstWinUiError.COMPLETE_MISSION, vm.state.value.error)
+        assertEquals(FirstWinPosition.DO, vm.state.value.position)
+        assertEquals(active, vm.state.value.mission)
+        assertFalse(vm.state.value.isBusy)
+    }
+
 }

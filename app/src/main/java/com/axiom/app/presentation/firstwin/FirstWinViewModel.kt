@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-enum class FirstWinUiError { LOAD, CREATE_MISSION }
+enum class FirstWinUiError { LOAD, CREATE_MISSION, COMPLETE_MISSION }
 
 data class FirstWinEntryUiState(
     val isLoading: Boolean = false,
@@ -111,4 +111,6 @@ class FirstWinViewModel @Inject constructor(
             }
         }
     }
+
+    fun completeMission(): Unit = TODO("WP-207 RED")
 }
