@@ -58,6 +58,7 @@ fun FirstWinScreen(
         onBackToArea = viewModel::backToArea,
         onCreateMission = viewModel::createMission,
         onCompleteMission = viewModel::completeMission,
+        onContinueReward = viewModel::continueFromReward,
         onRetryLoad = viewModel::start,
     )
 }
@@ -71,6 +72,7 @@ private fun FirstWinContent(
     onBackToArea: () -> Unit,
     onCreateMission: () -> Unit,
     onCompleteMission: () -> Unit,
+    onContinueReward: () -> Unit,
     onRetryLoad: () -> Unit,
 ) {
     Surface(
@@ -118,7 +120,15 @@ private fun FirstWinContent(
             }
 
             state.position == FirstWinPosition.REWARD -> {
-                FirstWinRewardStep()
+                FirstWinRewardStep(
+                    isBusy = state.isBusy,
+                    showError = state.error == FirstWinUiError.ACK_REWARD,
+                    onContinue = onContinueReward,
+                )
+            }
+
+            state.position == FirstWinPosition.NEXT -> {
+                FirstWinNextStep()
             }
 
             else -> FirstWinLoading()
@@ -350,7 +360,11 @@ private fun FirstWinDoStep(
 }
 
 @Composable
-private fun FirstWinRewardStep() {
+private fun FirstWinRewardStep(
+    isBusy: Boolean,
+    showError: Boolean,
+    onContinue: () -> Unit,
+) {
     FirstWinPage {
         StepLabel(R.string.first_win_step_4_of_4)
         Text(
@@ -360,6 +374,38 @@ private fun FirstWinRewardStep() {
         )
         Text(
             text = stringResource(R.string.first_win_reward_body),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        if (showError) {
+            Text(
+                text = stringResource(R.string.first_win_reward_error),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+            )
+        }
+        PrimaryButton(
+            text = if (isBusy) {
+                stringResource(R.string.first_win_continuing)
+            } else {
+                stringResource(R.string.first_win_continue)
+            },
+            enabled = !isBusy,
+            onClick = onContinue,
+        )
+    }
+}
+
+@Composable
+private fun FirstWinNextStep() {
+    FirstWinPage {
+        Text(
+            text = stringResource(R.string.first_win_next_title),
+            style = MaterialTheme.typography.displayMedium,
+            modifier = Modifier.semantics { heading() },
+        )
+        Text(
+            text = stringResource(R.string.first_win_next_body),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

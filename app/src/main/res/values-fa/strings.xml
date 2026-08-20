@@ -666,4 +666,8 @@
     <string name="first_win_step_4_of_4">گام ۴ از ۴</string>
     <string name="first_win_reward_title">این یک برد واقعی بود</string>
     <string name="first_win_reward_body">یک کار واقعی را تمام کردی. پیشرفتت ذخیره شده است.</string>
+    <string name="first_win_reward_error">بردت ذخیره شده، اما رفتن به مرحله بعد انجام نشد. دوباره تلاش کن.</string>
+    <string name="first_win_continuing">در حال ادامه…</string>
+    <string name="first_win_next_title">این حرکت را ادامه بده</string>
+    <string name="first_win_next_body">انتخاب کن بعدش چه شود. می‌توانی یک کار کوچک دیگر را زمان‌بندی کنی یا فعلاً تمام کنی.</string>
 </resources>

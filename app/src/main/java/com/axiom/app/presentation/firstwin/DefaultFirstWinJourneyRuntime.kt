@@ -6,6 +6,7 @@ import com.axiom.app.domain.firstwin.EnsureFirstWinHunterUseCase
 import com.axiom.app.domain.firstwin.FirstWinArea
 import com.axiom.app.domain.firstwin.FirstWinFactsReader
 import com.axiom.app.domain.firstwin.FirstWinIds
+import com.axiom.app.domain.firstwin.FirstWinLifecycleOutcome
 import com.axiom.app.domain.firstwin.FirstWinLifecycleController
 import com.axiom.app.domain.firstwin.FirstWinMissionStore
 import com.axiom.app.domain.firstwin.FirstWinPositionReducer
@@ -52,7 +53,18 @@ class DefaultFirstWinJourneyRuntime @Inject constructor(
 
     override suspend fun acknowledgeReward(
         sessionId: String,
-    ): FirstWinJourneySnapshot = TODO("WP-207 RED")
+    ): FirstWinJourneySnapshot {
+        val setupComplete = preferences.setupCompleteFlow.first()
+        when (lifecycle.markRewardSeen(setupComplete, sessionId, System.currentTimeMillis())) {
+            FirstWinLifecycleOutcome.APPLIED,
+            FirstWinLifecycleOutcome.ALREADY_APPLIED -> Unit
+            FirstWinLifecycleOutcome.PRECONDITION_FAILED ->
+                error("Reward acknowledgement prerequisites are missing")
+            FirstWinLifecycleOutcome.STATE_CONFLICT ->
+                error("Reward acknowledgement lifecycle state conflicted")
+        }
+        return readSnapshot(sessionId)
+    }
 
     private suspend fun readSnapshot(sessionId: String): FirstWinJourneySnapshot {
         val facts = factsReader.read(

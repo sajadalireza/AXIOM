@@ -141,5 +141,29 @@ class FirstWinViewModel @Inject constructor(
         }
     }
 
-    fun continueFromReward(): Unit = TODO("WP-207 RED")
+    fun continueFromReward() {
+        val current = _state.value
+        val sessionId = current.sessionId ?: return
+        if (current.isBusy || current.position != FirstWinPosition.REWARD) return
+
+        _state.update { it.copy(isBusy = true, error = null) }
+        viewModelScope.launch {
+            try {
+                val snapshot = runtime.acknowledgeReward(sessionId)
+                _state.update {
+                    it.copy(
+                        isBusy = false,
+                        sessionId = snapshot.sessionId,
+                        position = snapshot.position,
+                        mission = snapshot.mission,
+                        error = null,
+                    )
+                }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Throwable) {
+                _state.update { it.copy(isBusy = false, error = FirstWinUiError.ACK_REWARD) }
+            }
+        }
+    }
 }
