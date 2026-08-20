@@ -660,4 +660,10 @@
     <string name="first_win_create_error">That action could not be saved. Your text is still here.</string>
     <string name="first_win_do_title">Do this one thing</string>
     <string name="first_win_do_body">For now, only focus on finishing this small action.</string>
+    <string name="first_win_complete_action">I finished it</string>
+    <string name="first_win_completing">Saving your win…</string>
+    <string name="first_win_complete_error">That completion could not be saved. Try again.</string>
+    <string name="first_win_step_4_of_4">Step 4 of 4</string>
+    <string name="first_win_reward_title">That counts</string>
+    <string name="first_win_reward_body">You finished a real action. Your progress is saved.</string>
 </resources>

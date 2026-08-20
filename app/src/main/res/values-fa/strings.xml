@@ -660,4 +660,10 @@
     <string name="first_win_create_error">این کار ذخیره نشد. متن تو همین‌جا مانده است.</string>
     <string name="first_win_do_title">همین یک کار را انجام بده</string>
     <string name="first_win_do_body">فعلاً فقط روی تمام‌کردن همین کار کوچک تمرکز کن.</string>
+    <string name="first_win_complete_action">انجامش دادم</string>
+    <string name="first_win_completing">در حال ذخیره بردت…</string>
+    <string name="first_win_complete_error">ثبت پایان کار انجام نشد. دوباره تلاش کن.</string>
+    <string name="first_win_step_4_of_4">گام ۴ از ۴</string>
+    <string name="first_win_reward_title">این یک برد واقعی بود</string>
+    <string name="first_win_reward_body">یک کار واقعی را تمام کردی. پیشرفتت ذخیره شده است.</string>
 </resources>

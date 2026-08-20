@@ -42,7 +42,13 @@ class DefaultFirstWinJourneyRuntime @Inject constructor(
     override suspend fun completeMission(
         sessionId: String,
         missionId: String,
-    ): FirstWinJourneySnapshot = TODO("WP-207 RED")
+    ): FirstWinJourneySnapshot {
+        completeMissionUseCase(
+            missionId = missionId,
+            firstWinSessionId = sessionId,
+        )
+        return readSnapshot(sessionId)
+    }
 
     private suspend fun readSnapshot(sessionId: String): FirstWinJourneySnapshot {
         val facts = factsReader.read(

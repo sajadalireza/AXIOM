@@ -112,5 +112,32 @@ class FirstWinViewModel @Inject constructor(
         }
     }
 
-    fun completeMission(): Unit = TODO("WP-207 RED")
+    fun completeMission() {
+        val current = _state.value
+        val sessionId = current.sessionId ?: return
+        val mission = current.mission ?: return
+        if (current.isBusy || current.position != FirstWinPosition.DO) return
+
+        _state.update { it.copy(isBusy = true, error = null) }
+        viewModelScope.launch {
+            try {
+                val snapshot = runtime.completeMission(sessionId, mission.id)
+                _state.update {
+                    it.copy(
+                        isBusy = false,
+                        sessionId = snapshot.sessionId,
+                        position = snapshot.position,
+                        mission = snapshot.mission,
+                        error = null,
+                    )
+                }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Throwable) {
+                _state.update {
+                    it.copy(isBusy = false, error = FirstWinUiError.COMPLETE_MISSION)
+                }
+            }
+        }
+    }
 }

@@ -57,6 +57,7 @@ fun FirstWinScreen(
         onActionTitleChange = viewModel::setActionTitle,
         onBackToArea = viewModel::backToArea,
         onCreateMission = viewModel::createMission,
+        onCompleteMission = viewModel::completeMission,
         onRetryLoad = viewModel::start,
     )
 }
@@ -69,6 +70,7 @@ private fun FirstWinContent(
     onActionTitleChange: (String) -> Unit,
     onBackToArea: () -> Unit,
     onCreateMission: () -> Unit,
+    onCompleteMission: () -> Unit,
     onRetryLoad: () -> Unit,
 ) {
     Surface(
@@ -107,7 +109,16 @@ private fun FirstWinContent(
             }
 
             state.position == FirstWinPosition.DO && state.mission != null -> {
-                FirstWinDoStep(state.mission.title)
+                FirstWinDoStep(
+                    missionTitle = state.mission.title,
+                    isBusy = state.isBusy,
+                    showError = state.error == FirstWinUiError.COMPLETE_MISSION,
+                    onComplete = onCompleteMission,
+                )
+            }
+
+            state.position == FirstWinPosition.REWARD -> {
+                FirstWinRewardStep()
             }
 
             else -> FirstWinLoading()
@@ -289,7 +300,12 @@ private fun FirstWinActionStep(
 }
 
 @Composable
-private fun FirstWinDoStep(missionTitle: String) {
+private fun FirstWinDoStep(
+    missionTitle: String,
+    isBusy: Boolean,
+    showError: Boolean,
+    onComplete: () -> Unit,
+) {
     FirstWinPage {
         StepLabel(R.string.first_win_step_3_of_4)
         Text(
@@ -314,6 +330,39 @@ private fun FirstWinDoStep(missionTitle: String) {
                 modifier = Modifier.padding(16.dp),
             )
         }
+        if (showError) {
+            Text(
+                text = stringResource(R.string.first_win_complete_error),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+            )
+        }
+        PrimaryButton(
+            text = if (isBusy) {
+                stringResource(R.string.first_win_completing)
+            } else {
+                stringResource(R.string.first_win_complete_action)
+            },
+            enabled = !isBusy,
+            onClick = onComplete,
+        )
+    }
+}
+
+@Composable
+private fun FirstWinRewardStep() {
+    FirstWinPage {
+        StepLabel(R.string.first_win_step_4_of_4)
+        Text(
+            text = stringResource(R.string.first_win_reward_title),
+            style = MaterialTheme.typography.displayMedium,
+            modifier = Modifier.semantics { heading() },
+        )
+        Text(
+            text = stringResource(R.string.first_win_reward_body),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
