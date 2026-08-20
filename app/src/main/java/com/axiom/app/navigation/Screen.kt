@@ -35,6 +35,7 @@ sealed class Screen(val route: String) {
     object Premium : Screen("premium")
     object Leagues : Screen("leagues")
     object FirstMission : Screen("first_mission")
+    object FirstWin : Screen("first_win")
     object BlueprintWizard : Screen("blueprint_wizard")
     object BodyMap : Screen("body_map")
     object DailyCheckin : Screen("daily_checkin")
