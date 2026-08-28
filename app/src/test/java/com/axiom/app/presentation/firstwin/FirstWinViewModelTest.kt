@@ -29,32 +29,61 @@ class FirstWinViewModelTest {
         var createResult: FirstWinJourneySnapshot = openResult,
         var completeResult: FirstWinJourneySnapshot = openResult,
         var rewardResult: FirstWinJourneySnapshot = openResult,
+        var finishResult: FirstWinJourneySnapshot = openResult,
+        var handoffResult: FirstWinJourneySnapshot = openResult,
     ) : FirstWinJourneyRuntime {
         var openCalls = 0
         var createCalls = 0
         var completeCalls = 0
         var rewardCalls = 0
+        var finishCalls = 0
+        var handoffCalls = 0
         var createFailure: Throwable? = null
         var completeFailure: Throwable? = null
         var rewardFailure: Throwable? = null
+        var finishFailure: Throwable? = null
+        var handoffFailure: Throwable? = null
+
         override suspend fun open(): FirstWinJourneySnapshot {
             openCalls++
             return openResult
         }
-        override suspend fun createMission(sessionId: String, area: FirstWinArea, actionTitle: String): FirstWinJourneySnapshot {
+
+        override suspend fun createMission(
+            sessionId: String,
+            area: FirstWinArea,
+            actionTitle: String,
+        ): FirstWinJourneySnapshot {
             createCalls++
             createFailure?.let { throw it }
             return createResult
         }
-        override suspend fun completeMission(sessionId: String, missionId: String): FirstWinJourneySnapshot {
+
+        override suspend fun completeMission(
+            sessionId: String,
+            missionId: String,
+        ): FirstWinJourneySnapshot {
             completeCalls++
             completeFailure?.let { throw it }
             return completeResult
         }
+
         override suspend fun acknowledgeReward(sessionId: String): FirstWinJourneySnapshot {
             rewardCalls++
             rewardFailure?.let { throw it }
             return rewardResult
+        }
+
+        override suspend fun finishForNow(sessionId: String): FirstWinJourneySnapshot {
+            finishCalls++
+            finishFailure?.let { throw it }
+            return finishResult
+        }
+
+        override suspend fun completeHandoff(sessionId: String): FirstWinJourneySnapshot {
+            handoffCalls++
+            handoffFailure?.let { throw it }
+            return handoffResult
         }
     }
 
@@ -147,7 +176,6 @@ class FirstWinViewModelTest {
         assertFalse(vm.state.value.isBusy)
     }
 
-
     @Test fun continueFromReward_acknowledgesOnce_andRefreshesToNext() = runTest {
         val completed = mission().copy(status = "COMPLETED", completedAt = 2L)
         val runtime = FakeRuntime(
@@ -175,4 +203,57 @@ class FirstWinViewModelTest {
         assertFalse(vm.state.value.isBusy)
     }
 
+    @Test fun finishForNow_usesRuntimeOnce_andRefreshesToHandoff() = runTest {
+        val completed = mission().copy(status = "COMPLETED", completedAt = 2L)
+        val runtime = FakeRuntime(
+            openResult = FirstWinJourneySnapshot(sessionId, FirstWinPosition.NEXT, completed),
+            finishResult = FirstWinJourneySnapshot(sessionId, FirstWinPosition.HANDOFF, completed),
+        )
+        val vm = FirstWinViewModel(runtime)
+        vm.start(); advanceUntilIdle()
+        vm.finishForNow(); vm.finishForNow(); advanceUntilIdle()
+        assertEquals(1, runtime.finishCalls)
+        assertEquals(FirstWinPosition.HANDOFF, vm.state.value.position)
+        assertFalse(vm.state.value.isBusy)
+    }
+
+    @Test fun finishFailure_isGeneric_andPreservesNext() = runTest {
+        val completed = mission().copy(status = "COMPLETED", completedAt = 2L)
+        val runtime = FakeRuntime(
+            openResult = FirstWinJourneySnapshot(sessionId, FirstWinPosition.NEXT, completed),
+        ).apply { finishFailure = IllegalStateException("sensitive internal detail") }
+        val vm = FirstWinViewModel(runtime)
+        vm.start(); advanceUntilIdle()
+        vm.finishForNow(); advanceUntilIdle()
+        assertEquals(FirstWinUiError.FINISH_FOR_NOW, vm.state.value.error)
+        assertEquals(FirstWinPosition.NEXT, vm.state.value.position)
+        assertFalse(vm.state.value.isBusy)
+    }
+
+    @Test fun completeHandoff_usesRuntimeOnce_andRefreshesToHome() = runTest {
+        val completed = mission().copy(status = "COMPLETED", completedAt = 2L)
+        val runtime = FakeRuntime(
+            openResult = FirstWinJourneySnapshot(sessionId, FirstWinPosition.HANDOFF, completed),
+            handoffResult = FirstWinJourneySnapshot(sessionId, FirstWinPosition.HOME, completed),
+        )
+        val vm = FirstWinViewModel(runtime)
+        vm.start(); advanceUntilIdle()
+        vm.completeHandoff(); vm.completeHandoff(); advanceUntilIdle()
+        assertEquals(1, runtime.handoffCalls)
+        assertEquals(FirstWinPosition.HOME, vm.state.value.position)
+        assertFalse(vm.state.value.isBusy)
+    }
+
+    @Test fun handoffFailure_isGeneric_andPreservesHandoff() = runTest {
+        val completed = mission().copy(status = "COMPLETED", completedAt = 2L)
+        val runtime = FakeRuntime(
+            openResult = FirstWinJourneySnapshot(sessionId, FirstWinPosition.HANDOFF, completed),
+        ).apply { handoffFailure = IllegalStateException("sensitive internal detail") }
+        val vm = FirstWinViewModel(runtime)
+        vm.start(); advanceUntilIdle()
+        vm.completeHandoff(); advanceUntilIdle()
+        assertEquals(FirstWinUiError.COMPLETE_HANDOFF, vm.state.value.error)
+        assertEquals(FirstWinPosition.HANDOFF, vm.state.value.position)
+        assertFalse(vm.state.value.isBusy)
+    }
 }
