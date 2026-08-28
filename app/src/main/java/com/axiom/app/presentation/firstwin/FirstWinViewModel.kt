@@ -14,7 +14,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-enum class FirstWinUiError { LOAD, CREATE_MISSION, COMPLETE_MISSION, ACK_REWARD }
+enum class FirstWinUiError {
+    LOAD,
+    CREATE_MISSION,
+    COMPLETE_MISSION,
+    ACK_REWARD,
+    FINISH_FOR_NOW,
+    COMPLETE_HANDOFF,
+}
 
 data class FirstWinEntryUiState(
     val isLoading: Boolean = false,
@@ -41,15 +48,7 @@ class FirstWinViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val snapshot = runtime.open()
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        sessionId = snapshot.sessionId,
-                        position = snapshot.position,
-                        mission = snapshot.mission,
-                        error = null,
-                    )
-                }
+                applySnapshot(snapshot)
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (_: Throwable) {
@@ -92,16 +91,7 @@ class FirstWinViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val sessionId = current.sessionId ?: runtime.open().sessionId
-                val snapshot = runtime.createMission(sessionId, area, actionTitle)
-                _state.update {
-                    it.copy(
-                        isBusy = false,
-                        sessionId = snapshot.sessionId,
-                        position = snapshot.position,
-                        mission = snapshot.mission,
-                        error = null,
-                    )
-                }
+                applySnapshot(runtime.createMission(sessionId, area, actionTitle))
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (_: Throwable) {
@@ -121,16 +111,7 @@ class FirstWinViewModel @Inject constructor(
         _state.update { it.copy(isBusy = true, error = null) }
         viewModelScope.launch {
             try {
-                val snapshot = runtime.completeMission(sessionId, mission.id)
-                _state.update {
-                    it.copy(
-                        isBusy = false,
-                        sessionId = snapshot.sessionId,
-                        position = snapshot.position,
-                        mission = snapshot.mission,
-                        error = null,
-                    )
-                }
+                applySnapshot(runtime.completeMission(sessionId, mission.id))
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (_: Throwable) {
@@ -149,21 +130,59 @@ class FirstWinViewModel @Inject constructor(
         _state.update { it.copy(isBusy = true, error = null) }
         viewModelScope.launch {
             try {
-                val snapshot = runtime.acknowledgeReward(sessionId)
-                _state.update {
-                    it.copy(
-                        isBusy = false,
-                        sessionId = snapshot.sessionId,
-                        position = snapshot.position,
-                        mission = snapshot.mission,
-                        error = null,
-                    )
-                }
+                applySnapshot(runtime.acknowledgeReward(sessionId))
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (_: Throwable) {
                 _state.update { it.copy(isBusy = false, error = FirstWinUiError.ACK_REWARD) }
             }
+        }
+    }
+
+    fun finishForNow() {
+        val current = _state.value
+        val sessionId = current.sessionId ?: return
+        if (current.isBusy || current.position != FirstWinPosition.NEXT) return
+
+        _state.update { it.copy(isBusy = true, error = null) }
+        viewModelScope.launch {
+            try {
+                applySnapshot(runtime.finishForNow(sessionId))
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Throwable) {
+                _state.update { it.copy(isBusy = false, error = FirstWinUiError.FINISH_FOR_NOW) }
+            }
+        }
+    }
+
+    fun completeHandoff() {
+        val current = _state.value
+        val sessionId = current.sessionId ?: return
+        if (current.isBusy || current.position != FirstWinPosition.HANDOFF) return
+
+        _state.update { it.copy(isBusy = true, error = null) }
+        viewModelScope.launch {
+            try {
+                applySnapshot(runtime.completeHandoff(sessionId))
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Throwable) {
+                _state.update { it.copy(isBusy = false, error = FirstWinUiError.COMPLETE_HANDOFF) }
+            }
+        }
+    }
+
+    private fun applySnapshot(snapshot: FirstWinJourneySnapshot) {
+        _state.update {
+            it.copy(
+                isLoading = false,
+                isBusy = false,
+                sessionId = snapshot.sessionId,
+                position = snapshot.position,
+                mission = snapshot.mission,
+                error = null,
+            )
         }
     }
 }
