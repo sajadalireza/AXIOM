@@ -138,7 +138,14 @@ fun AwakenNavGraph(
             )
         }
         composable(Screen.FirstWin.route) {
-            FirstWinScreen()
+            FirstWinScreen(
+                onHandoffComplete = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.FirstWin.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+            )
         }
         composable(Screen.BlueprintWizard.route) {
             com.axiom.app.presentation.onboarding.blueprint.BlueprintWizardScreen(
