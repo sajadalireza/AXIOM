@@ -184,7 +184,7 @@ fun LanguageThemeSetupScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(52.dp)
+                        .heightIn(min = 52.dp)
                         .clip(RoundedCornerShape(4.dp))
                         .background(SystemGreen)
                         .clickable {
@@ -202,7 +202,13 @@ fun LanguageThemeSetupScreen(
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
                         color = VoidBlack,
-                        letterSpacing = 2.sp
+                        letterSpacing = 2.sp,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        softWrap = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 8.dp),
                     )
                 }
             }
