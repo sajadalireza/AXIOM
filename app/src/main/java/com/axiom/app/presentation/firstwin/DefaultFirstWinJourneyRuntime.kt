@@ -66,6 +66,36 @@ class DefaultFirstWinJourneyRuntime @Inject constructor(
         return readSnapshot(sessionId)
     }
 
+    override suspend fun finishForNow(
+        sessionId: String,
+    ): FirstWinJourneySnapshot {
+        val setupComplete = preferences.setupCompleteFlow.first()
+        when (lifecycle.markHandoffWithoutSchedule(setupComplete, sessionId, System.currentTimeMillis())) {
+            FirstWinLifecycleOutcome.APPLIED,
+            FirstWinLifecycleOutcome.ALREADY_APPLIED -> Unit
+            FirstWinLifecycleOutcome.PRECONDITION_FAILED ->
+                error("First-Win handoff prerequisites are missing")
+            FirstWinLifecycleOutcome.STATE_CONFLICT ->
+                error("First-Win handoff lifecycle state conflicted")
+        }
+        return readSnapshot(sessionId)
+    }
+
+    override suspend fun completeHandoff(
+        sessionId: String,
+    ): FirstWinJourneySnapshot {
+        val setupComplete = preferences.setupCompleteFlow.first()
+        when (lifecycle.markCompleted(setupComplete, sessionId, System.currentTimeMillis())) {
+            FirstWinLifecycleOutcome.APPLIED,
+            FirstWinLifecycleOutcome.ALREADY_APPLIED -> Unit
+            FirstWinLifecycleOutcome.PRECONDITION_FAILED ->
+                error("First-Win completion prerequisites are missing")
+            FirstWinLifecycleOutcome.STATE_CONFLICT ->
+                error("First-Win completion lifecycle state conflicted")
+        }
+        return readSnapshot(sessionId)
+    }
+
     private suspend fun readSnapshot(sessionId: String): FirstWinJourneySnapshot {
         val facts = factsReader.read(
             setupComplete = preferences.setupCompleteFlow.first(),
