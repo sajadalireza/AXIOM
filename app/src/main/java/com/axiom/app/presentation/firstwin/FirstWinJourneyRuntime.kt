@@ -22,4 +22,6 @@ interface FirstWinJourneyRuntime {
         missionId: String,
     ): FirstWinJourneySnapshot
     suspend fun acknowledgeReward(sessionId: String): FirstWinJourneySnapshot
+    suspend fun finishForNow(sessionId: String): FirstWinJourneySnapshot
+    suspend fun completeHandoff(sessionId: String): FirstWinJourneySnapshot
 }
