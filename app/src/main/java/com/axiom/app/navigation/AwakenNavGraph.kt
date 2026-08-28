@@ -36,6 +36,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import com.axiom.app.presentation.home.HomeScreen
+import com.axiom.app.presentation.firstwin.FirstWinScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
@@ -134,6 +135,16 @@ fun AwakenNavGraph(
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 }
+            )
+        }
+        composable(Screen.FirstWin.route) {
+            FirstWinScreen(
+                onHandoffComplete = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.FirstWin.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
             )
         }
         composable(Screen.BlueprintWizard.route) {

@@ -635,4 +635,39 @@
     <string name="skill_strength_training">Strength Training</string>
     <string name="skill_sleep_quality">Sleep Quality</string>
     <string name="skill_daily_hygiene">Daily Hygiene</string>
+
+    <!-- WP-207 First-Win -->
+    <string name="first_win_loading">Getting your first step ready</string>
+    <string name="first_win_load_error">Could not open your first step</string>
+    <string name="first_win_load_error_body">Your saved progress is still safe. Try loading it again.</string>
+    <string name="first_win_try_again">Try again</string>
+    <string name="first_win_step_1_of_4">Step 1 of 4</string>
+    <string name="first_win_step_2_of_4">Step 2 of 4</string>
+    <string name="first_win_step_3_of_4">Step 3 of 4</string>
+    <string name="first_win_area_title">Choose an area for a small win</string>
+    <string name="first_win_area_body">Pick what matters most right now. You can change course later.</string>
+    <string name="first_win_area_work">Work</string>
+    <string name="first_win_area_study">Study</string>
+    <string name="first_win_area_health">Health</string>
+    <string name="first_win_area_personal">Personal</string>
+    <string name="first_win_continue">Continue</string>
+    <string name="first_win_back">Back</string>
+    <string name="first_win_action_title">Choose one small action</string>
+    <string name="first_win_action_body">Make it specific and small enough to finish in a few minutes.</string>
+    <string name="first_win_action_label">What will you do?</string>
+    <string name="first_win_start_action">Start this action</string>
+    <string name="first_win_starting">Starting…</string>
+    <string name="first_win_create_error">That action could not be saved. Your text is still here.</string>
+    <string name="first_win_do_title">Do this one thing</string>
+    <string name="first_win_do_body">For now, only focus on finishing this small action.</string>
+    <string name="first_win_complete_action">I finished it</string>
+    <string name="first_win_completing">Saving your win…</string>
+    <string name="first_win_complete_error">That completion could not be saved. Try again.</string>
+    <string name="first_win_step_4_of_4">Step 4 of 4</string>
+    <string name="first_win_reward_title">That counts</string>
+    <string name="first_win_reward_body">You finished a real action. Your progress is saved.</string>
+    <string name="first_win_reward_error">Your win is saved, but this step could not advance. Try again.</string>
+    <string name="first_win_continuing">Continuing…</string>
+    <string name="first_win_next_title">Keep the momentum</string>
+    <string name="first_win_next_body">Choose what should happen next. You can schedule another small action or finish for now.</string>
 </resources>

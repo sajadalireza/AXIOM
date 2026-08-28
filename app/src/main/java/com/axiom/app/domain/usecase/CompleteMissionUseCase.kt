@@ -57,7 +57,8 @@ class CompleteMissionUseCase @Inject constructor(
         actualHours: Float? = null,
         goalSet: Boolean = true,
         gotFeedback: Boolean = true,
-        pushedComfortZone: Boolean = true
+        pushedComfortZone: Boolean = true,
+        firstWinSessionId: String? = null,
     ): XPResult? {
         val mission = missionRepository.getMissionById(missionId) ?: return null
         if (mission.status == "COMPLETED") return null
@@ -341,7 +342,10 @@ class CompleteMissionUseCase @Inject constructor(
                 nowMillis = now,
                 hunterXpAwarded = hunterXpAwarded,
                 skillXpAwarded = skillXpAwarded,
-                sessionId = null,
+                sessionId = com.axiom.app.domain.firstwin.FirstWinCompletionLink.resolveSessionId(
+                    isFirstWin = isFirstWin,
+                    candidateSessionId = firstWinSessionId,
+                ),
                 analyticsCollectionAllowed = analyticsCollectionAllowed
             )
         )

@@ -38,7 +38,8 @@ class SplashViewModel @Inject constructor(
     private val ensureAnonymousSessionUseCase: com.axiom.app.domain.usecase.EnsureAnonymousSessionUseCase,
     private val preferences: com.axiom.app.data.local.AxiomPreferences,
     private val hunterRepository: com.axiom.app.domain.repository.HunterRepository,
-    private val startupReadiness: StartupReadiness
+    private val startupReadiness: StartupReadiness,
+    private val firstWinFactsReader: com.axiom.app.domain.firstwin.FirstWinFactsReader,
 ) : ViewModel() {
     /**
      * Resolves the launch destination from authoritative startup facts.
@@ -47,22 +48,42 @@ class SplashViewModel @Inject constructor(
      * independent of Splash animation / seeding coroutine timing.
      * WP-202: the returned [LaunchDestination] is the single navigation authority
      * handed verbatim to the one-shot Splash exit (no NavGraph recomputation).
-     * WP-203: routing now consults the four-fact [EligibilityStateMachine] — the
-     * Hunter entity (`hunterExists`) is read as a first-class fact so a missing
-     * Hunter after earned progress recovers (never routes HOME into a null-Hunter
-     * shimmer). Pure classification only; no Room/DataStore mutation here.
+     * WP-203: routing consults the four-fact [EligibilityStateMachine] — the Hunter
+     * entity is a prerequisite fact, never completion evidence.
+     * WP-207: the resulting eligibility decision is then combined with the durable
+     * First-Win session lifecycle. This is the only place the one-shot launch route
+     * may insert FIRST_WIN or recognize a completed First-Win session as HOME.
      */
     suspend fun resolveDestination(): LaunchDestination {
         // WP-201 gate: block until startup work is done, THEN read facts.
         startupReadiness.await()
+        val hunter = hunterRepository.getDirectHunterProfile()
         val snapshot = EligibilitySnapshot(
             setupComplete = preferences.setupCompleteFlow.first(),
-            hunterExists = hunterRepository.getDirectHunterProfile() != null,
+            hunterExists = hunter != null,
             firstMissionDone = preferences.firstMissionDoneFlow.first(),
             blueprintSetupComplete = preferences.blueprintSetupCompleteFlow.first(),
         )
-        return EligibilityStateMachine.evaluate(snapshot).destination
+        val eligibility = EligibilityStateMachine.evaluate(snapshot)
+
+        // Durable First-Win state is hunter-scoped by a deterministic correlation id.
+        // Unknown persisted status remains fail-closed through FirstWinFactsReader:
+        // sessionExists=true + sessionStatus=null resumes FIRST_WIN rather than
+        // trusting an unrecognized lifecycle label or silently routing HOME.
+        val firstWinFacts = hunter?.let {
+            firstWinFactsReader.read(
+                setupComplete = snapshot.setupComplete,
+                sessionId = com.axiom.app.domain.firstwin.FirstWinIds.sessionId(it.id),
+            )
+        }
+
+        return FirstWinLaunchPolicy.resolve(
+            eligibility = eligibility,
+            firstWinSessionStatus = firstWinFacts?.sessionStatus,
+            firstWinSessionExists = firstWinFacts?.sessionExists ?: false,
+        )
     }
+
     fun ensureAnonymousSessionInBackground() {
         viewModelScope.launch {
             try {

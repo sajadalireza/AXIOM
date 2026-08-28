@@ -11,6 +11,7 @@ enum class LaunchDestination {
     SETUP,
     ONBOARDING,
     BLUEPRINT_WIZARD,
+    FIRST_WIN,
     HOME,
 }
 

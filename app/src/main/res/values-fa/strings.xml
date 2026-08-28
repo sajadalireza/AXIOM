@@ -635,4 +635,39 @@
     <string name="skill_strength_training">پرورش ماهیچه و وزنه‌برداری پویا</string>
     <string name="skill_sleep_quality">مدیریت غلظت خواب عمیق</string>
     <string name="skill_daily_hygiene">رعایت روزانه آداب بهداشتی</string>
+
+    <!-- WP-207 First-Win -->
+    <string name="first_win_loading">در حال آماده‌کردن اولین قدم</string>
+    <string name="first_win_load_error">نتوانستیم اولین قدم را باز کنیم</string>
+    <string name="first_win_load_error_body">پیشرفت ذخیره‌شده‌ات امن است. دوباره تلاش کن.</string>
+    <string name="first_win_try_again">تلاش دوباره</string>
+    <string name="first_win_step_1_of_4">گام ۱ از ۴</string>
+    <string name="first_win_step_2_of_4">گام ۲ از ۴</string>
+    <string name="first_win_step_3_of_4">گام ۳ از ۴</string>
+    <string name="first_win_area_title">یک زمینه برای یک برد کوچک انتخاب کن</string>
+    <string name="first_win_area_body">چیزی را انتخاب کن که همین حالا برایت مهم‌تر است. بعداً می‌توانی مسیر را عوض کنی.</string>
+    <string name="first_win_area_work">کار</string>
+    <string name="first_win_area_study">مطالعه</string>
+    <string name="first_win_area_health">سلامت</string>
+    <string name="first_win_area_personal">شخصی</string>
+    <string name="first_win_continue">ادامه</string>
+    <string name="first_win_back">بازگشت</string>
+    <string name="first_win_action_title">یک کار کوچک انتخاب کن</string>
+    <string name="first_win_action_body">آن‌قدر مشخص و کوچک باشد که بتوانی در چند دقیقه انجامش بدهی.</string>
+    <string name="first_win_action_label">الان چه کاری انجام می‌دهی؟</string>
+    <string name="first_win_start_action">شروع این کار</string>
+    <string name="first_win_starting">در حال شروع…</string>
+    <string name="first_win_create_error">این کار ذخیره نشد. متن تو همین‌جا مانده است.</string>
+    <string name="first_win_do_title">همین یک کار را انجام بده</string>
+    <string name="first_win_do_body">فعلاً فقط روی تمام‌کردن همین کار کوچک تمرکز کن.</string>
+    <string name="first_win_complete_action">انجامش دادم</string>
+    <string name="first_win_completing">در حال ذخیره بردت…</string>
+    <string name="first_win_complete_error">ثبت پایان کار انجام نشد. دوباره تلاش کن.</string>
+    <string name="first_win_step_4_of_4">گام ۴ از ۴</string>
+    <string name="first_win_reward_title">این یک برد واقعی بود</string>
+    <string name="first_win_reward_body">یک کار واقعی را تمام کردی. پیشرفتت ذخیره شده است.</string>
+    <string name="first_win_reward_error">بردت ذخیره شده، اما رفتن به مرحله بعد انجام نشد. دوباره تلاش کن.</string>
+    <string name="first_win_continuing">در حال ادامه…</string>
+    <string name="first_win_next_title">این حرکت را ادامه بده</string>
+    <string name="first_win_next_body">انتخاب کن بعدش چه شود. می‌توانی یک کار کوچک دیگر را زمان‌بندی کنی یا فعلاً تمام کنی.</string>
 </resources>
