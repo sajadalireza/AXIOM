@@ -42,12 +42,18 @@ import com.axiom.app.domain.firstwin.FirstWinPosition
 
 @Composable
 fun FirstWinScreen(
+    onHandoffComplete: () -> Unit,
     viewModel: FirstWinViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(viewModel) {
         viewModel.start()
+    }
+    LaunchedEffect(state.position) {
+        if (state.position == FirstWinPosition.HOME) {
+            onHandoffComplete()
+        }
     }
 
     FirstWinContent(
@@ -59,6 +65,8 @@ fun FirstWinScreen(
         onCreateMission = viewModel::createMission,
         onCompleteMission = viewModel::completeMission,
         onContinueReward = viewModel::continueFromReward,
+        onFinishForNow = viewModel::finishForNow,
+        onCompleteHandoff = viewModel::completeHandoff,
         onRetryLoad = viewModel::start,
     )
 }
@@ -73,6 +81,8 @@ private fun FirstWinContent(
     onCreateMission: () -> Unit,
     onCompleteMission: () -> Unit,
     onContinueReward: () -> Unit,
+    onFinishForNow: () -> Unit,
+    onCompleteHandoff: () -> Unit,
     onRetryLoad: () -> Unit,
 ) {
     Surface(
@@ -128,7 +138,23 @@ private fun FirstWinContent(
             }
 
             state.position == FirstWinPosition.NEXT -> {
-                FirstWinNextStep()
+                FirstWinNextStep(
+                    isBusy = state.isBusy,
+                    showError = state.error == FirstWinUiError.FINISH_FOR_NOW,
+                    onFinishForNow = onFinishForNow,
+                )
+            }
+
+            state.position == FirstWinPosition.HANDOFF -> {
+                FirstWinHandoffStep(
+                    isBusy = state.isBusy,
+                    showError = state.error == FirstWinUiError.COMPLETE_HANDOFF,
+                    onCompleteHandoff = onCompleteHandoff,
+                )
+            }
+
+            state.position == FirstWinPosition.HOME -> {
+                FirstWinLoading()
             }
 
             else -> FirstWinLoading()
@@ -397,7 +423,11 @@ private fun FirstWinRewardStep(
 }
 
 @Composable
-private fun FirstWinNextStep() {
+private fun FirstWinNextStep(
+    isBusy: Boolean,
+    showError: Boolean,
+    onFinishForNow: () -> Unit,
+) {
     FirstWinPage {
         Text(
             text = stringResource(R.string.first_win_next_title),
@@ -405,9 +435,61 @@ private fun FirstWinNextStep() {
             modifier = Modifier.semantics { heading() },
         )
         Text(
-            text = stringResource(R.string.first_win_next_body),
+            text = stringResource(R.string.first_win_next_body_finish_only),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        if (showError) {
+            Text(
+                text = stringResource(R.string.first_win_finish_error),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+            )
+        }
+        PrimaryButton(
+            text = if (isBusy) {
+                stringResource(R.string.first_win_continuing)
+            } else {
+                stringResource(R.string.first_win_finish_for_now)
+            },
+            enabled = !isBusy,
+            onClick = onFinishForNow,
+        )
+    }
+}
+
+@Composable
+private fun FirstWinHandoffStep(
+    isBusy: Boolean,
+    showError: Boolean,
+    onCompleteHandoff: () -> Unit,
+) {
+    FirstWinPage {
+        Text(
+            text = stringResource(R.string.first_win_handoff_title),
+            style = MaterialTheme.typography.displayMedium,
+            modifier = Modifier.semantics { heading() },
+        )
+        Text(
+            text = stringResource(R.string.first_win_handoff_body),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        if (showError) {
+            Text(
+                text = stringResource(R.string.first_win_handoff_error),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+            )
+        }
+        PrimaryButton(
+            text = if (isBusy) {
+                stringResource(R.string.first_win_continuing)
+            } else {
+                stringResource(R.string.first_win_open_home)
+            },
+            enabled = !isBusy,
+            onClick = onCompleteHandoff,
         )
     }
 }
