@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="first_win_next_body_finish_only">Your first win is saved. Finish this first session, then continue from Home.</string>
+    <string name="first_win_finish_for_now">Finish for now</string>
+    <string name="first_win_finish_error">Your win is safe, but the handoff could not start. Try again.</string>
+    <string name="first_win_handoff_title">Your first win is ready</string>
+    <string name="first_win_handoff_body">Everything is saved. Open Home to continue with your real progress.</string>
+    <string name="first_win_open_home">Open Home</string>
+    <string name="first_win_handoff_error">Your progress is safe, but Home could not open yet. Try again.</string>
+</resources>

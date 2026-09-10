@@ -37,6 +37,7 @@ fun splashExitRoute(
     LaunchDestination.SETUP -> Screen.Setup.route
     LaunchDestination.ONBOARDING -> Screen.Onboarding.route
     LaunchDestination.BLUEPRINT_WIZARD -> Screen.BlueprintWizard.route
+    LaunchDestination.FIRST_WIN -> Screen.FirstWin.route
     LaunchDestination.HOME -> Screen.Home.route
 }
 

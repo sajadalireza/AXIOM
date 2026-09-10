@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="first_win_next_body_finish_only">اولین بردت ذخیره شده است. این جلسهٔ اول را تمام کن و بعد از خانه ادامه بده.</string>
+    <string name="first_win_finish_for_now">فعلاً تمام کن</string>
+    <string name="first_win_finish_error">بردت امن است، اما شروع انتقال انجام نشد. دوباره تلاش کن.</string>
+    <string name="first_win_handoff_title">اولین بردت آماده است</string>
+    <string name="first_win_handoff_body">همه‌چیز ذخیره شده است. خانه را باز کن و پیشرفت واقعی‌ات را ادامه بده.</string>
+    <string name="first_win_open_home">باز کردن خانه</string>
+    <string name="first_win_handoff_error">پیشرفتت امن است، اما هنوز نتوانستیم خانه را باز کنیم. دوباره تلاش کن.</string>
+</resources>

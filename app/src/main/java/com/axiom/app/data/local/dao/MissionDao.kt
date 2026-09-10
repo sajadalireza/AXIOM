@@ -18,6 +18,9 @@ interface MissionDao {
     @Query("SELECT * FROM missions WHERE scheduleBlockId = :scheduleBlockId")
     suspend fun getMissionsByScheduleBlockId(scheduleBlockId: String): List<MissionEntity>
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertMissionIfAbsent(mission: MissionEntity): Long
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMission(mission: MissionEntity)
 

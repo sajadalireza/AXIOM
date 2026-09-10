@@ -19,6 +19,9 @@ interface CompletionReceiptDao {
     @Query("SELECT * FROM completion_receipt WHERE idempotencyKey = :key LIMIT 1")
     suspend fun getByKey(key: String): CompletionReceiptEntity?
 
+    @Query("SELECT * FROM completion_receipt WHERE sessionId = :sessionId ORDER BY createdAt DESC LIMIT 1")
+    suspend fun getBySessionId(sessionId: String): CompletionReceiptEntity?
+
     @Query("SELECT * FROM completion_receipt ORDER BY createdAt DESC")
     suspend fun getAll(): List<CompletionReceiptEntity>
 }

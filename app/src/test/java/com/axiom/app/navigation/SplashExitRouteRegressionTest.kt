@@ -69,6 +69,12 @@ class SplashExitRouteRegressionTest {
     }
 
     @Test
+    fun resolvedFirstWin_routesFirstWin_regardlessOfFlags() {
+        assertEquals(Screen.FirstWin.route, splashExitRoute(LaunchDestination.FIRST_WIN, false, false))
+        assertEquals(Screen.FirstWin.route, splashExitRoute(LaunchDestination.FIRST_WIN, true, true))
+    }
+
+    @Test
     fun resolvedHome_routesHome_regardlessOfFlags() {
         assertEquals(Screen.Home.route, splashExitRoute(LaunchDestination.HOME, false, false))
         assertEquals(Screen.Home.route, splashExitRoute(LaunchDestination.HOME, true, true))

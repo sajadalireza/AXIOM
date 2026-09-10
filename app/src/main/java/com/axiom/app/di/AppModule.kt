@@ -33,6 +33,36 @@ abstract class AppModule {
 
     @Binds
     @Singleton
+    abstract fun bindFirstWinStateStore(
+        impl: RoomFirstWinStateStore
+    ): com.axiom.app.domain.firstwin.FirstWinStateStore
+
+    @Binds
+    @Singleton
+    abstract fun bindFirstWinLifecycleStore(
+        impl: RoomFirstWinLifecycleStore
+    ): com.axiom.app.domain.firstwin.FirstWinLifecycleStore
+
+    @Binds
+    @Singleton
+    abstract fun bindFirstWinMissionStore(
+        impl: RoomFirstWinMissionStore
+    ): com.axiom.app.domain.firstwin.FirstWinMissionStore
+
+    @Binds
+    @Singleton
+    abstract fun bindFirstWinScheduleStore(
+        impl: RoomFirstWinScheduleStore
+    ): com.axiom.app.domain.firstwin.FirstWinScheduleStore
+
+    @Binds
+    @Singleton
+    abstract fun bindFirstWinJourneyRuntime(
+        impl: com.axiom.app.presentation.firstwin.DefaultFirstWinJourneyRuntime
+    ): com.axiom.app.presentation.firstwin.FirstWinJourneyRuntime
+
+    @Binds
+    @Singleton
     abstract fun bindMissionRepository(
         impl: MissionRepositoryImpl
     ): MissionRepository

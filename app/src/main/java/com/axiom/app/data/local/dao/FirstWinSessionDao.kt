@@ -18,6 +18,17 @@ interface FirstWinSessionDao {
     @Query("SELECT * FROM first_win_session WHERE sessionId = :id LIMIT 1")
     suspend fun getById(id: String): FirstWinSessionEntity?
 
+    @Query(
+        "UPDATE first_win_session SET status = :targetStatus, updatedAt = :updatedAt " +
+            "WHERE sessionId = :id AND status = :expectedStatus"
+    )
+    suspend fun compareAndSetStatus(
+        id: String,
+        expectedStatus: String,
+        targetStatus: String,
+        updatedAt: Long,
+    ): Int
+
     @Query("SELECT * FROM first_win_session ORDER BY createdAt DESC")
     suspend fun getAll(): List<FirstWinSessionEntity>
 }

@@ -1,6 +1,7 @@
 package com.axiom.app.domain.usecase
 
 import com.axiom.app.data.local.dao.MissionDao
+import com.axiom.app.domain.firstwin.shouldGenerateMissionFromScheduleBlock
 import com.axiom.app.domain.model.Mission
 import com.axiom.app.domain.repository.MissionRepository
 import com.axiom.app.domain.repository.SkillRepository
@@ -32,6 +33,10 @@ class GenerateDailyMissionsFromScheduleUseCase @Inject constructor(
         val now = System.currentTimeMillis()
 
         for (block in blocks) {
+            // First-Win one-shot schedules already materialize their linked Mission at commit time.
+            // Re-materializing them here would create an unintended recurring stream.
+            if (!shouldGenerateMissionFromScheduleBlock(block)) continue
+
             // Check if there is already a mission for today linked to this scheduleBlockId
             val existingMissions = try {
                 missionDao.getMissionsByScheduleBlockId(block.id)
