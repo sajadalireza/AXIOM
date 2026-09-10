@@ -360,7 +360,7 @@
     <string name="stat_execution_title">EXECUTION SPEED</string>
     <string name="stat_execution_desc">Speeds up workflow completion rate and system efficacy.</string>
     <string name="stat_focus_title">FOCUS DEPTH</string>
-    <string name="stat_focus_desc">Reinforces stress tolerance limits and daily task accuracy.</string>
+    <string name="stat_focus_desc">Reinforces stress tolerance limits and daily mission accuracy.</string>
     <string name="stat_knowledge_title">KNOWLEDGE RATIO</string>
     <string name="stat_knowledge_desc">Augments informational absorption and logical structures.</string>
     <string name="stat_business_title">COMMERCIAL ACUMEN</string>
@@ -387,7 +387,7 @@
     <string name="core_connection_locked">◈ SYSTEM CONNECTION LOCKED</string>
     <string name="awaken_core_node">◈ AWAKEN CORE NODE</string>
     <string name="overclock_node">◈ OVERCLOCK INSTANT VALUE</string>
-    <string name="instant_gate_protocol_title">◈ SPRINT WINDOW PROTOCOL</string>
+    <string name="instant_gate_protocol_title">◈ SPRINT WINDOW TIMED MISSION</string>
     <string name="instant_gate_protocol_desc">Timed session: Finish within 1 hour to secure 3.0x high-leverage XP multiplier!</string>
     <string name="cognitive_interface_modulator">◈ SELECT STRATEGIC CONSULTIVE PERSONA</string>
     <string name="system_voice_cold">Ruthless Critic (Blunt Feedback)</string>
@@ -545,7 +545,7 @@
     <!-- First Mission Onboarding -->
     <string name="first_mission_header">[ WARRIOR OS — INITIAL DEPLOYMENT ]</string>
     <string name="first_mission_title">Warrior, your first focus session awaits.</string>
-    <string name="first_mission_desc">Write down the single highest priority task you MUST resolve today.</string>
+    <string name="first_mission_desc">Write down the single highest priority mission you MUST resolve today.</string>
     <string name="first_mission_label">Primary Context Session</string>
     <string name="first_mission_placeholder">e.g. 1 hour of ESM2 protein modeling codebase</string>
     <string name="first_mission_btn_open">▶ ENGAGE STRATEGIC FOCUS</string>
