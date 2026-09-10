@@ -3,12 +3,11 @@ package com.axiom.app.presentation.onboarding
 import com.axiom.app.domain.firstwin.FirstWinSessionStatus
 
 /**
- * WP-207 — pure First-Win launch policy.
+ * WP-207/WP-208 — pure First-Win launch policy with Kill Switch & Rollback control plane.
  *
  * Decides the final [LaunchDestination] by combining the existing WP-203
- * [EligibilityResult] with the durable First-Win session lifecycle status. It
- * NEVER modifies the [EligibilityStateMachine]; it only inserts [LaunchDestination.FIRST_WIN]
- * where the slice's new-user path applies and routes completed sessions to Home.
+ * [EligibilityResult] with the durable First-Win session lifecycle status and the
+ * WP-208 [isTreatmentActive] control gate.
  *
  * Precedence (fail-closed):
  *  1. [EligibilityState.HUNTER_RECOVERY]             -> existing destination (a lost Hunter recovers in place)
@@ -16,8 +15,14 @@ import com.axiom.app.domain.firstwin.FirstWinSessionStatus
  *  3. NEEDS_HUNTER + COMPLETED session                 -> existing destination
  *       (WP-203 invariant: a missing Hunter never routes directly Home)
  *  4. session status == [FirstWinSessionStatus.COMPLETED] -> HOME
- *  5. any other or unknown status on an existing session -> FIRST_WIN (resume/fail-closed)
- *  6. no session && NEEDS_HUNTER || NEEDS_FIRST_MISSION -> FIRST_WIN (fresh assignment)
+ *       (WP-208 MUST-ACCEPTANCE: switching off treatment NEVER throws a completed user back
+ *        into onboarding; durable Room completion dominates regardless of treatment flag)
+ *  5. any other or unknown status on an existing session:
+ *       - if [isTreatmentActive] == true             -> FIRST_WIN (resumes at exact position)
+ *       - if [isTreatmentActive] == false            -> existing destination (bounded legacy fallback)
+ *  6. no session && (NEEDS_HUNTER || NEEDS_FIRST_MISSION):
+ *       - if [isTreatmentActive] == true             -> FIRST_WIN (fresh assignment)
+ *       - if [isTreatmentActive] == false            -> existing destination (bounded legacy fallback: ONBOARDING)
  *  7. otherwise                                      -> existing destination (NEEDS_SETUP / NEEDS_BLUEPRINT / ESTABLISHED)
  *
  * Pure: no clock, no I/O, no coroutine timing — the same inputs always yield the
@@ -29,6 +34,7 @@ object FirstWinLaunchPolicy {
         eligibility: EligibilityResult,
         firstWinSessionStatus: FirstWinSessionStatus?,
         firstWinSessionExists: Boolean = firstWinSessionStatus != null,
+        isTreatmentActive: Boolean = true,
     ): LaunchDestination {
         val state = eligibility.state
 
@@ -44,18 +50,32 @@ object FirstWinLaunchPolicy {
             return eligibility.destination
         }
 
-        // 4-5. A First-Win session exists (setup completed, not in recovery/repair):
-        // a completed session is done (Home); any other session resumes First-Win.
-        when (firstWinSessionStatus) {
-            FirstWinSessionStatus.COMPLETED -> return LaunchDestination.HOME
-            null -> Unit
-            else -> return LaunchDestination.FIRST_WIN
+        // 4. A completed First-Win session is finished (Home).
+        // WP-208 invariant: switching off treatment never throws a completed user back
+        // into onboarding (No duplicate onboarding / zero data loss).
+        if (firstWinSessionStatus == FirstWinSessionStatus.COMPLETED) {
+            return LaunchDestination.HOME
         }
-        if (firstWinSessionExists) return LaunchDestination.FIRST_WIN
 
-        // 6. No session — fresh First-Win assignment for first-win-eligible states.
+        // 5. An existing in-progress session (setup completed, not recovery/repair):
+        // If treatment is active, resume First-Win. If treatment is disabled (killed/control),
+        // fall back cleanly to the legacy destination without deleting session data.
+        if (firstWinSessionExists || firstWinSessionStatus != null) {
+            return if (isTreatmentActive) {
+                LaunchDestination.FIRST_WIN
+            } else {
+                eligibility.destination
+            }
+        }
+
+        // 6. No session — fresh First-Win assignment for first-win-eligible states if treatment is active.
+        // If treatment is inactive/killed, fall back to legacy destination (ONBOARDING).
         if (state == EligibilityState.NEEDS_HUNTER || state == EligibilityState.NEEDS_FIRST_MISSION) {
-            return LaunchDestination.FIRST_WIN
+            return if (isTreatmentActive) {
+                LaunchDestination.FIRST_WIN
+            } else {
+                eligibility.destination
+            }
         }
 
         // 7. Legacy setup / blueprint / established keep their existing destination.

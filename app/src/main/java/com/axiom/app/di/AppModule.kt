@@ -63,6 +63,12 @@ abstract class AppModule {
 
     @Binds
     @Singleton
+    abstract fun bindFirstWinControlPlane(
+        impl: com.axiom.app.data.repository.FirstWinControlPlaneImpl
+    ): com.axiom.app.domain.firstwin.control.FirstWinControlPlane
+
+    @Binds
+    @Singleton
     abstract fun bindMissionRepository(
         impl: MissionRepositoryImpl
     ): MissionRepository

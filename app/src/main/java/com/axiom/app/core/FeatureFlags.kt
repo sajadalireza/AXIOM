@@ -18,4 +18,12 @@ object FeatureFlags {
      *  yet (see PremiumViewModel.kt). Flip to true only after Cafe
      *  Bazaar / Myket IAB SDK is wired to real purchase confirmation. */
     const val PREMIUM_PURCHASE_ENABLED = false
+
+    /**
+     * WP-208: local kill switch for the First-Win vertical slice.
+     * Default is false (treatment allowed).
+     * Flipping this to true immediately suppresses the First-Win treatment flow
+     * locally and routes eligible launches to legacy onboarding fallback.
+     */
+    var FIRST_WIN_LOCAL_KILL = false
 }
