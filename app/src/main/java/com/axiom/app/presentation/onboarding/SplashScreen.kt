@@ -40,6 +40,7 @@ class SplashViewModel @Inject constructor(
     private val hunterRepository: com.axiom.app.domain.repository.HunterRepository,
     private val startupReadiness: StartupReadiness,
     private val firstWinFactsReader: com.axiom.app.domain.firstwin.FirstWinFactsReader,
+    private val firstWinControlPlane: com.axiom.app.domain.firstwin.control.FirstWinControlPlane,
 ) : ViewModel() {
     /**
      * Resolves the launch destination from authoritative startup facts.
@@ -51,8 +52,9 @@ class SplashViewModel @Inject constructor(
      * WP-203: routing consults the four-fact [EligibilityStateMachine] — the Hunter
      * entity is a prerequisite fact, never completion evidence.
      * WP-207: the resulting eligibility decision is then combined with the durable
-     * First-Win session lifecycle. This is the only place the one-shot launch route
-     * may insert FIRST_WIN or recognize a completed First-Win session as HOME.
+     * First-Win session lifecycle.
+     * WP-208: FirstWinControlPlane gates treatment activity with sticky variant
+     * assignment, eligibility versioning, and local/remote kill boundaries.
      */
     suspend fun resolveDestination(): LaunchDestination {
         // WP-201 gate: block until startup work is done, THEN read facts.
@@ -77,10 +79,13 @@ class SplashViewModel @Inject constructor(
             )
         }
 
+        val isTreatmentActive = firstWinControlPlane.isTreatmentActive()
+
         return FirstWinLaunchPolicy.resolve(
             eligibility = eligibility,
             firstWinSessionStatus = firstWinFacts?.sessionStatus,
             firstWinSessionExists = firstWinFacts?.sessionExists ?: false,
+            isTreatmentActive = isTreatmentActive,
         )
     }
 

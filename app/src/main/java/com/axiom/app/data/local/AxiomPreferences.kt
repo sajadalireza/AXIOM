@@ -72,6 +72,11 @@ open class AxiomPreferences @Inject constructor(
         // WP-206 — three-state analytics consent (default UNKNOWN) + last-change timestamp.
         private val ANALYTICS_CONSENT_STATE = stringPreferencesKey("analytics_consent_state")
         private val ANALYTICS_CONSENT_UPDATED_AT = longPreferencesKey("analytics_consent_updated_at")
+        // WP-208 — First-Win control plane keys: sticky variant, eligibility version, assignment timestamp, and remote kill switch.
+        private val FIRST_WIN_VARIANT = stringPreferencesKey("first_win_variant")
+        private val FIRST_WIN_ASSIGNED_ELIGIBILITY_VERSION = intPreferencesKey("first_win_assigned_eligibility_version")
+        private val FIRST_WIN_ASSIGNMENT_TIMESTAMP = longPreferencesKey("first_win_assignment_timestamp")
+        private val FIRST_WIN_REMOTE_KILL_ACTIVE = booleanPreferencesKey("first_win_remote_kill_active")
         private val IS_PREMIUM = booleanPreferencesKey("is_premium")
         private val PREMIUM_PLAN = stringPreferencesKey("premium_plan")
         private val EQUIPPED_PASSIVE_SKILL_ID = stringPreferencesKey("equipped_passive_skill_id")
@@ -1066,6 +1071,41 @@ open class AxiomPreferences @Inject constructor(
             prefs.remove(FOCUS_IS_BOSS)
             prefs.remove(FOCUS_PAUSED)
             prefs.remove(FOCUS_PAUSED_REMAINING_SECONDS)
+        }
+    }
+
+    // WP-208: First-Win control plane accessors (sticky variant, eligibility version, assignment timestamp, remote kill).
+    open val firstWinVariantFlow: Flow<String?> = context.dataStore.data.map { prefs ->
+        prefs[FIRST_WIN_VARIANT]
+    }
+
+    open val firstWinAssignedEligibilityVersionFlow: Flow<Int?> = context.dataStore.data.map { prefs ->
+        prefs[FIRST_WIN_ASSIGNED_ELIGIBILITY_VERSION]
+    }
+
+    open val firstWinAssignmentTimestampFlow: Flow<Long?> = context.dataStore.data.map { prefs ->
+        prefs[FIRST_WIN_ASSIGNMENT_TIMESTAMP]
+    }
+
+    open val firstWinRemoteKillFlow: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[FIRST_WIN_REMOTE_KILL_ACTIVE] ?: false
+    }
+
+    open suspend fun setFirstWinVariantAssignment(
+        variant: String,
+        eligibilityVersion: Int,
+        timestamp: Long,
+    ) {
+        context.dataStore.edit { prefs ->
+            prefs[FIRST_WIN_VARIANT] = variant
+            prefs[FIRST_WIN_ASSIGNED_ELIGIBILITY_VERSION] = eligibilityVersion
+            prefs[FIRST_WIN_ASSIGNMENT_TIMESTAMP] = timestamp
+        }
+    }
+
+    open suspend fun setFirstWinRemoteKill(active: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[FIRST_WIN_REMOTE_KILL_ACTIVE] = active
         }
     }
 }
