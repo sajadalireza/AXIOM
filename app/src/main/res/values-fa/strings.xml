@@ -387,7 +387,7 @@
     <string name="core_connection_locked">◈ پایداری دیتابیس قفل فعال است</string>
     <string name="awaken_core_node">◈ فعال‌سازی گره مهارتی</string>
     <string name="overclock_node">◈ اورکلاک آنی ویژگی‌ها</string>
-    <string name="instant_gate_protocol_title">◈ دالان مأموریت فوری فعال شد</string>
+    <string name="instant_gate_protocol_title">◈ پنجره اسپرینت: مأموریت زمان‌بندی‌شده</string>
     <string name="instant_gate_protocol_desc">مأموریت جاری: کار را زیر ۱ ساعت انجام دهید تا ۳ برابر ضریب تکانه‌ تجربه کسب گردد!</string>
     <string name="cognitive_interface_modulator">◈ بستر همفکری اتاق جنگ</string>
     <string name="system_voice_cold">منتقد سخت‌گیر (بازخورد شفاف و مقتدر)</string>
@@ -545,7 +545,7 @@
     <!-- First Mission Onboarding -->
     <string name="first_mission_header">[ سیستم‌عامل WARRIOR — استقرار مأموریت ریشه ]</string>
     <string name="first_mission_title">وریر مأمور، اولین گام و عادت منتظر شماست.</string>
-    <string name="first_mission_desc">یک کار حیاتی که امروز بدون چون و چرا باید به ثمر برسانید را تبیین فرمایید.</string>
+    <string name="first_mission_desc">یک مأموریت حیاتی که امروز بدون چون و چرا باید به ثمر برسانید را تبیین فرمایید.</string>
     <string name="first_mission_label">مأموریت کلیدی تمرکز</string>
     <string name="first_mission_placeholder">مثلاً: ۱ ساعت پیاده‌سازی مدل ESM2 پروتئینی</string>
     <string name="first_mission_btn_open">▶ آغاز متمرکز روند کار</string>
