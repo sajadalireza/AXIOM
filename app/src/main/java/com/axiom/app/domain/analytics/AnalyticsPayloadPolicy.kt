@@ -18,30 +18,58 @@ object AnalyticsPayloadPolicy {
         "ai_call",
         "streak_shield_used",
         "streak_broken",
-        "FIRST_WIN_COMPLETION"
+        "FIRST_WIN_COMPLETION",
+        "first_win_assigned",
+        "first_win_exposed",
+        "first_win_completed",
+        "onboarding_started",
+        "mission_created",
+        "mission_started",
+        "wmpu_achieved",
+        "weekly_review_exposed",
+        "weekly_review_completed",
+        "experiment_assigned",
+        "experiment_exposed",
+        "operational_error",
+        "integrity_heartbeat"
     )
 
     /** Per-event allowlist. A property key MUST appear here (case-sensitive) to be carried. */
     val ALLOWLIST: Map<String, Set<String>> = mapOf(
-        "mission_completed" to setOf("rarity", "xp_gained", "leveled_up"),
-        "onboarding_completed" to emptySet(),
+        "mission_completed" to setOf("rarity", "xp_gained", "leveled_up", "has_goal", "contributes_to_wmpu", "mission_id"),
+        "onboarding_completed" to setOf("cohort_ring", "duration_seconds"),
         "ai_call" to setOf("method", "success", "reason"),
         "streak_shield_used" to setOf("streak_length"),
         "streak_broken" to setOf("streak_length"),
-        "FIRST_WIN_COMPLETION" to setOf("missionId", "hunterXpAwarded")
+        "FIRST_WIN_COMPLETION" to setOf("missionId", "hunterXpAwarded"),
+        "first_win_assigned" to setOf("treatment_id", "template_id", "cohort_ring"),
+        "first_win_exposed" to setOf("treatment_id", "template_id", "screen_name", "cohort_ring"),
+        "first_win_completed" to setOf("treatment_id", "template_id", "duration_seconds", "cohort_ring"),
+        "onboarding_started" to setOf("cohort_ring"),
+        "mission_created" to setOf("mission_id", "has_goal", "has_kpi", "is_custom"),
+        "mission_started" to setOf("mission_id", "has_goal"),
+        "wmpu_achieved" to setOf("cycle_week", "meaningful_mission_count", "goal_count", "cohort_ring"),
+        "weekly_review_exposed" to setOf("cycle_week", "cohort_ring"),
+        "weekly_review_completed" to setOf("cycle_week", "actions_taken", "cohort_ring"),
+        "experiment_assigned" to setOf("experiment_id", "variant_id", "cohort_ring"),
+        "experiment_exposed" to setOf("experiment_id", "variant_id", "screen_name", "cohort_ring"),
+        "operational_error" to setOf("component", "error_category", "error_code", "status"),
+        "integrity_heartbeat" to setOf("schema_version", "pending_events_count", "cohort_ring", "status")
     )
 
     /**
      * Defense-in-depth blacklist (§9). Compared case-insensitively against every property key.
-     * Covers free text, journal/reflection, mission title, identity, and secret/token aliases.
+     * Covers free text, journal/reflection, mission title, goal title, identity, health/finance, and secret/token aliases.
      */
     val SENSITIVE_KEYS: Set<String> = setOf(
-        "title", "missiontitle", "mission_title",
+        "title", "missiontitle", "mission_title", "goaltitle", "goal_title",
         "reflection", "reflectiontext", "reflection_text",
         "note", "notes", "journal", "journaltext", "journal_text",
         "prompt", "usertext", "user_text", "freetext", "free_text",
         "description", "message", "body", "content", "text",
         "answer", "question",
+        "health", "healthdata", "health_data", "medical",
+        "finance", "financial", "salary", "bank", "income",
         "email", "phone", "name", "huntername", "hunter_name", "username", "user_name",
         "token", "apikey", "api_key", "password", "secret", "authorization", "bearer"
     )

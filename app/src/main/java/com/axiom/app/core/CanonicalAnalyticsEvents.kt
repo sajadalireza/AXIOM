@@ -44,6 +44,26 @@ object CanonicalAnalyticsEvents {
     const val PURPOSE_DEFINED = "purpose_defined"
     const val PURPOSE_UPDATED = "purpose_updated"
 
+    // Funnel & First-Win Lifecycle Events (Strict separation of assignment vs. exposure)
+    const val FIRST_WIN_ASSIGNED = "first_win_assigned"
+    const val FIRST_WIN_EXPOSED = "first_win_exposed"
+    const val FIRST_WIN_COMPLETED = "first_win_completed"
+    const val ONBOARDING_STARTED = "onboarding_started"
+    const val ONBOARDING_COMPLETED = "onboarding_completed"
+    const val WEEKLY_REVIEW_EXPOSED = "weekly_review_exposed"
+    const val WEEKLY_REVIEW_COMPLETED = "weekly_review_completed"
+
+    // Experimentation Events (Separation of assignment vs. exposure)
+    const val EXPERIMENT_ASSIGNED = "experiment_assigned"
+    const val EXPERIMENT_EXPOSED = "experiment_exposed"
+
+    // WMPU (Weekly Meaningful Progress Unit) Event
+    const val WMPU_ACHIEVED = "wmpu_achieved"
+
+    // Operational Integrity & Error Boundary Events
+    const val OPERATIONAL_ERROR = "operational_error"
+    const val INTEGRITY_HEARTBEAT = "integrity_heartbeat"
+
     /**
      * Map of legacy event names to their canonical equivalents.
      */
@@ -54,7 +74,8 @@ object CanonicalAnalyticsEvents {
         "task_created" to MISSION_CREATED,
         "task_completed" to MISSION_COMPLETED,
         "instant_gate_started" to MISSION_STARTED,
-        "instant_gate_completed" to MISSION_COMPLETED
+        "instant_gate_completed" to MISSION_COMPLETED,
+        "FIRST_WIN_COMPLETION" to FIRST_WIN_COMPLETED
     )
 
     /**

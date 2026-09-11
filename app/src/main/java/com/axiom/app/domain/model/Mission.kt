@@ -38,4 +38,10 @@ data class Mission(
      */
     val projectId: String?
         get() = dungeonId
+
+    /**
+     * Canonical reference to the associated [Goal] (maps to trackId or projectId).
+     */
+    val goalId: String?
+        get() = trackId ?: projectId
 }
