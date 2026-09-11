@@ -18,6 +18,7 @@ import com.axiom.app.domain.streak.StreakCadence
 import com.axiom.app.domain.streak.StreakCadenceType
 import com.axiom.app.domain.streak.StreakPauseState
 import com.axiom.app.domain.streak.StreakRecoveryState
+import com.axiom.app.domain.template.TemplateUsageStats
 import com.axiom.app.ui.theme.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -154,6 +155,10 @@ open class AxiomPreferences @Inject constructor(
         private val STREAK_RECOVERY_DEADLINE = longPreferencesKey("streak_recovery_deadline")
         private val STREAK_RECOVERY_MISSION_ID = stringPreferencesKey("streak_recovery_mission_id")
         private val STREAK_LAST_RECOVERY_DATE = stringPreferencesKey("streak_last_recovery_date")
+
+        // Gate G5 — E4.3 Mission Template Pack Acceptance Tracking
+        private val TEMPLATE_ACCEPTED_COUNT = intPreferencesKey("template_accepted_count")
+        private val BLANK_MISSION_CREATED_COUNT = intPreferencesKey("blank_mission_created_count")
     }
 
     open val lastCommandVoiceShownDateFlow: Flow<String> = context.dataStore.data.map { prefs ->
@@ -1235,6 +1240,28 @@ open class AxiomPreferences @Inject constructor(
             if (state.lastRecoveryDate != null) {
                 prefs[STREAK_LAST_RECOVERY_DATE] = state.lastRecoveryDate.toString()
             }
+        }
+    }
+
+    // Gate G5 — E4.3 Template Acceptance Tracking
+    open val templateUsageStatsFlow: Flow<TemplateUsageStats> = context.dataStore.data.map { prefs ->
+        TemplateUsageStats(
+            templateAcceptedCount = prefs[TEMPLATE_ACCEPTED_COUNT] ?: 0,
+            blankCreatedCount = prefs[BLANK_MISSION_CREATED_COUNT] ?: 0
+        )
+    }
+
+    open suspend fun recordTemplateAccepted() {
+        context.dataStore.edit { prefs ->
+            val current = prefs[TEMPLATE_ACCEPTED_COUNT] ?: 0
+            prefs[TEMPLATE_ACCEPTED_COUNT] = current + 1
+        }
+    }
+
+    open suspend fun recordBlankMissionCreated() {
+        context.dataStore.edit { prefs ->
+            val current = prefs[BLANK_MISSION_CREATED_COUNT] ?: 0
+            prefs[BLANK_MISSION_CREATED_COUNT] = current + 1
         }
     }
 }

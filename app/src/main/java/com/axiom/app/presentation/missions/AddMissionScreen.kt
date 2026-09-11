@@ -42,6 +42,8 @@ import com.axiom.app.domain.model.EvidenceLevel
 import com.axiom.app.domain.model.MissionAuthoringPayload
 import com.axiom.app.domain.model.ScheduleSlot
 import com.axiom.app.domain.model.Skill
+import com.axiom.app.domain.template.MissionTemplate
+import com.axiom.app.domain.template.MissionTemplatePack
 import com.axiom.app.ui.MissionsUiState
 import com.axiom.app.ui.MissionsViewModel
 import com.axiom.app.ui.components.AnimatedScanlineOverlay
@@ -89,6 +91,12 @@ fun AddMissionScreen(
     var sessionGoalSet by remember { mutableStateOf(true) }
     var sessionGotFeedback by remember { mutableStateOf(true) }
     var sessionPushedComfortZone by remember { mutableStateOf(true) }
+
+    // Template Pack (G5-P3: E4.3)
+    var showTemplateSheet by remember { mutableStateOf(false) }
+    var activeTemplateId by remember { mutableStateOf<String?>(null) }
+    var activeTemplateTitle by remember { mutableStateOf<String?>(null) }
+    var templateWasCustomized by remember { mutableStateOf(false) }
 
     val scrollState = rememberScrollState()
     val haptic = LocalHapticFeedback.current
@@ -224,10 +232,71 @@ fun AddMissionScreen(
                             }
                         }
 
+                        // TEMPLATE PACK SELECTOR / ACTIVE BANNER (G5-P3: E4.3)
+                        if (activeTemplateId != null) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(LegendaryGold.copy(alpha = 0.12f))
+                                    .border(1.dp, LegendaryGold.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
+                                    .padding(horizontal = 14.dp, vertical = 10.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "TEMPLATE APPLIED",
+                                        color = LegendaryGold,
+                                        fontFamily = JetBrainsMono,
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = activeTemplateTitle ?: "Solopreneur Template",
+                                        color = TextPrimary,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
+                                TextButton(
+                                    onClick = {
+                                        activeTemplateId = null
+                                        activeTemplateTitle = null
+                                        templateWasCustomized = false
+                                    },
+                                    modifier = Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp)
+                                ) {
+                                    Text("Clear", color = TextSecondary, fontSize = 12.sp)
+                                }
+                            }
+                        } else {
+                            OutlinedButton(
+                                onClick = { showTemplateSheet = true },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(min = 48.dp)
+                                    .testTag("btn_browse_templates"),
+                                border = BorderStroke(1.dp, LegendaryGold.copy(alpha = 0.6f)),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = LegendaryGold),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(
+                                    text = "⚡ BROWSE TEMPLATES (SOFTWARE / SOLOPRENEUR)",
+                                    fontFamily = JetBrainsMono,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+
                         // 2. MISSION TITLE INPUT
                         TerminalTextField(
                             value = title,
-                            onValueChange = { title = it },
+                            onValueChange = {
+                                title = it
+                                if (activeTemplateId != null) templateWasCustomized = true
+                            },
                             label = stringResource(R.string.add_mission_title_label),
                             placeholder = {
                                 Text(
@@ -245,7 +314,10 @@ fun AddMissionScreen(
                         // 3. DONE CONDITION INPUT (Canonical requirement)
                         TerminalTextField(
                             value = doneCondition,
-                            onValueChange = { doneCondition = it },
+                            onValueChange = {
+                                doneCondition = it
+                                if (activeTemplateId != null) templateWasCustomized = true
+                            },
                             label = stringResource(R.string.add_mission_done_condition_label),
                             placeholder = {
                                 Text(
@@ -856,7 +928,11 @@ fun AddMissionScreen(
                                                     sessionGotFeedback = sessionGotFeedback,
                                                     sessionPushedComfortZone = sessionPushedComfortZone
                                                 )
-                                                viewModel.createMissionFromPayload(payload) {
+                                                viewModel.createMissionFromPayload(
+                                                    payload = payload,
+                                                    templateId = activeTemplateId,
+                                                    wasCustomized = templateWasCustomized
+                                                ) {
                                                     onMissionCreated()
                                                 }
                                             }
@@ -904,6 +980,32 @@ fun AddMissionScreen(
                     }
                 }
             }
+        }
+
+        if (showTemplateSheet) {
+            MissionTemplateSelectorSheet(
+                onDismiss = { showTemplateSheet = false },
+                onSelectTemplate = { template ->
+                    title = template.titleEn
+                    doneCondition = template.doneConditionEn
+                    contextTrigger = template.contextTriggerEn
+                    durationMinutes = template.defaultDurationMinutes
+                    activeTemplateId = template.id
+                    activeTemplateTitle = template.titleEn
+                    templateWasCustomized = false
+                    viewModel.recordTemplateExposed(template.id)
+                    val s = state
+                    if (s is MissionsUiState.Success) {
+                        val matchedSkill = s.skills.firstOrNull { 
+                            it.name.equals(template.recommendedSkillName, ignoreCase = true) 
+                        }
+                        if (matchedSkill != null) {
+                            selectedSkill = matchedSkill
+                        }
+                    }
+                    showTemplateSheet = false
+                }
+            )
         }
     }
 }

@@ -117,6 +117,30 @@ class AnalyticsPayloadPolicyTest {
         assertEquals("sensitive_key", reject("weekly_review_completed", mapOf("note" to "My goal was Y")).reason)
     }
 
+    @Test fun accepts_missionTemplateEvents() {
+        val rExposed = AnalyticsPayloadPolicy.validate(
+            "mission_template_exposed",
+            mapOf("template_id" to "solopreneur_customer_interview", "beachhead" to "SOFTWARE_SOLOPRENEUR", "cohort_ring" to "INTERNAL")
+        )
+        assertTrue(rExposed is PayloadValidation.Accepted)
+
+        val rAccepted = AnalyticsPayloadPolicy.validate(
+            "mission_template_accepted",
+            mapOf("template_id" to "solopreneur_customer_interview", "beachhead" to "SOFTWARE_SOLOPRENEUR", "was_customized" to "false", "cohort_ring" to "INTERNAL")
+        )
+        assertTrue(rAccepted is PayloadValidation.Accepted)
+
+        val rRated = AnalyticsPayloadPolicy.validate(
+            "mission_template_rated",
+            mapOf("template_id" to "solopreneur_customer_interview", "rating" to "5", "cohort_ring" to "INTERNAL")
+        )
+        assertTrue(rRated is PayloadValidation.Accepted)
+
+        // Sensitive key rejection on template events
+        assertEquals("sensitive_key", reject("mission_template_accepted", mapOf("title" to "Custom title leak")).reason)
+        assertEquals("sensitive_key", reject("mission_template_rated", mapOf("note" to "User feedback note")).reason)
+    }
+
     @Test fun catalog_classifiesAllAnalyticsTypes() {
         assertEquals(
             setOf(
@@ -126,7 +150,8 @@ class AnalyticsPayloadPolicyTest {
                 "weekly_review_exposed", "weekly_review_completed", "experiment_assigned",
                 "experiment_exposed", "operational_error", "integrity_heartbeat",
                 "streak_paused", "streak_resumed", "streak_recovery_offered",
-                "streak_recovery_completed", "streak_recovery_expired", "streak_opt_out_changed"
+                "streak_recovery_completed", "streak_recovery_expired", "streak_opt_out_changed",
+                "mission_template_exposed", "mission_template_accepted", "mission_template_rated"
             ),
             AnalyticsPayloadPolicy.ANALYTICS_EVENT_TYPES
         )

@@ -72,6 +72,11 @@ object CanonicalAnalyticsEvents {
     const val STREAK_RECOVERY_EXPIRED = "streak_recovery_expired"
     const val STREAK_OPT_OUT_CHANGED = "streak_opt_out_changed"
 
+    // Gate G5 — E4.3 Mission Template Pack Events
+    const val MISSION_TEMPLATE_EXPOSED = "mission_template_exposed"
+    const val MISSION_TEMPLATE_ACCEPTED = "mission_template_accepted"
+    const val MISSION_TEMPLATE_RATED = "mission_template_rated"
+
     /**
      * Map of legacy event names to their canonical equivalents.
      */
