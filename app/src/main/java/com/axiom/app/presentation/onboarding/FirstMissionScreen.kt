@@ -7,6 +7,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -15,6 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -62,12 +67,14 @@ fun FirstMissionScreen(
         // Ambient particle background
         VoidParticleField(modifier = Modifier.fillMaxSize())
 
+        val scrollState = rememberScrollState()
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Spacing.l),
+            verticalArrangement = Arrangement.spacedBy(AxiomSpacing.l),
             modifier = Modifier
-                .padding(Spacing.xl)
+                .padding(AxiomSpacing.xl)
                 .fillMaxWidth()
+                .verticalScroll(scrollState)
         ) {
             // Header protocol with info/help button
             Row(
@@ -101,7 +108,7 @@ fun FirstMissionScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(Spacing.xs))
+            Spacer(modifier = Modifier.height(AxiomSpacing.xs))
 
             // Body text
             Text(
@@ -121,7 +128,7 @@ fun FirstMissionScreen(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(Spacing.m))
+            Spacer(modifier = Modifier.height(AxiomSpacing.m))
 
             // Text Field for first mission title
             TerminalTextField(
@@ -139,7 +146,7 @@ fun FirstMissionScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(Spacing.m))
+            Spacer(modifier = Modifier.height(AxiomSpacing.m))
 
             // Interactions
             val interactionSource = remember { MutableInteractionSource() }
@@ -159,9 +166,10 @@ fun FirstMissionScreen(
                 modifier = Modifier
                     .scale(scale)
                     .fillMaxWidth()
-                    .height(52.dp)
-                    .clip(RoundedCornerShape(4.dp))
+                    .heightIn(min = 52.dp)
+                    .clip(RoundedCornerShape(AxiomRadius.s))
                     .background(buttonBgColor)
+                    .semantics { role = Role.Button }
                     .clickable(
                         interactionSource = interactionSource,
                         indication = null,

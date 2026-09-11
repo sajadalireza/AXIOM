@@ -128,6 +128,10 @@ fun Modifier.neonGlow(
 fun AnimatedScanlineOverlay(
     modifier: Modifier = Modifier
 ) {
+    val reducedMotion = LocalAxiomReducedMotion.current
+    if (reducedMotion) {
+        return
+    }
     val infiniteTransition = rememberInfiniteTransition(label = "cyber_scanline_infinite")
     val progress by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -196,7 +200,9 @@ fun Modifier.rarityGlowPulse(
     idColor: Color,
     enabled: Boolean = true
 ): Modifier = this.composed {
-    val intensity = if (enabled) {
+    val reducedMotion = LocalAxiomReducedMotion.current
+    val effectiveEnabled = enabled && !reducedMotion
+    val intensity = if (effectiveEnabled) {
         val infiniteTransition = rememberInfiniteTransition(label = "rarity_pulse_infinite")
         val pulsedValue by infiniteTransition.animateFloat(
             initialValue = 0.6f,

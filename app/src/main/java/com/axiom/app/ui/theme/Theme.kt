@@ -51,6 +51,7 @@ private fun materialSchemeFor(colors: AxiomColorScheme, dark: Boolean) =
 @Composable
 fun AwakenTheme(
     themeMode: ThemeMode = ThemeMode.SYSTEM,
+    reducedMotion: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val darkTheme = when (themeMode) {
@@ -60,7 +61,10 @@ fun AwakenTheme(
     }
     val axiomColors = if (darkTheme) AxiomDarkColors else AxiomLightColors
 
-    CompositionLocalProvider(LocalAxiomColors provides axiomColors) {
+    CompositionLocalProvider(
+        LocalAxiomColors provides axiomColors,
+        LocalAxiomReducedMotion provides reducedMotion
+    ) {
         MaterialTheme(
             colorScheme = materialSchemeFor(axiomColors, darkTheme),
             typography = Typography,
@@ -68,4 +72,16 @@ fun AwakenTheme(
             content = content
         )
     }
+}
+
+/**
+ * Canonical theme composable for AXIOM.
+ */
+@Composable
+fun AxiomTheme(
+    themeMode: ThemeMode = ThemeMode.SYSTEM,
+    reducedMotion: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    AwakenTheme(themeMode = themeMode, reducedMotion = reducedMotion, content = content)
 }

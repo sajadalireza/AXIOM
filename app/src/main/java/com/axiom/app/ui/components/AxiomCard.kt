@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.Dp
 import com.axiom.app.ui.theme.AxiomBorder
 import com.axiom.app.ui.theme.AxiomRadius
 import com.axiom.app.ui.theme.LocalAxiomColors
+import com.axiom.app.ui.theme.LocalAxiomReducedMotion
 import com.axiom.app.ui.theme.SoloLevelingBeveledShape
 import com.axiom.app.ui.theme.soloLevelingCard
 
@@ -45,19 +46,26 @@ fun AxiomCard(
     onClick: (() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
+    val reducedMotion = LocalAxiomReducedMotion.current
+    val effectiveGlow = if (reducedMotion) false else glowEnabled
+    val effectiveScanlines = if (reducedMotion) false else showScanlines
+
     val effectiveShape = if (showBevel) {
         SoloLevelingBeveledShape(bevel = 16f, showSideNotches = true)
     } else {
         shape
     }
 
+    val effectiveBorderColor = if (effectiveGlow) accentColor else borderColor
+    val effectiveBorderWidth = if (effectiveGlow) AxiomBorder.medium else borderWidth
+
     val baseModifier = if (showBevel) {
         modifier
             .soloLevelingCard(
-                accentColor = borderColor,
+                accentColor = effectiveBorderColor,
                 bevel = 16f,
-                borderWidth = borderWidth.value,
-                glowRadius = if (glowEnabled) 8f else 0f,
+                borderWidth = effectiveBorderWidth.value,
+                glowRadius = if (effectiveGlow) 8f else 0f,
                 showSideNotches = true,
                 backgroundColor = backgroundColor
             )
@@ -66,7 +74,7 @@ fun AxiomCard(
         modifier
             .clip(effectiveShape)
             .background(backgroundColor)
-            .border(borderWidth, borderColor, effectiveShape)
+            .border(effectiveBorderWidth, effectiveBorderColor, effectiveShape)
     }
 
     val interactiveModifier = if (onClick != null) {
@@ -76,7 +84,7 @@ fun AxiomCard(
     }
 
     Box(modifier = interactiveModifier) {
-        if (showScanlines) {
+        if (effectiveScanlines) {
             AnimatedScanlineOverlay(modifier = Modifier.matchParentSize())
         }
         content()
