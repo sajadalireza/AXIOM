@@ -165,25 +165,27 @@ private fun DigitBlock(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp)
+                .heightIn(min = 52.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(Color(0xFF0B0C0B))
-                .border(1.dp, colors.legendaryGold.copy(alpha = 0.35f), RoundedCornerShape(8.dp)),
+                .border(1.dp, colors.legendaryGold.copy(alpha = 0.35f), RoundedCornerShape(8.dp))
+                .padding(vertical = 4.dp, horizontal = 2.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = value,
                 fontFamily = JetBrainsMono,
-                fontSize = 26.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = colors.textPrimary
+                color = colors.textPrimary,
+                maxLines = 1
             )
         }
         // Label using JetBrainsMono below the block
         Text(
             text = label,
             fontFamily = JetBrainsMono,
-            fontSize = 8.sp,
+            fontSize = 9.sp,
             fontWeight = FontWeight.Bold,
             color = colors.textDim,
             letterSpacing = 1.sp,

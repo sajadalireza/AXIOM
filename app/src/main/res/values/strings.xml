@@ -670,4 +670,16 @@
     <string name="first_win_continuing">Continuing…</string>
     <string name="first_win_next_title">Keep the momentum</string>
     <string name="first_win_next_body">Choose what should happen next. You can schedule another small action or finish for now.</string>
+
+    <!-- G3-P3 Home Primary Action & Hero Card -->
+    <string name="home_hero_label">NEXT MEANINGFUL MISSION</string>
+    <string name="home_hero_start_mission">START MISSION</string>
+    <string name="home_hero_commit_mission">+ COMMIT TO A MISSION</string>
+    <string name="home_hero_no_mission_desc">No active mission committed. Choose your next meaningful step to advance your goals.</string>
+    <string name="home_hero_advances_goal">ADVANCES GOAL: %s</string>
+    <string name="home_hero_advances_project">PROJECT: %s</string>
+    <string name="home_hero_view_all_missions">VIEW ALL MISSIONS</string>
+    <string name="home_secondary_surfaces_title">VITALS &amp; PROTOCOLS</string>
+    <string name="home_secondary_surfaces_expand">SHOW DETAILS</string>
+    <string name="home_secondary_surfaces_collapse">HIDE DETAILS</string>
 </resources>
