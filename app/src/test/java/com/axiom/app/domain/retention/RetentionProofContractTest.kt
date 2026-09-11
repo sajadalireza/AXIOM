@@ -4,9 +4,18 @@ import com.axiom.app.domain.analytics.ReleaseRing
 import org.junit.Assert.*
 import org.junit.Test
 
+/**
+ * Contract tests for Gate G5 (Retention Proof) review engine.
+ *
+ * CRITICAL EVIDENCE-INTEGRITY NOTICE:
+ * The data fixtures in this test file (such as [createSyntheticPassingCohortsFixture])
+ * are SYNTHETIC UNIT-TEST STUBS designed purely to exercise the logical evaluation
+ * branches of [RetentionProofReviewEngine]. They are NOT observed user data, NOT
+ * live cohort evidence, and MUST NEVER be represented as real-world metrics.
+ */
 class RetentionProofContractTest {
 
-    private fun createPassingCohorts(): List<CohortRetentionEvidence> = listOf(
+    private fun createSyntheticPassingCohortsFixture(): List<CohortRetentionEvidence> = listOf(
         CohortRetentionEvidence(
             cohortId = "cohort_concierge_2026_08",
             releaseRing = ReleaseRing.CONCIERGE,
@@ -38,7 +47,7 @@ class RetentionProofContractTest {
     @Test
     fun evaluateReview_returnsAdvanceToG6_whenAllCriteriaSatisfied() {
         val inputs = GateG5ReviewInputs(
-            cohorts = createPassingCohorts(),
+            cohorts = createSyntheticPassingCohortsFixture(),
             compositeReviewScore = 9.94f,
             hardCapsActive = false
         )
@@ -60,7 +69,7 @@ class RetentionProofContractTest {
 
     @Test
     fun evaluateReview_returnsMaintainRetentionTest_whenCohortCountInsufficient() {
-        val singleCohort = listOf(createPassingCohorts().first())
+        val singleCohort = listOf(createSyntheticPassingCohortsFixture().first())
         val inputs = GateG5ReviewInputs(
             cohorts = singleCohort,
             compositeReviewScore = 9.94f,
@@ -77,7 +86,7 @@ class RetentionProofContractTest {
 
     @Test
     fun evaluateReview_returnsMaintainRetentionTest_whenObservationWindowIncomplete() {
-        val prematureCohorts = createPassingCohorts().map { it.copy(observationDays = 14) }
+        val prematureCohorts = createSyntheticPassingCohortsFixture().map { it.copy(observationDays = 14) }
         val inputs = GateG5ReviewInputs(
             cohorts = prematureCohorts,
             compositeReviewScore = 9.94f,
@@ -93,7 +102,7 @@ class RetentionProofContractTest {
 
     @Test
     fun evaluateReview_returnsNeedsRepairOrPivot_whenD30BelowThreshold() {
-        val failingCohorts = createPassingCohorts().map { it.copy(d30RetentionRate = 0.06f) }
+        val failingCohorts = createSyntheticPassingCohortsFixture().map { it.copy(d30RetentionRate = 0.06f) }
         val inputs = GateG5ReviewInputs(
             cohorts = failingCohorts,
             compositeReviewScore = 9.94f,
@@ -111,7 +120,7 @@ class RetentionProofContractTest {
 
     @Test
     fun evaluateReview_returnsNeedsRepairOrPivot_whenStreakRecoveryBelowThreshold() {
-        val failingCohorts = createPassingCohorts().map { it.copy(streakRecoveryRate = 0.25f) }
+        val failingCohorts = createSyntheticPassingCohortsFixture().map { it.copy(streakRecoveryRate = 0.25f) }
         val inputs = GateG5ReviewInputs(
             cohorts = failingCohorts,
             compositeReviewScore = 9.94f,
@@ -128,7 +137,7 @@ class RetentionProofContractTest {
 
     @Test
     fun evaluateReview_returnsNeedsRepairOrPivot_whenXionKillCriterionTriggered() {
-        val lowXionCohorts = createPassingCohorts().map {
+        val lowXionCohorts = createSyntheticPassingCohortsFixture().map {
             it.copy(xionAcceptanceRate = 0.12f, xionDecisionsCount = 20)
         }
         val inputs = GateG5ReviewInputs(
@@ -147,7 +156,7 @@ class RetentionProofContractTest {
 
     @Test
     fun evaluateReview_returnsNeedsRepairOrPivot_whenS1DefectsPresent() {
-        val crashedCohorts = createPassingCohorts().mapIndexed { i, c ->
+        val crashedCohorts = createSyntheticPassingCohortsFixture().mapIndexed { i, c ->
             if (i == 0) c.copy(s1DefectCount = 1) else c
         }
         val inputs = GateG5ReviewInputs(
@@ -167,7 +176,7 @@ class RetentionProofContractTest {
     @Test
     fun evaluateReview_returnsNeedsRepairOrPivot_whenHardCapsActive() {
         val inputs = GateG5ReviewInputs(
-            cohorts = createPassingCohorts(),
+            cohorts = createSyntheticPassingCohortsFixture(),
             compositeReviewScore = 9.94f,
             hardCapsActive = true
         )
