@@ -125,6 +125,28 @@
     <string name="add_mission_power_score">EXECUTION SCORE</string>
     <string name="add_mission_success_chance">ALIGNMENT RATIO: %d%%</string>
     <string name="add_mission_accept">[ EXECUTE CURRENT HABIT ]</string>
+    <string name="add_mission_quick_create_badge">QUICK CREATE</string>
+    <string name="add_mission_title_label">MISSION TITLE</string>
+    <string name="add_mission_title_placeholder">E.g. Finalize Q3 System Architecture RFC</string>
+    <string name="add_mission_done_condition_label">DONE CONDITION (OBSERVABLE CRITERIA)</string>
+    <string name="add_mission_done_condition_placeholder">E.g. Pull request submitted with 4 review approvals</string>
+    <string name="add_mission_context_label">EXECUTION CONTEXT / TRIGGER (OPTIONAL)</string>
+    <string name="add_mission_context_placeholder">E.g. If at desk after standup, then start 45m focus session</string>
+    <string name="add_mission_duration_label">SESSION DURATION</string>
+    <string name="add_mission_duration_min">%d MIN</string>
+    <string name="add_mission_schedule_label">SCHEDULE TIMING</string>
+    <string name="add_mission_schedule_now">Now</string>
+    <string name="add_mission_schedule_morning">Morning (09:00)</string>
+    <string name="add_mission_schedule_afternoon">Afternoon (14:00)</string>
+    <string name="add_mission_schedule_evening">Evening (19:00)</string>
+    <string name="add_mission_evidence_label">EVIDENCE LEVEL</string>
+    <string name="add_mission_evidence_none">Direct (No Evidence)</string>
+    <string name="add_mission_evidence_checklist">Checklist (Binary Criteria)</string>
+    <string name="add_mission_evidence_metric">Metric / Notes (Reflection)</string>
+    <string name="add_mission_advanced_toggle_expand">+ ADVANCED ROI &amp; SETTINGS</string>
+    <string name="add_mission_advanced_toggle_collapse">- HIDE ADVANCED SETTINGS</string>
+    <string name="add_mission_primary_cta">ACCEPT MISSION</string>
+    <string name="add_mission_validation_hint">Enter title and observable done condition to accept mission</string>
 
     <!-- Mission Card -->
     <string name="mission_complete">COMPLETE</string>

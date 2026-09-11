@@ -88,4 +88,42 @@ class CreateMissionUseCase @Inject constructor(
             estimatedHours = estimatedHours
         )
     }
+
+    suspend operator fun invoke(payload: com.axiom.app.domain.model.MissionAuthoringPayload): String {
+        require(payload.isValid) { "Mission payload is invalid: title, doneCondition, and skillId must not be blank, and duration must be positive." }
+
+        val formattedDescription = com.axiom.app.domain.model.MissionAuthoringSerializer.formatDescription(
+            doneCondition = payload.doneCondition,
+            contextTrigger = payload.contextTrigger,
+            notes = payload.notes,
+            evidenceLevel = payload.evidenceLevel,
+            scheduleSlot = payload.scheduleSlot,
+            durationMinutes = payload.durationMinutes
+        )
+
+        val powerScore = com.axiom.app.domain.engine.ROIEngine.calculatePowerScore(
+            marketDemand = payload.marketDemand,
+            leverage = payload.leverage,
+            complexity = payload.complexity,
+            estimatedHours = payload.estimatedHours
+        )
+        val calculatedRarity = payload.customRarity
+            ?: if (payload.isTimedMission) "LEGENDARY"
+            else com.axiom.app.domain.engine.ROIEngine.classifyRarity(powerScore).uppercase()
+        val xpReward = (powerScore * 20f).toInt().coerceAtLeast(25)
+
+        return invoke(
+            title = payload.title,
+            track = payload.track,
+            rarity = calculatedRarity,
+            skillId = payload.skillId,
+            xpReward = xpReward,
+            powerScore = powerScore,
+            estimatedHours = payload.estimatedHours,
+            dungeonId = payload.dungeonId,
+            isInstantGate = payload.isTimedMission,
+            description = formattedDescription
+        )
+    }
 }
+
