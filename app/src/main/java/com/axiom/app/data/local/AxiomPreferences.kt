@@ -159,6 +159,15 @@ open class AxiomPreferences @Inject constructor(
         // Gate G5 — E4.3 Mission Template Pack Acceptance Tracking
         private val TEMPLATE_ACCEPTED_COUNT = intPreferencesKey("template_accepted_count")
         private val BLANK_MISSION_CREATED_COUNT = intPreferencesKey("blank_mission_created_count")
+
+        // Gate G5 — E4.4 Xion Decision Layer Quota & Acceptance Tracking
+        private val XION_QUOTA_DATE = stringPreferencesKey("xion_quota_date")
+        private val XION_QUOTA_USED_COUNT = intPreferencesKey("xion_quota_used_count")
+        private val XION_SUGGESTIONS_EXPOSED_COUNT = intPreferencesKey("xion_suggestions_exposed_count")
+        private val XION_SUGGESTIONS_ACCEPTED_COUNT = intPreferencesKey("xion_suggestions_accepted_count")
+        private val XION_SUGGESTIONS_REJECTED_COUNT = intPreferencesKey("xion_suggestions_rejected_count")
+        private val XION_SUGGESTIONS_EDITED_COUNT = intPreferencesKey("xion_suggestions_edited_count")
+        private val XION_SUGGESTIONS_REPORTED_COUNT = intPreferencesKey("xion_suggestions_reported_count")
     }
 
     open val lastCommandVoiceShownDateFlow: Flow<String> = context.dataStore.data.map { prefs ->
@@ -1263,6 +1272,84 @@ open class AxiomPreferences @Inject constructor(
             val current = prefs[BLANK_MISSION_CREATED_COUNT] ?: 0
             prefs[BLANK_MISSION_CREATED_COUNT] = current + 1
         }
+    }
+
+    open val xionQuotaStatusFlow: Flow<com.axiom.app.domain.xion.XionQuotaStatus> = context.dataStore.data.map { prefs ->
+        val today = java.time.LocalDate.now().toString()
+        val storedDate = prefs[XION_QUOTA_DATE] ?: ""
+        val used = if (storedDate == today) prefs[XION_QUOTA_USED_COUNT] ?: 0 else 0
+        val dailyLimit = 5
+        val remaining = (dailyLimit - used).coerceAtLeast(0)
+        com.axiom.app.domain.xion.XionQuotaStatus(
+            dailyLimit = dailyLimit,
+            usedToday = used,
+            remainingToday = remaining,
+            isExhausted = remaining <= 0
+        )
+    }
+
+    open suspend fun consumeXionDailyQuota(dailyLimit: Int = 5): Boolean {
+        var success = false
+        context.dataStore.edit { prefs ->
+            val today = java.time.LocalDate.now().toString()
+            val storedDate = prefs[XION_QUOTA_DATE] ?: ""
+            val used = if (storedDate == today) prefs[XION_QUOTA_USED_COUNT] ?: 0 else 0
+            if (used < dailyLimit) {
+                prefs[XION_QUOTA_DATE] = today
+                prefs[XION_QUOTA_USED_COUNT] = used + 1
+                success = true
+            } else {
+                success = false
+            }
+        }
+        return success
+    }
+
+    open suspend fun recordXionExposed(count: Int) {
+        context.dataStore.edit { prefs ->
+            val current = prefs[XION_SUGGESTIONS_EXPOSED_COUNT] ?: 0
+            prefs[XION_SUGGESTIONS_EXPOSED_COUNT] = current + count
+        }
+    }
+
+    open suspend fun recordXionSuggestionAccepted(wasEdited: Boolean) {
+        context.dataStore.edit { prefs ->
+            val currentAccepted = prefs[XION_SUGGESTIONS_ACCEPTED_COUNT] ?: 0
+            prefs[XION_SUGGESTIONS_ACCEPTED_COUNT] = currentAccepted + 1
+            if (wasEdited) {
+                val currentEdited = prefs[XION_SUGGESTIONS_EDITED_COUNT] ?: 0
+                prefs[XION_SUGGESTIONS_EDITED_COUNT] = currentEdited + 1
+            }
+        }
+    }
+
+    open suspend fun recordXionSuggestionRejected() {
+        context.dataStore.edit { prefs ->
+            val currentRejected = prefs[XION_SUGGESTIONS_REJECTED_COUNT] ?: 0
+            prefs[XION_SUGGESTIONS_REJECTED_COUNT] = currentRejected + 1
+        }
+    }
+
+    open suspend fun recordXionSuggestionReported() {
+        context.dataStore.edit { prefs ->
+            val currentReported = prefs[XION_SUGGESTIONS_REPORTED_COUNT] ?: 0
+            prefs[XION_SUGGESTIONS_REPORTED_COUNT] = currentReported + 1
+        }
+    }
+
+    open val xionAcceptanceMetricsFlow: Flow<com.axiom.app.domain.xion.XionAcceptanceMetrics> = context.dataStore.data.map { prefs ->
+        val exposed = prefs[XION_SUGGESTIONS_EXPOSED_COUNT] ?: 0
+        val accepted = prefs[XION_SUGGESTIONS_ACCEPTED_COUNT] ?: 0
+        val rejected = prefs[XION_SUGGESTIONS_REJECTED_COUNT] ?: 0
+        val edited = prefs[XION_SUGGESTIONS_EDITED_COUNT] ?: 0
+        val reported = prefs[XION_SUGGESTIONS_REPORTED_COUNT] ?: 0
+        com.axiom.app.domain.xion.XionDecisionEngine.calculateAcceptanceMetrics(
+            exposedCount = exposed,
+            acceptedCount = accepted,
+            rejectedCount = rejected,
+            editedCount = edited,
+            reportedCount = reported
+        )
     }
 }
 

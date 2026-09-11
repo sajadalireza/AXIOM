@@ -141,6 +141,43 @@ class AnalyticsPayloadPolicyTest {
         assertEquals("sensitive_key", reject("mission_template_rated", mapOf("note" to "User feedback note")).reason)
     }
 
+    @Test fun accepts_xionDecisionEvents() {
+        val rExposed = AnalyticsPayloadPolicy.validate(
+            "xion_suggestion_exposed",
+            mapOf("source" to "template_first", "template_first" to "true", "count" to "3", "cohort_ring" to "INTERNAL")
+        )
+        assertTrue(rExposed is PayloadValidation.Accepted)
+
+        val rAccepted = AnalyticsPayloadPolicy.validate(
+            "xion_suggestion_accepted",
+            mapOf("template_matched" to "true", "was_edited" to "false", "rarity" to "RARE", "cohort_ring" to "INTERNAL")
+        )
+        assertTrue(rAccepted is PayloadValidation.Accepted)
+
+        val rRejected = AnalyticsPayloadPolicy.validate(
+            "xion_suggestion_rejected",
+            mapOf("rejection_reason" to "not_relevant", "template_matched" to "true", "cohort_ring" to "INTERNAL")
+        )
+        assertTrue(rRejected is PayloadValidation.Accepted)
+
+        val rEdited = AnalyticsPayloadPolicy.validate(
+            "xion_suggestion_edited",
+            mapOf("field_edited" to "content", "cohort_ring" to "INTERNAL")
+        )
+        assertTrue(rEdited is PayloadValidation.Accepted)
+
+        val rReported = AnalyticsPayloadPolicy.validate(
+            "xion_suggestion_reported",
+            mapOf("report_category" to "inappropriate_counseling", "cohort_ring" to "INTERNAL")
+        )
+        assertTrue(rReported is PayloadValidation.Accepted)
+
+        // Sensitive key rejection on xion events
+        assertEquals("sensitive_key", reject("xion_suggestion_accepted", mapOf("title" to "Title leak")).reason)
+        assertEquals("sensitive_key", reject("xion_suggestion_rejected", mapOf("prompt" to "Prompt leak")).reason)
+        assertEquals("sensitive_key", reject("xion_suggestion_reported", mapOf("message" to "Free text leak")).reason)
+    }
+
     @Test fun catalog_classifiesAllAnalyticsTypes() {
         assertEquals(
             setOf(
@@ -151,7 +188,9 @@ class AnalyticsPayloadPolicyTest {
                 "experiment_exposed", "operational_error", "integrity_heartbeat",
                 "streak_paused", "streak_resumed", "streak_recovery_offered",
                 "streak_recovery_completed", "streak_recovery_expired", "streak_opt_out_changed",
-                "mission_template_exposed", "mission_template_accepted", "mission_template_rated"
+                "mission_template_exposed", "mission_template_accepted", "mission_template_rated",
+                "xion_suggestion_exposed", "xion_suggestion_accepted", "xion_suggestion_rejected",
+                "xion_suggestion_edited", "xion_suggestion_reported"
             ),
             AnalyticsPayloadPolicy.ANALYTICS_EVENT_TYPES
         )

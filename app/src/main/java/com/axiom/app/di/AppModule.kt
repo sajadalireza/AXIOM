@@ -159,6 +159,12 @@ abstract class AppModule {
         impl: com.axiom.app.data.analytics.SupabaseAnalyticsUploader
     ): com.axiom.app.domain.analytics.AnalyticsUploader
 
+    @Binds
+    @Singleton
+    abstract fun bindXionGatewayBoundary(
+        impl: com.axiom.app.core.ai.DefaultXionGatewayBoundary
+    ): com.axiom.app.core.ai.XionGatewayBoundary
+
     companion object {
         /**
          * WP-202: adapt the concrete [com.axiom.app.data.local.AxiomPreferences] to the

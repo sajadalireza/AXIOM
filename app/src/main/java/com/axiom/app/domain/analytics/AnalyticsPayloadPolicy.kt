@@ -40,7 +40,12 @@ object AnalyticsPayloadPolicy {
         "streak_opt_out_changed",
         "mission_template_exposed",
         "mission_template_accepted",
-        "mission_template_rated"
+        "mission_template_rated",
+        "xion_suggestion_exposed",
+        "xion_suggestion_accepted",
+        "xion_suggestion_rejected",
+        "xion_suggestion_edited",
+        "xion_suggestion_reported"
     )
 
     /** Per-event allowlist. A property key MUST appear here (case-sensitive) to be carried. */
@@ -72,7 +77,12 @@ object AnalyticsPayloadPolicy {
         "streak_opt_out_changed" to setOf("opt_out_state", "cohort_ring"),
         "mission_template_exposed" to setOf("template_id", "beachhead", "cohort_ring"),
         "mission_template_accepted" to setOf("template_id", "beachhead", "was_customized", "cohort_ring"),
-        "mission_template_rated" to setOf("template_id", "rating", "cohort_ring")
+        "mission_template_rated" to setOf("template_id", "rating", "cohort_ring"),
+        "xion_suggestion_exposed" to setOf("source", "template_first", "count", "cohort_ring"),
+        "xion_suggestion_accepted" to setOf("template_matched", "was_edited", "rarity", "cohort_ring"),
+        "xion_suggestion_rejected" to setOf("rejection_reason", "template_matched", "cohort_ring"),
+        "xion_suggestion_edited" to setOf("field_edited", "cohort_ring"),
+        "xion_suggestion_reported" to setOf("report_category", "cohort_ring")
     )
 
     /**

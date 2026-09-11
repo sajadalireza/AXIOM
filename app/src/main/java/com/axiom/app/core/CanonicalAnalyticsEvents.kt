@@ -77,6 +77,13 @@ object CanonicalAnalyticsEvents {
     const val MISSION_TEMPLATE_ACCEPTED = "mission_template_accepted"
     const val MISSION_TEMPLATE_RATED = "mission_template_rated"
 
+    // Gate G5 — E4.4 Xion Decision Layer Events
+    const val XION_SUGGESTION_EXPOSED = "xion_suggestion_exposed"
+    const val XION_SUGGESTION_ACCEPTED = "xion_suggestion_accepted"
+    const val XION_SUGGESTION_REJECTED = "xion_suggestion_rejected"
+    const val XION_SUGGESTION_EDITED = "xion_suggestion_edited"
+    const val XION_SUGGESTION_REPORTED = "xion_suggestion_reported"
+
     /**
      * Map of legacy event names to their canonical equivalents.
      */
