@@ -69,7 +69,20 @@ object AxiomMotion {
     const val slowMs: Int = 500
     const val pulseMs: Int = 1200
     const val shimmerMs: Int = 3000
+
+    /**
+     * Resolves an animation duration respecting reduced motion accessibility settings.
+     * Clamps to 0ms when reduced motion is requested.
+     */
+    fun effectiveDuration(baseDurationMs: Int, reducedMotion: Boolean): Int {
+        return if (reducedMotion) 0 else baseDurationMs
+    }
 }
+
+/**
+ * CompositionLocal indicating whether the user or system requests reduced motion.
+ */
+val LocalAxiomReducedMotion = androidx.compose.runtime.compositionLocalOf { false }
 
 // ═══════════════════════════════════════════════════════════════
 // BACKWARD COMPATIBILITY ALIASES (Deprecated — use Axiom* equivalents)

@@ -25,7 +25,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -273,7 +273,8 @@ fun XionInputBar(
             // Send Button
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
+                    .size(48.dp)
                     .clip(CircleShape)
                     .background(if (value.isNotBlank() && !isChatLoading) systemColor.copy(alpha = 0.2f) else colors.shadowSurface)
                     .border(1.dp, if (value.isNotBlank() && !isChatLoading) systemColor else colors.borderFaint, CircleShape)
@@ -284,10 +285,10 @@ fun XionInputBar(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.Send,
+                    imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Send",
                     tint = if (value.isNotBlank() && !isChatLoading) systemColor else colors.textDim,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(18.dp)
                 )
             }
         }

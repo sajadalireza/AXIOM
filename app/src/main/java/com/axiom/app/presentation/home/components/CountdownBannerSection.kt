@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.axiom.app.core.localization.AxiomDateFormatter
 import com.axiom.app.ui.theme.*
 import kotlinx.coroutines.delay
 
@@ -45,6 +46,9 @@ fun CountdownBannerSection(
     val hoursRemaining = if (remainingMillis > 0) (remainingMillis % (24 * 60 * 60 * 1000L)) / (60 * 60 * 1000L) else 0L
     val minutesRemaining = if (remainingMillis > 0) (remainingMillis % (60 * 60 * 1000L)) / (60 * 1000L) else 0L
 
+    val isFa = java.util.Locale.getDefault().language == "fa"
+    val reducedMotion = LocalAxiomReducedMotion.current
+
     // Pulsing alpha for the blinking indicator dot
     val infiniteTransition = rememberInfiniteTransition(label = "countdown_dot_pulse")
     val dotAlpha by infiniteTransition.animateFloat(
@@ -56,6 +60,7 @@ fun CountdownBannerSection(
         ),
         label = "dot_alpha"
     )
+    val effectiveDotAlpha = if (reducedMotion) 1.0f else dotAlpha
 
     Card(
         modifier = modifier
@@ -84,12 +89,12 @@ fun CountdownBannerSection(
                         modifier = Modifier
                             .size(5.dp)
                             .background(
-                                color = colors.legendaryGold.copy(alpha = dotAlpha),
+                                color = colors.legendaryGold.copy(alpha = effectiveDotAlpha),
                                 shape = RoundedCornerShape(2.5.dp)
                             )
                     )
                     Text(
-                        text = "DECISION COUNTDOWN",
+                        text = if (isFa) "شمارش معکوس تصمیم‌گیری" else "DECISION COUNTDOWN",
                         fontFamily = JetBrainsMono,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
@@ -98,7 +103,7 @@ fun CountdownBannerSection(
                     )
                 }
                 Text(
-                    text = "EDIT START",
+                    text = if (isFa) "تغییر تاریخ" else "EDIT START",
                     fontFamily = JetBrainsMono,
                     fontSize = 9.sp,
                     color = colors.textSecondary,
@@ -116,9 +121,13 @@ fun CountdownBannerSection(
                 horizontalArrangement = Arrangement.spacedBy(7.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val daysStr = if (isFa) AxiomDateFormatter.toPersianDigits(daysRemaining.toString().padStart(3, '0')) else daysRemaining.toString().padStart(3, '0')
+                val hoursStr = if (isFa) AxiomDateFormatter.toPersianDigits(hoursRemaining.toString().padStart(2, '0')) else hoursRemaining.toString().padStart(2, '0')
+                val minutesStr = if (isFa) AxiomDateFormatter.toPersianDigits(minutesRemaining.toString().padStart(2, '0')) else minutesRemaining.toString().padStart(2, '0')
+
                 DigitBlock(
-                    value = daysRemaining.toString().padStart(3, '0'),
-                    label = "DAYS",
+                    value = daysStr,
+                    label = if (isFa) "روز" else "DAYS",
                     modifier = Modifier.weight(1f)
                 )
                 Text(
@@ -129,8 +138,8 @@ fun CountdownBannerSection(
                     modifier = Modifier.padding(bottom = 14.dp)
                 )
                 DigitBlock(
-                    value = hoursRemaining.toString().padStart(2, '0'),
-                    label = "HOURS",
+                    value = hoursStr,
+                    label = if (isFa) "ساعت" else "HOURS",
                     modifier = Modifier.weight(1f)
                 )
                 Text(
@@ -141,8 +150,8 @@ fun CountdownBannerSection(
                     modifier = Modifier.padding(bottom = 14.dp)
                 )
                 DigitBlock(
-                    value = minutesRemaining.toString().padStart(2, '0'),
-                    label = "MINUTES",
+                    value = minutesStr,
+                    label = if (isFa) "دقیقه" else "MINUTES",
                     modifier = Modifier.weight(1f)
                 )
             }
