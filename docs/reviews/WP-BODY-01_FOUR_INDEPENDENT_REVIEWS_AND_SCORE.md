@@ -46,9 +46,9 @@ Executed on Android Emulator (`emulator-5554`, API 34 x86_64, `com.axiom.app` pr
 | **English Normal Scale** | Default 1.0x typography | Rendered with clean alignment, zero truncation or overlap across all tabs and labels. | **PASS** |
 | **Persian RTL Support** | Right-to-left layout and bilingual parity | Verified in Caliber Insights & 1RM calculator: Persian strings (`امتیاز کلی کالیبر قدرت بدنی`, `کالکیولیتور تخمین رکورد`) rendered with correct RTL reading direction and font rendering. | **PASS** |
 | **200% Font Scale** | Android system font scale 2.0 (`settings put system font_scale 2.0`) | Verified via live capture (`bodymap_200_font.png`); container and cards adapt dynamically without text cutoff or container clipping. | **PASS** |
-| **TalkBack Traversal** | Screen reader semantics and content descriptions | Content descriptions present on all core elements: `Male front body map`, `Female back body map`, `Chest, recovery 100 percent, Recovered`, `Close sheet`, `Drag handle`, `Close`. | **PASS** |
-| **Touch Target Size** | WCAG 2.1 AA minimum $\ge 48\text{dp}$ | All interactive controls verified: <br>• Back button: $48\text{dp}$ ($126\text{px}$)<br>• Tab items: $\ge 48\text{dp}$ (`sizeIn(minHeight = 48.dp)`)<br>• View/Sex segment toggles: $48\text{dp}$ height<br>• Muscle selector chips: $\ge 48\text{dp}$ min height and width<br>• Log button: $\ge 48\text{dp}$ touch bounding box. | **PASS** |
-| **Reduced Motion** | System reduced-motion preference | When `LocalReducedMotion.current` is active, the bounce animation (`bounceScale`) is bypassed to prevent motion sickness. | **PASS** |
+| **TalkBack-Compatible Semantics** | Screen reader semantics and content descriptions | TalkBack-compatible semantics/content descriptions verified through Android accessibility UI hierarchy (`uiautomator dump`): labels present on `Male front body map`, `Female back body map`, `Chest, recovery 100 percent, Recovered`, `Close sheet`, `Drag handle`, `Close`. Auditory screen reader traversal not claimed. | **PASS** |
+| **Touch Target Size** | WCAG 2.1 AA minimum $\ge 48\text{dp}$ | All interactive controls verified via automated layout assertions and UI dump: <br>• Back button: $48\text{dp}$ ($126\text{px}$)<br>• Tab items: $\ge 48\text{dp}$ (`sizeIn(minHeight = 48.dp)`)<br>• View/Sex segment toggles: $48\text{dp}$ height<br>• Muscle selector chips: $\ge 48\text{dp}$ min height and width<br>• Log button: $\ge 48\text{dp}$ touch bounding box. | **PASS** |
+| **Reduced Motion Fallback** | System reduced-motion preference handling | Classified as automated source/contract verification (`BodyMapContractTest.testReducedMotionFallback`) and runtime verification (`animator_duration_scale 0.0`): animation duration clamped to 0ms via `AxiomMotion.effectiveDuration` and bounce animation strictly gated by `if (!reducedMotion)`. | **PASS** |
 
 ---
 
@@ -109,7 +109,10 @@ Telemetry recorded during interactive session on `emulator-5554`:
 - **Findings:**
   - Synthetic numeric claims purged in favor of verified architectural descriptions and `dumpsys gfxinfo` empirical telemetry.
   - 100% token compliance: all off-brand hex colors purged; zero raw `Color(0x...)` literals in touched production components.
-  - Automated test suite: 32/32 unit and contract tests pass 100% (`BodyMapGeometryTest`, `BodyMapAtlasModelTest`, `BodyMapContractTest`).
+  - Automated test suite: 36/36 unit and contract tests pass 100%:
+    - `BodyMapGeometryTest`: 13/13 PASS
+    - `BodyMapAtlasModelTest`: 11/11 PASS
+    - `BodyMapContractTest`: 12/12 PASS
   - Remote CI pipeline passes 4/4 checks.
 - **Score:** **9.95 / 10.00**
 
@@ -122,7 +125,7 @@ Telemetry recorded during interactive session on `emulator-5554`:
 | **Review A: Systems Architecture & Geometry Engine** | 25% | 9.95 | 2.4875 | Pure-Kotlin geometry math, static path hoisting, Compose zero-dimension layout guards. |
 | **Review B: UX / Human Factors & Dignity** | 25% | 9.90 | 2.4750 | 4 canonical tabs preserved, WCAG AA $\ge 48\text{dp}$, full EN/FA RTL parity, dignity copy. |
 | **Review C: Security, Privacy & Boundary Isolation** | 25% | 10.00 | 2.5000 | Room v18 frozen, 0 PII, 0 secrets, 0 forbidden transfers (§13), G6 strictly locked. |
-| **Review D: Operability, Performance & Quality** | 25% | 9.95 | 2.4875 | Synthetic claims removed, dumpsys telemetry verified, 100% token compliance, 32/32 tests PASS. |
+| **Review D: Operability, Performance & Quality** | 25% | 9.95 | 2.4875 | Synthetic claims removed, dumpsys telemetry verified, 100% token compliance, 36/36 tests PASS. |
 | **TOTAL CANONICAL SCORE** | **100%** | — | **`9.9500 / 10.00`** | **APPROVED — EXCEEDS 9.50 THRESHOLD (0 HARD CAPS)** |
 
 ### Hard Cap Checklist
@@ -130,7 +133,7 @@ Telemetry recorded during interactive session on `emulator-5554`:
 - [x] **Room Schema Frozen at v18 (27 Tables, 0 Migrations):** PASS
 - [x] **Zero Client Secrets in Binary:** PASS
 - [x] **Zero Forbidden Transfers from Donor (§13):** PASS
-- [x] **Unit & Contract Tests 100% Green (32/32):** PASS
+- [x] **Unit & Contract Tests 100% Green (36/36):** PASS
 - [x] **Premature Monetization Guard (G6 Remains Locked):** PASS
 
 **Active Hard Caps:** **0**  

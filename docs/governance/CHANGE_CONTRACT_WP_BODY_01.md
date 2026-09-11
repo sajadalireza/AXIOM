@@ -66,7 +66,7 @@
 | `BodyMapViewModel.kt` | **PRESERVE & HARDEN** | Sound MVI/MVVM pattern maintaining `muscleRepository.getAllMuscleGroups()` with exhaustive `BodyMapUiState` handling. |
 | `MuscleStatusPanel.kt` | **HARDEN & RE-TOKENIZE** | Hardened bottom sheet detail panel with training session logging and $\ge 48\text{dp}$ touch targets. |
 | `body_{m,f}_light.png` | **PORT** | Ported lightweight base silhouette bitmaps to `drawable-nodpi/` for hardware-accelerated ambient rendering. |
-| Unit Test Suites | **PORT & HARDEN** | Ported and expanded `BodyMapGeometryTest.kt` (13 tests), `BodyMapAtlasModelTest.kt` (13 tests), and `BodyMapContractTest.kt` (6 tests). Total 32 tests. |
+| Unit Test Suites | **PORT & HARDEN** | Ported and expanded `BodyMapGeometryTest.kt` (13 tests), `BodyMapAtlasModelTest.kt` (11 tests), and `BodyMapContractTest.kt` (12 tests). Total 36 tests. |
 
 ### B. Reference-Only Components & Dropped Feature Preservation
 | Component | Donor Disposition | Canonical AXIOM Action |
