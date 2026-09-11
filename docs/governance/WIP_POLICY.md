@@ -26,12 +26,15 @@ Only one state label may exist on a controlled Issue.
 | `state:authorized` | 0 | Explicitly authorized but not active. |
 | `state:active` | 1 | Current executing controlled Issue. |
 | `state:blocked` | 1 | Current Issue is blocked by a named dependency and retains WIP. |
+| `state:suspended` | 0 | Explicitly suspended by Product Owner decision due only to a prolonged external/non-code dependency; retains context, blocker, and history, but releases WIP. |
 | `state:review` | 1 | Work or artifact is under evidence-gated review and retains WIP. |
 | `state:accepted` | 1 | Acceptance passed but formal closure is pending; WIP remains consumed. |
 | `state:closed` | 0 | Formally closed after required evidence and decision. |
 | `state:superseded` | 0 | Replaced only through an explicit Product Owner decision. |
 
 A blocked Issue remains the current packet. Blocking does not release WIP and does not permit its successor to start.
+
+`state:suspended` is strictly reserved for an Issue whose engineering implementation is complete or paused awaiting a prolonged external/non-code dependency (such as multi-week real-world cohort retention observation). It does NOT mean accepted, closed, cancelled, superseded, or authorized backlog. It preserves full issue history, blocker identity, evidence requirements, and unfinished acceptance criteria. Suspension may only release WIP as part of an explicitly authorized controlled handoff.
 
 ## Canonical transition path
 
@@ -47,6 +50,8 @@ planned
 Permitted controlled variations:
 
 - `blocked → active` after the named blocker is cleared and verified;
+- `blocked → suspended` only through an explicit Product Owner decision naming the prolonged external blocker and authorized successor;
+- `suspended → active` only through an explicit Product Owner reactivation decision when the external blocker clears;
 - `active → review` after the implementation or artifact is complete;
 - `review → active` when repair is required within the same bounded packet;
 - any transition to `superseded` only through an explicit Product Owner decision.
@@ -68,7 +73,7 @@ State changes must replace the existing state label; multiple state labels are i
 GitHub Issue state changes are separate repository-integration operations and cannot be applied transactionally across predecessor and successor Issues. When a predecessor-to-successor transfer cannot be represented as one atomic integration operation, an explicit Product Owner decision may authorize one bounded handoff:
 
 ```text
-close predecessor
+close or suspend predecessor
 → immediate successor activation
 ```
 
@@ -78,12 +83,15 @@ Every controlled handoff must satisfy all of the following:
 
 1. The Product Owner decision names the exact predecessor, successor, baseline, permitted state mutations, and stop conditions.
 2. WIP must never exceed `1`.
-3. A transient WIP result of `0` is permitted only after the authorized predecessor closure and before the immediately following authorized successor activation.
+3. A transient WIP result of `0` is permitted only after the authorized predecessor closure or suspension and before the immediately following authorized successor activation.
 4. No unrelated inspection, mutation, branch/PR action, workflow action, or new decision may occur between those two state changes.
 5. If successor activation fails, execution stops immediately at WIP=`0` and the failure evidence is preserved.
 6. No compensating mutation may occur after a failed activation without a new Product Owner decision.
 7. The final successful handoff state must restore global WIP to exactly `1`.
-8. The predecessor remains closed; the successor becomes the sole WIP-consuming Issue.
+8. The predecessor remains closed or suspended; the successor becomes the sole WIP-consuming Issue.
+9. Do NOT allow a prolonged steady-state WIP=0 after the successor finishes. If the predecessor's external blocker has not cleared when the successor completes its implementation and acceptance:
+   - keep the successor in `state:accepted` consuming WIP=1 until an explicitly authorized immediate successor handoff exists;
+   - do NOT close it and leave the program at WIP=0 for days or weeks.
 
 A transient WIP=`0` outside this explicitly authorized transport sequence remains invalid.
 
