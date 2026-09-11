@@ -91,6 +91,32 @@ class AnalyticsPayloadPolicyTest {
         assertTrue(r3 is PayloadValidation.Accepted)
     }
 
+    @Test fun accepts_weeklyReviewCompleted_withExpandedProperties() {
+        val r = AnalyticsPayloadPolicy.validate(
+            "weekly_review_completed",
+            mapOf(
+                "cycle_week" to 37,
+                "actions_taken" to "1",
+                "cohort_ring" to "INTERNAL",
+                "wmpu_achieved" to "true",
+                "usefulness_rating" to "5",
+                "effective_hours_bracket" to "5-10h"
+            )
+        )
+        assertTrue(r is PayloadValidation.Accepted)
+        val clean = (r as PayloadValidation.Accepted).clean
+        assertEquals("37", clean["cycle_week"])
+        assertEquals("1", clean["actions_taken"])
+        assertEquals("true", clean["wmpu_achieved"])
+        assertEquals("5", clean["usefulness_rating"])
+        assertEquals("5-10h", clean["effective_hours_bracket"])
+
+        // Rejection of free text / reflection in weekly_review_completed
+        assertEquals("sensitive_key", reject("weekly_review_completed", mapOf("journal" to "Private notes")).reason)
+        assertEquals("sensitive_key", reject("weekly_review_completed", mapOf("reflection_text" to "I learned X")).reason)
+        assertEquals("sensitive_key", reject("weekly_review_completed", mapOf("note" to "My goal was Y")).reason)
+    }
+
     @Test fun catalog_classifiesAllAnalyticsTypes() {
         assertEquals(
             setOf(

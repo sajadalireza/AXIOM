@@ -2,22 +2,22 @@ package com.axiom.app.presentation.review
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.with
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,13 +31,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.axiom.app.ui.theme.LegendaryGold
-import com.axiom.app.ui.theme.JetBrainsMono
-import com.axiom.app.ui.theme.TextPrimary
-import com.axiom.app.ui.theme.TextSecondary
-import com.axiom.app.ui.theme.BorderFaint
-import com.axiom.app.ui.theme.VoidBlack
-import com.axiom.app.ui.theme.SystemGreen
+import com.axiom.app.domain.review.ObstacleCategory
+import com.axiom.app.domain.review.WeeklyReviewEngine
+import com.axiom.app.ui.theme.*
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
@@ -46,17 +43,21 @@ fun WeeklyReviewScreen(
     viewModel: WeeklyReviewViewModel = hiltViewModel()
 ) {
     val completedMissions by viewModel.completedMissionsThisWeek.collectAsStateWithLifecycle()
-    val summaryText = remember(completedMissions) {
-        viewModel.createEvidenceSummary(completedMissions)
+    val snapshot by viewModel.progressSnapshot.collectAsStateWithLifecycle()
+    val summaryText = remember(completedMissions, snapshot) {
+        viewModel.createEvidenceSummary(completedMissions, snapshot)
     }
 
-    var step by remember { mutableStateOf(1) }
+    var step by remember { mutableIntStateOf(1) }
 
     // State placeholders for each step
+    var selectedObstacleCategory by remember { mutableStateOf<ObstacleCategory?>(null) }
     var wrongAssumption by remember { mutableStateOf("") }
     var criticFeedback by remember { mutableStateOf("") }
     var selectedDecisionType by remember { mutableStateOf("Tactics (Change Now)") }
+    var primaryOutcome by remember { mutableStateOf("") }
     var journalText by remember { mutableStateOf("") }
+    var usefulnessRating by remember { mutableIntStateOf(5) }
 
     val clipboardManager = LocalClipboardManager.current
     var isCopiedNotificationShown by remember { mutableStateOf(false) }
@@ -110,7 +111,6 @@ fun WeeklyReviewScreen(
                 (1..6).forEach { i ->
                     val isCurrentOrCompleted = i <= step
                     val color = if (isCurrentOrCompleted) LegendaryGold else BorderFaint.copy(alpha = 0.5f)
-                    val weight = if (i == step) FontWeight.ExtraBold else FontWeight.Medium
                     
                     Box(
                         modifier = Modifier
@@ -124,12 +124,12 @@ fun WeeklyReviewScreen(
             
             Text(
                 text = "STEP $step OF 6: " + when(step) {
-                    1 -> "GATHER EVIDENCE"
-                    2 -> "CHECK ASSUMPTIONS"
+                    1 -> "PROGRESS RECOGNITION"
+                    2 -> "OBSTACLE IDENTIFICATION"
                     3 -> "RUTHLESS CRITIC PROMPT"
-                    4 -> "DECIDE WHAT CHANGES"
+                    4 -> "NEXT-WEEK COMMITMENT"
                     5 -> "WRITE ONE PAGE"
-                    6 -> "COMMIT"
+                    6 -> "COMMIT & EVALUATE"
                     else -> ""
                 },
                 color = LegendaryGold,
@@ -144,18 +144,80 @@ fun WeeklyReviewScreen(
             Box(modifier = Modifier.weight(1f)) {
                 when (step) {
                     1 -> {
-                        Column {
+                        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                             Text(
-                                "Tallying outputs, tracking disciplines, and auditing absolute metrics logged in the past 7 days:",
+                                "Truth-grounded progress audit. Zero vanity metrics, zero unearned inflation:",
                                 color = TextPrimary,
                                 fontSize = 15.sp,
                                 lineHeight = 20.sp
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            // Structured Metrics Row
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                Card(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .border(1.dp, BorderFaint.copy(alpha = 0.3f), RoundedCornerShape(8.dp)),
+                                    colors = CardDefaults.cardColors(containerColor = VoidBlack.copy(alpha = 0.6f))
+                                ) {
+                                    Column(modifier = Modifier.padding(10.dp)) {
+                                        Text("WMPU STATUS", color = TextSecondary, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            if (snapshot.wmpuAchieved) "ACHIEVED" else "PENDING",
+                                            color = if (snapshot.wmpuAchieved) SystemGreen else LegendaryGold,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            fontSize = 13.sp
+                                        )
+                                    }
+                                }
+
+                                Card(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .border(1.dp, BorderFaint.copy(alpha = 0.3f), RoundedCornerShape(8.dp)),
+                                    colors = CardDefaults.cardColors(containerColor = VoidBlack.copy(alpha = 0.6f))
+                                ) {
+                                    Column(modifier = Modifier.padding(10.dp)) {
+                                        Text("GOAL ACTIONS", color = TextSecondary, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            "${snapshot.goalContributingMissions} / ${snapshot.totalMissionsCompleted}",
+                                            color = TextPrimary,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            fontSize = 13.sp
+                                        )
+                                    }
+                                }
+
+                                Card(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .border(1.dp, BorderFaint.copy(alpha = 0.3f), RoundedCornerShape(8.dp)),
+                                    colors = CardDefaults.cardColors(containerColor = VoidBlack.copy(alpha = 0.6f))
+                                ) {
+                                    Column(modifier = Modifier.padding(10.dp)) {
+                                        Text("EFFECTIVE HRS", color = TextSecondary, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            String.format(Locale.US, "%.1fh", snapshot.totalEffectiveHours),
+                                            color = TextPrimary,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            fontSize = 13.sp
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(14.dp))
+
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .weight(1f)
                                     .border(1.dp, LegendaryGold.copy(alpha = 0.3f), RoundedCornerShape(12.dp)),
                                 colors = CardDefaults.cardColors(
                                     containerColor = VoidBlack.copy(alpha = 0.4f)
@@ -163,7 +225,7 @@ fun WeeklyReviewScreen(
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .fillMaxSize()
+                                        .fillMaxWidth()
                                         .padding(16.dp)
                                 ) {
                                     Text(
@@ -178,27 +240,85 @@ fun WeeklyReviewScreen(
                         }
                     }
                     2 -> {
-                        Column {
+                        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                             Text(
-                                "What assumption turned out wrong this week?",
+                                "Identify Friction & Check Assumptions",
                                 color = TextPrimary,
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(6.dp))
                             Text(
-                                "Review your hypotheses and call out any biases or failed expectations.",
+                                "Failure is data, not shame. Select the primary friction pattern and document broken assumptions:",
                                 color = TextSecondary,
-                                fontSize = 14.sp
+                                fontSize = 14.sp,
+                                lineHeight = 19.sp
                             )
                             Spacer(modifier = Modifier.height(16.dp))
+
+                            // Obstacle Category Selector Chips
+                            Text(
+                                "Friction Category:",
+                                color = LegendaryGold,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                ObstacleCategory.entries.forEach { category ->
+                                    val isSelected = selectedObstacleCategory == category
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .heightIn(min = 48.dp)
+                                            .border(
+                                                1.dp,
+                                                if (isSelected) LegendaryGold else BorderFaint.copy(alpha = 0.3f),
+                                                RoundedCornerShape(8.dp)
+                                            )
+                                            .background(
+                                                if (isSelected) LegendaryGold.copy(alpha = 0.15f) else VoidBlack.copy(alpha = 0.3f),
+                                                RoundedCornerShape(8.dp)
+                                            )
+                                            .clickable {
+                                                selectedObstacleCategory = if (isSelected) null else category
+                                            }
+                                            .padding(horizontal = 14.dp, vertical = 10.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            category.titleEn,
+                                            color = if (isSelected) LegendaryGold else TextPrimary,
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                            fontSize = 14.sp
+                                        )
+                                        Text(
+                                            category.titleFa,
+                                            color = TextSecondary,
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Text(
+                                "What assumption or hypothesis turned out wrong?",
+                                color = TextPrimary,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
                             OutlinedTextField(
                                 value = wrongAssumption,
                                 onValueChange = { wrongAssumption = it },
-                                placeholder = { Text("e.g. Assumed the client call would yield immediate signup, but they need 2 reviews...") },
+                                placeholder = { Text("e.g. Underestimated API integration complexity; need smaller daily slices...") },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .weight(1f)
+                                    .heightIn(min = 100.dp)
                                     .testTag("step2_wrong_assumption"),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = LegendaryGold,
@@ -211,7 +331,7 @@ fun WeeklyReviewScreen(
                     }
                     3 -> {
                         val ruthlessPrompt = "Given this data:\n$summaryText\n\nwhat is the most important thing I am not facing right now, and what one thing should I change?"
-                        Column {
+                        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                             Text(
                                 "Run the diagnostic with your external AI system to strip away denial.",
                                 color = TextPrimary,
@@ -252,7 +372,9 @@ fun WeeklyReviewScreen(
                                             containerColor = LegendaryGold,
                                             contentColor = VoidBlack
                                         ),
-                                        modifier = Modifier.testTag("copy_prompt_button")
+                                        modifier = Modifier
+                                            .heightIn(min = 48.dp)
+                                            .testTag("copy_prompt_button")
                                     ) {
                                         Icon(Icons.Default.ContentCopy, contentDescription = "Copy")
                                         Spacer(modifier = Modifier.width(8.dp))
@@ -281,7 +403,7 @@ fun WeeklyReviewScreen(
                                 placeholder = { Text("Paste response here...") },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .weight(1f)
+                                    .heightIn(min = 120.dp)
                                     .testTag("step3_critic_feedback"),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = LegendaryGold,
@@ -293,9 +415,9 @@ fun WeeklyReviewScreen(
                         }
                     }
                     4 -> {
-                        Column {
+                        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                             Text(
-                                "Decide What Level of Change is Needed:",
+                                "Decide What Changes & Next-Week Commitment",
                                 color = TextPrimary,
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
@@ -306,12 +428,13 @@ fun WeeklyReviewScreen(
                                 color = TextSecondary,
                                 fontSize = 14.sp
                             )
-                            Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
                             Column(Modifier.selectableGroup()) {
                                 decisionTypes.forEach { type ->
                                     Row(
                                         Modifier
                                             .fillMaxWidth()
+                                            .heightIn(min = 48.dp)
                                             .selectable(
                                                 selected = (type == selectedDecisionType),
                                                 onClick = { selectedDecisionType = type }
@@ -337,9 +460,32 @@ fun WeeklyReviewScreen(
                                             fontWeight = FontWeight.SemiBold
                                         )
                                     }
-                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Spacer(modifier = Modifier.height(10.dp))
                                 }
                             }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                "Single Primary Next-Week Outcome:",
+                                color = LegendaryGold,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            OutlinedTextField(
+                                value = primaryOutcome,
+                                onValueChange = { primaryOutcome = it },
+                                placeholder = { Text("e.g. Deliver working auth flow before Wednesday noon") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag("step4_primary_outcome"),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = LegendaryGold,
+                                    unfocusedBorderColor = BorderFaint.copy(alpha = 0.5f),
+                                    focusedTextColor = TextPrimary,
+                                    unfocusedTextColor = TextPrimary
+                                )
+                            )
                         }
                     }
                     5 -> {
@@ -375,44 +521,107 @@ fun WeeklyReviewScreen(
                         }
                     }
                     6 -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState()),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
                         ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center,
-                                modifier = Modifier.padding(16.dp)
+                            Icon(
+                                Icons.Default.CheckCircle,
+                                contentDescription = "Ready",
+                                tint = LegendaryGold,
+                                modifier = Modifier.size(64.dp)
+                            )
+                            Spacer(modifier = Modifier.height(14.dp))
+                            Text(
+                                "COMMIT & EVALUATE",
+                                color = LegendaryGold,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                "Your evidence and commitments will be locked into the historical archives.",
+                                color = TextSecondary,
+                                fontSize = 13.sp,
+                                textAlign = TextAlign.Center,
+                                lineHeight = 18.sp
+                            )
+
+                            Spacer(modifier = Modifier.height(20.dp))
+
+                            // Usefulness Rating (1..5)
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, BorderFaint.copy(alpha = 0.3f), RoundedCornerShape(10.dp)),
+                                colors = CardDefaults.cardColors(containerColor = VoidBlack.copy(alpha = 0.5f))
                             ) {
-                                Icon(
-                                    Icons.Default.CheckCircle,
-                                    contentDescription = "Ready",
-                                    tint = LegendaryGold,
-                                    modifier = Modifier.size(72.dp)
-                                )
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Text(
-                                    "THE PROTOCOL IS COMPLETE",
-                                    color = LegendaryGold,
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    textAlign = TextAlign.Center
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    "By committing, your outcomes and evidence are locked into your historical archives. Ready to enter next week with zero delusion?",
-                                    color = TextSecondary,
-                                    fontSize = 14.sp,
-                                    textAlign = TextAlign.Center,
-                                    lineHeight = 20.sp
-                                )
+                                Column(
+                                    modifier = Modifier.padding(16.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        "How useful was this review in grounding your next cycle?",
+                                        color = TextPrimary,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Row(
+                                        horizontalArrangement = Arrangement.Center,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        (1..5).forEach { star ->
+                                            IconButton(
+                                                onClick = { usefulnessRating = star },
+                                                modifier = Modifier
+                                                    .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
+                                                    .testTag("usefulness_rating_$star")
+                                            ) {
+                                                Icon(
+                                                    imageVector = if (star <= usefulnessRating) Icons.Default.Star else Icons.Outlined.Star,
+                                                    contentDescription = "Rating $star",
+                                                    tint = if (star <= usefulnessRating) LegendaryGold else BorderFaint
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            // Anti-Inflation Award Notice
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, SystemGreen.copy(alpha = 0.3f), RoundedCornerShape(8.dp)),
+                                colors = CardDefaults.cardColors(containerColor = VoidBlack.copy(alpha = 0.4f))
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        "⬡ Review Reward: +${WeeklyReviewEngine.FLAT_REVIEW_XP} XP (Flat, anti-inflationary)",
+                                        color = SystemGreen,
+                                        fontFamily = JetBrainsMono,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             // BOTTOM WIZARD CONTROLS
             Row(
@@ -429,7 +638,9 @@ fun WeeklyReviewScreen(
                             onBack()
                         }
                     },
-                    modifier = Modifier.testTag("wizard_back_button"),
+                    modifier = Modifier
+                        .heightIn(min = 48.dp)
+                        .testTag("wizard_back_button"),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary),
                     border = BorderStroke(1.dp, TextPrimary.copy(alpha = 0.4f)),
                     shape = RoundedCornerShape(8.dp)
@@ -438,7 +649,7 @@ fun WeeklyReviewScreen(
                 }
 
                 val canGoNext = when (step) {
-                    2 -> wrongAssumption.isNotBlank()
+                    2 -> wrongAssumption.isNotBlank() || selectedObstacleCategory != null
                     3 -> criticFeedback.isNotBlank()
                     5 -> journalText.isNotBlank()
                     else -> true
@@ -450,18 +661,27 @@ fun WeeklyReviewScreen(
                             step++
                             isCopiedNotificationShown = false
                         } else {
+                            val committedDecision = if (primaryOutcome.isNotBlank()) {
+                                "$selectedDecisionType - $primaryOutcome"
+                            } else {
+                                selectedDecisionType
+                            }
                             viewModel.submitReview(
                                 summary = summaryText,
                                 wrongAssumption = wrongAssumption,
                                 criticFeedback = criticFeedback,
-                                decisionType = selectedDecisionType,
+                                decisionType = committedDecision,
                                 journalText = journalText,
+                                obstacleCategory = selectedObstacleCategory,
+                                usefulnessRating = usefulnessRating,
                                 onComplete = onBack
                             )
                         }
                     },
                     enabled = canGoNext,
-                    modifier = Modifier.testTag("wizard_next_button"),
+                    modifier = Modifier
+                        .heightIn(min = 48.dp)
+                        .testTag("wizard_next_button"),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = LegendaryGold,
                         contentColor = VoidBlack,
