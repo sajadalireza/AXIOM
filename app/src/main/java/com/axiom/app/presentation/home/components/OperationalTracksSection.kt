@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.axiom.app.R
 import com.axiom.app.navigation.Screen
+import com.axiom.app.ui.theme.AxiomBorder
+import com.axiom.app.ui.theme.AxiomRadius
 import com.axiom.app.ui.theme.JetBrainsMono
 import com.axiom.app.ui.theme.LocalAxiomColors
 
@@ -48,7 +50,7 @@ fun OperationalTracksSection(
                 text = if (isFa) "ماژول‌های عملیاتی" else "OPERATIONAL MODULES",
                 fontFamily = JetBrainsMono,
                 fontSize = 11.sp,
-                color = Color(0xFF8A9B90),
+                color = colors.textSecondary,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 2.sp
             )
@@ -113,13 +115,13 @@ fun OperationalTracksSection(
                     modifier = Modifier
                         .weight(1f)
                         .height(82.dp)
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(AxiomRadius.l))
                         .background(
                             Brush.linearGradient(
-                                colors = listOf(Color(0xFF211C10), colors.shadowSurface)
+                                colors = listOf(colors.dimSurface, colors.shadowSurface)
                             )
                         )
-                        .border(1.dp, colors.legendaryGold.copy(alpha = 0.35f), RoundedCornerShape(12.dp))
+                        .border(AxiomBorder.thin, colors.legendaryGold.copy(alpha = 0.35f), RoundedCornerShape(AxiomRadius.l))
                         .clickable { onNavigate(Screen.Premium.route) }
                         .padding(vertical = 14.dp, horizontal = 8.dp),
                     contentAlignment = Alignment.Center
@@ -158,9 +160,9 @@ private fun QuickLaunchItem(
     Box(
         modifier = modifier
             .height(82.dp)
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(AxiomRadius.l))
             .background(colors.shadowSurface)
-            .border(1.dp, Color(0xFF232220), RoundedCornerShape(12.dp))
+            .border(AxiomBorder.thin, colors.borderFaint, RoundedCornerShape(AxiomRadius.l))
             .clickable { onClick() }
             .padding(vertical = 14.dp, horizontal = 8.dp),
         contentAlignment = Alignment.Center
