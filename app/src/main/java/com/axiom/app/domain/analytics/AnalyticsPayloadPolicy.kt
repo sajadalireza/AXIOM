@@ -56,7 +56,7 @@ object AnalyticsPayloadPolicy {
         "mission_started" to setOf("mission_id", "has_goal"),
         "wmpu_achieved" to setOf("cycle_week", "meaningful_mission_count", "goal_count", "cohort_ring"),
         "weekly_review_exposed" to setOf("cycle_week", "cohort_ring"),
-        "weekly_review_completed" to setOf("cycle_week", "actions_taken", "cohort_ring"),
+        "weekly_review_completed" to setOf("cycle_week", "actions_taken", "cohort_ring", "wmpu_achieved", "usefulness_rating", "effective_hours_bracket"),
         "experiment_assigned" to setOf("experiment_id", "variant_id", "cohort_ring"),
         "experiment_exposed" to setOf("experiment_id", "variant_id", "screen_name", "cohort_ring"),
         "operational_error" to setOf("component", "error_category", "error_code", "status"),
