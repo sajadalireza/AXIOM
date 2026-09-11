@@ -16,6 +16,10 @@ import com.axiom.app.domain.focus.FocusProtocolManager
 import com.axiom.app.data.local.AxiomPreferences
 import com.axiom.app.presentation.ceremony.CeremonyEngine
 import com.axiom.app.presentation.ceremony.CeremonyEvent
+import com.axiom.app.core.AnalyticsLogger
+import com.axiom.app.core.CanonicalAnalyticsEvents
+import com.axiom.app.domain.template.Beachhead
+import com.axiom.app.domain.template.TemplateUsageStats
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -55,6 +59,9 @@ class MissionsViewModel @Inject constructor(
     val isFocusTimerActive: StateFlow<Boolean> = focusProtocolManager.isTimerActive
     val activeFocusMission: StateFlow<Mission?> = focusProtocolManager.activeFocusMission
     val activeFocusTitle: StateFlow<String?> = focusProtocolManager.activeFocusTitle
+
+    val templateUsageStats: StateFlow<TemplateUsageStats> = preferences.templateUsageStatsFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TemplateUsageStats(0, 0))
 
     fun startFocusProtocol(mission: Mission, durationMinutes: Int) {
         focusProtocolManager.startFocusProtocol(mission, durationMinutes)
@@ -263,12 +270,70 @@ class MissionsViewModel @Inject constructor(
         }
     }
 
+    fun recordTemplateExposed(templateId: String, beachhead: String = Beachhead.SOFTWARE_SOLOPRENEUR.name) {
+        viewModelScope.launch {
+            val ring = preferences.releaseRingFlow.first().name
+            AnalyticsLogger.log(
+                CanonicalAnalyticsEvents.MISSION_TEMPLATE_EXPOSED,
+                mapOf(
+                    "template_id" to templateId,
+                    "beachhead" to beachhead,
+                    "cohort_ring" to ring
+                )
+            )
+        }
+    }
+
+    fun recordTemplateAccepted(
+        templateId: String,
+        beachhead: String = Beachhead.SOFTWARE_SOLOPRENEUR.name,
+        wasCustomized: Boolean = false
+    ) {
+        viewModelScope.launch {
+            preferences.recordTemplateAccepted()
+            val ring = preferences.releaseRingFlow.first().name
+            AnalyticsLogger.log(
+                CanonicalAnalyticsEvents.MISSION_TEMPLATE_ACCEPTED,
+                mapOf(
+                    "template_id" to templateId,
+                    "beachhead" to beachhead,
+                    "was_customized" to wasCustomized.toString(),
+                    "cohort_ring" to ring
+                )
+            )
+        }
+    }
+
+    fun recordTemplateRated(
+        templateId: String,
+        rating: Int
+    ) {
+        viewModelScope.launch {
+            val ring = preferences.releaseRingFlow.first().name
+            AnalyticsLogger.log(
+                CanonicalAnalyticsEvents.MISSION_TEMPLATE_RATED,
+                mapOf(
+                    "template_id" to templateId,
+                    "rating" to rating.toString(),
+                    "cohort_ring" to ring
+                )
+            )
+        }
+    }
+
     fun createMissionFromPayload(
         payload: com.axiom.app.domain.model.MissionAuthoringPayload,
+        templateId: String? = null,
+        wasCustomized: Boolean = false,
         onSuccess: (String) -> Unit = {}
     ) {
         viewModelScope.launch {
             if (!payload.isValid) return@launch
+            if (templateId != null) {
+                recordTemplateAccepted(templateId, wasCustomized = wasCustomized)
+            } else {
+                preferences.recordBlankMissionCreated()
+            }
             val missionId = createMissionUseCase(payload)
             if (payload.logAsCompleted) {
                 completeMission(

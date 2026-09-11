@@ -37,7 +37,10 @@ object AnalyticsPayloadPolicy {
         "streak_recovery_offered",
         "streak_recovery_completed",
         "streak_recovery_expired",
-        "streak_opt_out_changed"
+        "streak_opt_out_changed",
+        "mission_template_exposed",
+        "mission_template_accepted",
+        "mission_template_rated"
     )
 
     /** Per-event allowlist. A property key MUST appear here (case-sensitive) to be carried. */
@@ -66,7 +69,10 @@ object AnalyticsPayloadPolicy {
         "streak_recovery_offered" to setOf("streak_length", "cadence", "cohort_ring"),
         "streak_recovery_completed" to setOf("streak_length", "recovery_mission_id", "cohort_ring"),
         "streak_recovery_expired" to setOf("streak_length", "cohort_ring"),
-        "streak_opt_out_changed" to setOf("opt_out_state", "cohort_ring")
+        "streak_opt_out_changed" to setOf("opt_out_state", "cohort_ring"),
+        "mission_template_exposed" to setOf("template_id", "beachhead", "cohort_ring"),
+        "mission_template_accepted" to setOf("template_id", "beachhead", "was_customized", "cohort_ring"),
+        "mission_template_rated" to setOf("template_id", "rating", "cohort_ring")
     )
 
     /**
