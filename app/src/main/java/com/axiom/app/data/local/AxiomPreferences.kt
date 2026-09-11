@@ -7,10 +7,17 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.axiom.app.domain.model.CharacterStats
 import com.axiom.app.domain.analytics.AnalyticsConsentState
 import com.axiom.app.domain.analytics.ReleaseRing
+import com.axiom.app.domain.streak.FlexibleStreakEngine
+import com.axiom.app.domain.streak.RecoveryStatus
+import com.axiom.app.domain.streak.StreakCadence
+import com.axiom.app.domain.streak.StreakCadenceType
+import com.axiom.app.domain.streak.StreakPauseState
+import com.axiom.app.domain.streak.StreakRecoveryState
 import com.axiom.app.ui.theme.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -136,6 +143,17 @@ open class AxiomPreferences @Inject constructor(
         
         private val LAST_COMMAND_VOICE_SHOWN_DATE = stringPreferencesKey("last_command_voice_shown_date")
         private val LAST_SHOWN_AFFIRMATION_INDEX = intPreferencesKey("last_shown_affirmation_index")
+
+        // Gate G5 — Flexible Streak, Cadence, Proactive Pause, Grace Recovery, and Opt-Out
+        private val STREAK_TRACKING_ENABLED = booleanPreferencesKey("streak_tracking_enabled")
+        private val STREAK_CADENCE_TYPE = stringPreferencesKey("streak_cadence_type")
+        private val STREAK_SCHEDULED_DAYS = stringSetPreferencesKey("streak_scheduled_days")
+        private val STREAK_PAUSED_UNTIL = stringPreferencesKey("streak_paused_until")
+        private val STREAK_RECOVERY_STATUS = stringPreferencesKey("streak_recovery_status")
+        private val STREAK_RECOVERY_FROZEN_VALUE = intPreferencesKey("streak_recovery_frozen_value")
+        private val STREAK_RECOVERY_DEADLINE = longPreferencesKey("streak_recovery_deadline")
+        private val STREAK_RECOVERY_MISSION_ID = stringPreferencesKey("streak_recovery_mission_id")
+        private val STREAK_LAST_RECOVERY_DATE = stringPreferencesKey("streak_last_recovery_date")
     }
 
     open val lastCommandVoiceShownDateFlow: Flow<String> = context.dataStore.data.map { prefs ->
@@ -1134,6 +1152,89 @@ open class AxiomPreferences @Inject constructor(
     open suspend fun setFirstWinRemoteKill(active: Boolean) {
         context.dataStore.edit { prefs ->
             prefs[FIRST_WIN_REMOTE_KILL_ACTIVE] = active
+        }
+    }
+
+    // Gate G5 — Flexible Streak, Cadence, Proactive Pause, Grace Recovery, and Opt-Out
+    open val streakTrackingEnabledFlow: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[STREAK_TRACKING_ENABLED] ?: true
+    }
+
+    open suspend fun setStreakTrackingEnabled(enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[STREAK_TRACKING_ENABLED] = enabled
+        }
+    }
+
+    open val streakCadenceFlow: Flow<StreakCadence> = context.dataStore.data.map { prefs ->
+        val typeStr = prefs[STREAK_CADENCE_TYPE] ?: StreakCadenceType.EVERYDAY.name
+        val type = runCatching { StreakCadenceType.valueOf(typeStr) }.getOrDefault(StreakCadenceType.EVERYDAY)
+        val dayStrings = prefs[STREAK_SCHEDULED_DAYS]
+        val days = if (dayStrings.isNullOrEmpty()) {
+            java.time.DayOfWeek.values().toSet()
+        } else {
+            dayStrings.mapNotNull { runCatching { java.time.DayOfWeek.valueOf(it) }.getOrNull() }.toSet()
+        }
+        StreakCadence(type = type, scheduledDays = days)
+    }
+
+    open suspend fun setStreakCadence(cadence: StreakCadence) {
+        context.dataStore.edit { prefs ->
+            prefs[STREAK_CADENCE_TYPE] = cadence.type.name
+            prefs[STREAK_SCHEDULED_DAYS] = cadence.scheduledDays.map { it.name }.toSet()
+        }
+    }
+
+    open val streakPauseStateFlow: Flow<StreakPauseState> = context.dataStore.data.map { prefs ->
+        val dateStr = prefs[STREAK_PAUSED_UNTIL]
+        val date = if (!dateStr.isNullOrBlank()) runCatching { java.time.LocalDate.parse(dateStr) }.getOrNull() else null
+        StreakPauseState(isPaused = date != null, pausedUntil = date)
+    }
+
+    open suspend fun pauseStreak(days: Long) {
+        val clampedDays = days.coerceIn(1L, FlexibleStreakEngine.MAX_PAUSE_DAYS)
+        val untilDate = java.time.LocalDate.now().plusDays(clampedDays)
+        context.dataStore.edit { prefs ->
+            prefs[STREAK_PAUSED_UNTIL] = untilDate.toString()
+        }
+    }
+
+    open suspend fun resumeStreak() {
+        context.dataStore.edit { prefs ->
+            prefs.remove(STREAK_PAUSED_UNTIL)
+        }
+    }
+
+    open val streakRecoveryStateFlow: Flow<StreakRecoveryState> = context.dataStore.data.map { prefs ->
+        val statusStr = prefs[STREAK_RECOVERY_STATUS] ?: RecoveryStatus.NONE.name
+        val status = runCatching { RecoveryStatus.valueOf(statusStr) }.getOrDefault(RecoveryStatus.NONE)
+        val frozen = prefs[STREAK_RECOVERY_FROZEN_VALUE] ?: 0
+        val deadline = prefs[STREAK_RECOVERY_DEADLINE] ?: 0L
+        val missionId = prefs[STREAK_RECOVERY_MISSION_ID]
+        val lastDateStr = prefs[STREAK_LAST_RECOVERY_DATE]
+        val lastDate = if (!lastDateStr.isNullOrBlank()) runCatching { java.time.LocalDate.parse(lastDateStr) }.getOrNull() else null
+        StreakRecoveryState(
+            status = status,
+            frozenStreak = frozen,
+            deadlineMillis = deadline,
+            recoveryMissionId = missionId,
+            lastRecoveryDate = lastDate
+        )
+    }
+
+    open suspend fun setStreakRecoveryState(state: StreakRecoveryState) {
+        context.dataStore.edit { prefs ->
+            prefs[STREAK_RECOVERY_STATUS] = state.status.name
+            prefs[STREAK_RECOVERY_FROZEN_VALUE] = state.frozenStreak
+            prefs[STREAK_RECOVERY_DEADLINE] = state.deadlineMillis
+            if (state.recoveryMissionId != null) {
+                prefs[STREAK_RECOVERY_MISSION_ID] = state.recoveryMissionId
+            } else {
+                prefs.remove(STREAK_RECOVERY_MISSION_ID)
+            }
+            if (state.lastRecoveryDate != null) {
+                prefs[STREAK_LAST_RECOVERY_DATE] = state.lastRecoveryDate.toString()
+            }
         }
     }
 }

@@ -71,6 +71,26 @@ class AnalyticsPayloadPolicyTest {
         assertEquals(setOf("missionId", "hunterXpAwarded"), (r as PayloadValidation.Accepted).clean.keys)
     }
 
+    @Test fun accepts_streakRecoveryEvents() {
+        val r1 = AnalyticsPayloadPolicy.validate(
+            "streak_paused",
+            mapOf("days_paused" to 7, "resume_date" to "2026-09-21", "cohort_ring" to "INTERNAL")
+        )
+        assertTrue(r1 is PayloadValidation.Accepted)
+
+        val r2 = AnalyticsPayloadPolicy.validate(
+            "streak_recovery_offered",
+            mapOf("streak_length" to 14, "cadence" to "WEEKDAYS_ONLY", "cohort_ring" to "INTERNAL")
+        )
+        assertTrue(r2 is PayloadValidation.Accepted)
+
+        val r3 = AnalyticsPayloadPolicy.validate(
+            "streak_recovery_completed",
+            mapOf("streak_length" to 15, "recovery_mission_id" to "recovery_core_action", "cohort_ring" to "INTERNAL")
+        )
+        assertTrue(r3 is PayloadValidation.Accepted)
+    }
+
     @Test fun catalog_classifiesAllAnalyticsTypes() {
         assertEquals(
             setOf(
@@ -78,7 +98,9 @@ class AnalyticsPayloadPolicyTest {
                 "FIRST_WIN_COMPLETION", "first_win_assigned", "first_win_exposed", "first_win_completed",
                 "onboarding_started", "mission_created", "mission_started", "wmpu_achieved",
                 "weekly_review_exposed", "weekly_review_completed", "experiment_assigned",
-                "experiment_exposed", "operational_error", "integrity_heartbeat"
+                "experiment_exposed", "operational_error", "integrity_heartbeat",
+                "streak_paused", "streak_resumed", "streak_recovery_offered",
+                "streak_recovery_completed", "streak_recovery_expired", "streak_opt_out_changed"
             ),
             AnalyticsPayloadPolicy.ANALYTICS_EVENT_TYPES
         )

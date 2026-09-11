@@ -64,6 +64,14 @@ object CanonicalAnalyticsEvents {
     const val OPERATIONAL_ERROR = "operational_error"
     const val INTEGRITY_HEARTBEAT = "integrity_heartbeat"
 
+    // Gate G5 Flexible Streak & Recovery Events
+    const val STREAK_PAUSED = "streak_paused"
+    const val STREAK_RESUMED = "streak_resumed"
+    const val STREAK_RECOVERY_OFFERED = "streak_recovery_offered"
+    const val STREAK_RECOVERY_COMPLETED = "streak_recovery_completed"
+    const val STREAK_RECOVERY_EXPIRED = "streak_recovery_expired"
+    const val STREAK_OPT_OUT_CHANGED = "streak_opt_out_changed"
+
     /**
      * Map of legacy event names to their canonical equivalents.
      */
