@@ -39,7 +39,7 @@ import com.axiom.app.ui.components.ScreenHelpButton
 import com.axiom.app.ui.components.SystemToast
 import com.axiom.app.ui.theme.*
 
-import com.axiom.app.presentation.missions.AIMissionGeneratorSheet
+import com.axiom.app.presentation.missions.XionDecisionSheet
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.border
@@ -91,7 +91,21 @@ fun MissionsScreen(
                         color = colors.textPrimary
                     )
                     
-                    ScreenHelpButton(stringResId = R.string.glossary_missions)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(
+                            onClick = { showAISheet = true },
+                            modifier = Modifier.size(48.dp).testTag("btn_open_xion_decision_layer")
+                        ) {
+                            Text(
+                                text = "🧠",
+                                fontSize = 18.sp
+                            )
+                        }
+                        ScreenHelpButton(stringResId = R.string.glossary_missions)
+                    }
                 }
                 Text(
                     text = stringResource(R.string.missions_active_protocols, activeCount),
@@ -399,7 +413,7 @@ fun MissionsScreen(
         ScanlineOverlay()
 
         if (showAISheet && com.axiom.app.core.FeatureFlags.AI_FEATURES_ENABLED) {
-            AIMissionGeneratorSheet(onDismiss = { showAISheet = false })
+            XionDecisionSheet(onDismiss = { showAISheet = false })
         }
 
         // Toast overlay — placed at Box level so it overlays everything without zIndex hacks

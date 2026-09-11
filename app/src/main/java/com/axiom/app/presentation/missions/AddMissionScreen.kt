@@ -92,8 +92,9 @@ fun AddMissionScreen(
     var sessionGotFeedback by remember { mutableStateOf(true) }
     var sessionPushedComfortZone by remember { mutableStateOf(true) }
 
-    // Template Pack (G5-P3: E4.3)
+    // Template Pack (G5-P3: E4.3) & Xion Decision Layer (G5-P4: E4.4)
     var showTemplateSheet by remember { mutableStateOf(false) }
+    var showXionSheet by remember { mutableStateOf(false) }
     var activeTemplateId by remember { mutableStateOf<String?>(null) }
     var activeTemplateTitle by remember { mutableStateOf<String?>(null) }
     var templateWasCustomized by remember { mutableStateOf(false) }
@@ -271,22 +272,45 @@ fun AddMissionScreen(
                                 }
                             }
                         } else {
-                            OutlinedButton(
-                                onClick = { showTemplateSheet = true },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .heightIn(min = 48.dp)
-                                    .testTag("btn_browse_templates"),
-                                border = BorderStroke(1.dp, LegendaryGold.copy(alpha = 0.6f)),
-                                colors = ButtonDefaults.outlinedButtonColors(contentColor = LegendaryGold),
-                                shape = RoundedCornerShape(8.dp)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Text(
-                                    text = "⚡ BROWSE TEMPLATES (SOFTWARE / SOLOPRENEUR)",
-                                    fontFamily = JetBrainsMono,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 12.sp
-                                )
+                                OutlinedButton(
+                                    onClick = { showTemplateSheet = true },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .heightIn(min = 48.dp)
+                                        .testTag("btn_browse_templates"),
+                                    border = BorderStroke(1.dp, LegendaryGold.copy(alpha = 0.6f)),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = LegendaryGold),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Text(
+                                        text = "⚡ TEMPLATES",
+                                        fontFamily = JetBrainsMono,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 11.sp
+                                    )
+                                }
+
+                                OutlinedButton(
+                                    onClick = { showXionSheet = true },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .heightIn(min = 48.dp)
+                                        .testTag("btn_activate_xion_dialog"),
+                                    border = BorderStroke(1.dp, SystemGreen.copy(alpha = 0.6f)),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = SystemGreen),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Text(
+                                        text = "🧠 XION COPILOT",
+                                        fontFamily = JetBrainsMono,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 11.sp
+                                    )
+                                }
                             }
                         }
 
@@ -1004,6 +1028,14 @@ fun AddMissionScreen(
                         }
                     }
                     showTemplateSheet = false
+                }
+            )
+        }
+
+        if (showXionSheet) {
+            XionDecisionSheet(
+                onDismiss = {
+                    showXionSheet = false
                 }
             )
         }
