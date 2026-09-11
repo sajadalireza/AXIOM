@@ -61,16 +61,18 @@ fun HunterHeaderSection(
             .testTag("hunter_header_banner")
             .padding(18.dp)
     ) {
-        // Rank glyph watermark in the background at 5% opacity
+        // Rank glyph watermark in the background at 4% opacity (constrained so it never occludes text at 200% font scale)
         Text(
-            text = hunter.rankLabel.takeIf { it.isNotEmpty() } ?: "S",
+            text = hunter.rankLabel.takeIf { it.isNotEmpty() }?.take(1) ?: "S",
             fontFamily = JetBrainsMono,
-            fontSize = 130.sp,
+            fontSize = 64.sp,
             fontWeight = FontWeight.Bold,
-            color = colors.legendaryGold.copy(alpha = 0.05f),
+            color = colors.legendaryGold.copy(alpha = 0.04f),
+            maxLines = 1,
+            softWrap = false,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .offset(x = 10.dp, y = (-24).dp)
+                .padding(end = 6.dp, top = 4.dp)
         )
 
         // Main content Column

@@ -100,10 +100,10 @@ fun SuccessContent(
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 80.dp),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Zone 1: Identity
+            // Zone 1: Identity & Hunter Header
             item(key = "identity") {
                 HunterHeaderSection(
                     hunter = state.hunter,
@@ -114,111 +114,121 @@ fun SuccessContent(
                 )
             }
 
-            // Zone 2: Urgency
-            item(key = "urgency") {
-                CountdownBannerSection(
-                    programStartDate = actualStartDate,
-                    onEditProgramStart = { datePickerDialog.show() }
-                )
-            }
-
-            item(key = "quick_launch") {
-                OperationalTracksSection(
-                    onNavigate = onNavigate
-                )
-            }
-
-            if (isReviewOverdue) {
-                item(key = "review_overdue") {
-                    Card(
-                        modifier = Modifier.fillMaxWidth().clickable { onNavigate(Screen.WeeklyReview.route) }.testTag("weekly_review_overdue_banner"),
-                        colors = CardDefaults.cardColors(containerColor = colors.legendaryGold.copy(alpha = 0.08f)),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, colors.legendaryGold.copy(alpha = 0.5f))
-                    ) {
-                        Row(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Text("⚠️", fontSize = 20.sp)
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text("WEEKLY REVIEW RITUAL OVERDUE", fontFamily = FiraCode, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = colors.legendaryGold, letterSpacing = 1.sp)
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text("Run the 6-Step Evaluation Protocol to strip away denial and commit weekly alignment.", fontFamily = Inter, fontSize = 11.sp, color = colors.textSecondary, lineHeight = 15.sp)
-                            }
-                            Text("[ START ]", fontFamily = FiraCode, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = colors.legendaryGold, modifier = Modifier.background(colors.legendaryGold.copy(alpha = 0.15f), RoundedCornerShape(4.dp)).padding(horizontal = 8.dp, vertical = 4.dp))
-                        }
-                    }
-                }
-            }
-
-            // Zone 3: Action
-            item(key = "action") {
-                ActiveMissionStrip(
-                    topMissions = state.topMissions,
+            // Zone 2: Next Meaningful Mission Hero Card (Center of Gravity & Single Primary CTA)
+            item(key = "next_meaningful_mission") {
+                val primaryMission = state.topMissions.firstOrNull()
+                NextMissionHeroCard(
+                    mission = primaryMission,
                     dungeons = state.dungeons,
-                    isRestMode = false,
-                    onNavigateToMissionDetail = { id -> onNavigate(Screen.MissionDetail(id).route) },
-                    onCompleteMission = { id -> missionsViewModel.completeMission(id, null) },
-                    onDeleteMission = { id -> missionsViewModel.deleteMission(id) }
+                    onPrimaryAction = { missionId ->
+                        if (missionId != null) {
+                            onNavigate(Screen.MissionDetail(missionId).route)
+                        } else {
+                            onNavigate(Screen.AddMission.route)
+                        }
+                    },
+                    onViewAllMissions = {
+                        onNavigate(Screen.Missions.route)
+                    }
                 )
             }
 
-            item(key = "daily_outcomes") { DailyOutcomesSection() }
-
-            state.nextBestAction?.let { action ->
-                item(key = "next_best_action") {
-                    Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(4.dp)).background(colors.shadowSurface).border(1.dp, colors.borderFaint, RoundedCornerShape(4.dp)).clickable { state.nextBestActionRoute?.let { onNavigate(it) } }) {
-                        Box(modifier = Modifier.align(Alignment.CenterStart).width(3.dp).fillMaxHeight().background(colors.systemGreen))
-                        Column(modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 12.dp, top = 10.dp, bottom = 10.dp)) {
-                            Text(text = stringResource(R.string.home_next_action), fontFamily = FiraCode, fontSize = 9.sp, color = colors.systemGreen, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-                            Spacer(Modifier.height(3.dp))
-                            Text(text = action, fontFamily = Inter, fontSize = 13.sp, color = colors.textPrimary, fontWeight = FontWeight.Medium)
-                        }
-                    }
+            // Subordinate Mission Strip (for secondary active missions if > 1)
+            if (state.topMissions.size > 1) {
+                item(key = "other_missions") {
+                    ActiveMissionStrip(
+                        topMissions = state.topMissions.drop(1),
+                        dungeons = state.dungeons,
+                        isRestMode = false,
+                        onNavigateToMissionDetail = { id -> onNavigate(Screen.MissionDetail(id).route) },
+                        onCompleteMission = { id -> missionsViewModel.completeMission(id, null) },
+                        onDeleteMission = { id -> missionsViewModel.deleteMission(id) }
+                    )
                 }
             }
 
-            // Zone 4: Progress
-            item(key = "weekly_challenge") {
-                WeeklyChallengeSection(
-                    challenges = challenges,
-                    allClaimed = weekly.allClaimed,
-                    onClaimBonus = { axiomViewModel.claimWeeklyBonus() }
-                )
-            }
+            // Zone 3: Collapsible Secondary Surfaces
+            item(key = "secondary_surfaces") {
+                SecondarySurfacesSection(initiallyExpanded = false) {
+                    CountdownBannerSection(
+                        programStartDate = actualStartDate,
+                        onEditProgramStart = { datePickerDialog.show() }
+                    )
 
-            item(key = "daily_habit_nudge") {
-                DailyHabitNudgeSection(
-                    log = todayHabitLog,
-                    onClick = { onNavigate(Screen.DailyCheckin.route) }
-                )
-            }
+                    OperationalTracksSection(
+                        onNavigate = onNavigate
+                    )
 
-            item(key = "vitals_row") {
-                com.axiom.app.ui.components.VitalsRow(
-                    viewModel = vitalsViewModel,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+                    if (isReviewOverdue) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onNavigate(Screen.WeeklyReview.route) }
+                                .testTag("weekly_review_overdue_banner"),
+                            colors = CardDefaults.cardColors(containerColor = colors.legendaryGold.copy(alpha = 0.08f)),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, colors.legendaryGold.copy(alpha = 0.5f))
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Text("⚠️", fontSize = 20.sp)
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text("WEEKLY REVIEW RITUAL OVERDUE", fontFamily = FiraCode, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = colors.legendaryGold, letterSpacing = 1.sp)
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text("Run the 6-Step Evaluation Protocol to strip away denial and commit weekly alignment.", fontFamily = Inter, fontSize = 11.sp, color = colors.textSecondary, lineHeight = 15.sp)
+                                }
+                                Text("[ START ]", fontFamily = FiraCode, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = colors.legendaryGold, modifier = Modifier.background(colors.legendaryGold.copy(alpha = 0.15f), RoundedCornerShape(4.dp)).padding(horizontal = 8.dp, vertical = 4.dp))
+                            }
+                        }
+                    }
 
-            // Zone 5: Recovery
-            item(key = "body_status") {
-                BodyStatusSection(
-                    muscles = muscles,
-                    onNavigateToBodyMap = { onNavigate(Screen.BodyMap.route) }
-                )
-            }
+                    DailyOutcomesSection()
 
-            // Zone 6: Intel
-            item(key = "system_feed") { SystemFeedSection(recentFeed = state.recentFeed) }
+                    state.nextBestAction?.let { action ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(colors.shadowSurface)
+                                .border(1.dp, colors.borderFaint, RoundedCornerShape(4.dp))
+                                .clickable { state.nextBestActionRoute?.let { onNavigate(it) } }
+                        ) {
+                            Box(modifier = Modifier.align(Alignment.CenterStart).width(3.dp).fillMaxHeight().background(colors.systemGreen))
+                            Column(modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 12.dp, top = 10.dp, bottom = 10.dp)) {
+                                Text(text = stringResource(R.string.home_next_action), fontFamily = FiraCode, fontSize = 9.sp, color = colors.systemGreen, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                                Spacer(Modifier.height(3.dp))
+                                Text(text = action, fontFamily = Inter, fontSize = 13.sp, color = colors.textPrimary, fontWeight = FontWeight.Medium)
+                            }
+                        }
+                    }
+
+                    WeeklyChallengeSection(
+                        challenges = challenges,
+                        allClaimed = weekly.allClaimed,
+                        onClaimBonus = { axiomViewModel.claimWeeklyBonus() }
+                    )
+
+                    DailyHabitNudgeSection(
+                        log = todayHabitLog,
+                        onClick = { onNavigate(Screen.DailyCheckin.route) }
+                    )
+
+                    com.axiom.app.ui.components.VitalsRow(
+                        viewModel = vitalsViewModel,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    BodyStatusSection(
+                        muscles = muscles,
+                        onNavigateToBodyMap = { onNavigate(Screen.BodyMap.route) }
+                    )
+
+                    SystemFeedSection(recentFeed = state.recentFeed)
+                }
+            }
         }
-
-        // Floating HomeActionBar fixed to bottom center of the container
-        HomeActionBar(
-            onFocusClick = { onNavigate(Screen.Missions.route) },
-            onCheckInClick = { onNavigate(Screen.DailyCheckin.route) },
-            onAddMissionClick = { onNavigate(Screen.AddMission.route) },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 12.dp)
-        )
     }
 }
 

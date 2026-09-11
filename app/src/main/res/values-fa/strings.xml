@@ -670,4 +670,16 @@
     <string name="first_win_continuing">در حال ادامه…</string>
     <string name="first_win_next_title">این حرکت را ادامه بده</string>
     <string name="first_win_next_body">انتخاب کن بعدش چه شود. می‌توانی یک کار کوچک دیگر را زمان‌بندی کنی یا فعلاً تمام کنی.</string>
+
+    <!-- G3-P3 Home Primary Action & Hero Card -->
+    <string name="home_hero_label">مأموریت معنادار بعدی</string>
+    <string name="home_hero_start_mission">شروع مأموریت</string>
+    <string name="home_hero_commit_mission">+ ثبت مأموریت جدید</string>
+    <string name="home_hero_no_mission_desc">هیچ مأموریت فعالی ثبت نشده است. اقدام معنادار بعدی خود را برای پیشبرد اهداف انتخاب کنید.</string>
+    <string name="home_hero_advances_goal">پیشبرد هدف: %s</string>
+    <string name="home_hero_advances_project">پروژه: %s</string>
+    <string name="home_hero_view_all_missions">مشاهده همه مأموریت‌ها</string>
+    <string name="home_secondary_surfaces_title">پروتکل‌ها و وضعیت سلامت</string>
+    <string name="home_secondary_surfaces_expand">نمایش جزئیات</string>
+    <string name="home_secondary_surfaces_collapse">پنهان کردن جزئیات</string>
 </resources>
