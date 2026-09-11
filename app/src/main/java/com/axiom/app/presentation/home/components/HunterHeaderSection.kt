@@ -50,13 +50,13 @@ fun HunterHeaderSection(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(com.axiom.app.ui.theme.AxiomRadius.xl))
             .background(
                 Brush.linearGradient(
-                    colors = listOf(Color(0xFF18211D), Color(0xFF131312))
+                    colors = listOf(colors.shadowSurface, colors.dimSurface)
                 )
             )
-            .border(1.dp, Color(0xFF2A3530), RoundedCornerShape(16.dp))
+            .border(com.axiom.app.ui.theme.AxiomBorder.thin, colors.borderFaint, RoundedCornerShape(com.axiom.app.ui.theme.AxiomRadius.xl))
             .clickable { onNavigateToProfile() }
             .testTag("hunter_header_banner")
             .padding(18.dp)
@@ -87,7 +87,7 @@ fun HunterHeaderSection(
                 text = "▸ $questText",
                 fontFamily = Outfit,
                 fontSize = 11.sp,
-                color = Color(0xFF8C9A8F),
+                color = colors.textSecondary,
                 style = androidx.compose.ui.text.TextStyle(
                     fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
                 ),
@@ -170,9 +170,9 @@ fun HunterHeaderSection(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(9.dp)
-                        .clip(RoundedCornerShape(5.dp))
-                        .background(Color(0xFF0C0E0D))
-                        .border(1.dp, Color(0xFF243029), RoundedCornerShape(5.dp))
+                        .clip(RoundedCornerShape(com.axiom.app.ui.theme.AxiomRadius.s))
+                        .background(colors.voidBlack)
+                        .border(com.axiom.app.ui.theme.AxiomBorder.thin, colors.borderFaint, RoundedCornerShape(com.axiom.app.ui.theme.AxiomRadius.s))
                 ) {
                     if (progress > 0f) {
                         Box(

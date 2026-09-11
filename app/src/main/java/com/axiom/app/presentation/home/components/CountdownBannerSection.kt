@@ -62,8 +62,8 @@ fun CountdownBannerSection(
             .fillMaxWidth()
             .testTag("vehicle_countdown_card"),
         colors = CardDefaults.cardColors(containerColor = colors.shadowSurface),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF2A2724)),
-        shape = RoundedCornerShape(14.dp)
+        border = androidx.compose.foundation.BorderStroke(com.axiom.app.ui.theme.AxiomBorder.thin, colors.borderFaint),
+        shape = RoundedCornerShape(com.axiom.app.ui.theme.AxiomRadius.l)
     ) {
         Column(
             modifier = Modifier.padding(15.dp),
@@ -101,10 +101,10 @@ fun CountdownBannerSection(
                     text = "EDIT START",
                     fontFamily = JetBrainsMono,
                     fontSize = 9.sp,
-                    color = Color(0xFF8C8470),
+                    color = colors.textSecondary,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
-                        .background(colors.legendaryGold.copy(alpha = 0.08f), RoundedCornerShape(5.dp))
+                        .background(colors.legendaryGold.copy(alpha = 0.08f), RoundedCornerShape(com.axiom.app.ui.theme.AxiomRadius.s))
                         .clickable { onEditProgramStart() }
                         .padding(horizontal = 7.dp, vertical = 3.dp)
                 )
@@ -166,9 +166,9 @@ private fun DigitBlock(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 52.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color(0xFF0B0C0B))
-                .border(1.dp, colors.legendaryGold.copy(alpha = 0.35f), RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(AxiomRadius.m))
+                .background(colors.voidBlack)
+                .border(AxiomBorder.thin, colors.legendaryGold.copy(alpha = 0.35f), RoundedCornerShape(AxiomRadius.m))
                 .padding(vertical = 4.dp, horizontal = 2.dp),
             contentAlignment = Alignment.Center
         ) {

@@ -49,13 +49,16 @@ fun NextMissionHeroCard(
 ) {
     val colors = LocalAxiomColors.current
 
-    Card(
+    com.axiom.app.ui.components.AxiomCard(
         modifier = modifier
             .fillMaxWidth()
             .testTag("next_mission_hero_card"),
-        colors = CardDefaults.cardColors(containerColor = colors.shadowSurface),
-        border = androidx.compose.foundation.BorderStroke(1.5.dp, colors.systemGreen.copy(alpha = 0.6f)),
-        shape = RoundedCornerShape(16.dp)
+        accentColor = colors.systemGreen,
+        glowEnabled = true,
+        backgroundColor = colors.shadowSurface,
+        borderColor = colors.systemGreen.copy(alpha = 0.6f),
+        borderWidth = com.axiom.app.ui.theme.AxiomBorder.medium,
+        shape = RoundedCornerShape(com.axiom.app.ui.theme.AxiomRadius.xl)
     ) {
         Column(
             modifier = Modifier

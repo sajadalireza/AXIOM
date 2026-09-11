@@ -21,6 +21,11 @@ data class AxiomColorScheme(
     val textPrimary: Color,
     val textSecondary: Color,
     val textDim: Color,
+    // Status Semantic Roles
+    val statusSuccess: Color = systemGreen,
+    val statusWarning: Color = Color(0xFFE5A83B),
+    val statusError: Color = penaltyRed,
+    val statusInfo: Color = rareBlue,
     // WARRIOR Leverage Tags
     val leverageFoundation: Color,
     val leverageCompound: Color,
@@ -50,6 +55,10 @@ val AxiomDarkColors = AxiomColorScheme(
     textPrimary   = Color(0xFFF0EBE2),
     textSecondary = Color(0xFFA09880),
     textDim       = Color(0xFF5A5448),
+    statusSuccess = Color(0xFF1FAE80),
+    statusWarning = Color(0xFFE5A83B),
+    statusError   = Color(0xFFC04040),
+    statusInfo    = Color(0xFF5189C9),
     // Dark Leverage Tags
     leverageFoundation = Color(0xFF6E6E85),
     leverageCompound   = Color(0xFF188C68),
@@ -82,6 +91,10 @@ val AxiomLightColors = AxiomColorScheme(
     textPrimary   = Color(0xFF1A1812),
     textSecondary = Color(0xFF5A5448),
     textDim       = Color(0xFF8A8270),
+    statusSuccess = Color(0xFF157F5A),
+    statusWarning = Color(0xFFB8781B),
+    statusError   = Color(0xFF9C3030),
+    statusInfo    = Color(0xFF2D5478),
     // Light Leverage Tags
     leverageFoundation = Color(0xFF5A5A6E),
     leverageCompound   = Color(0xFF116A4E),
@@ -96,3 +109,4 @@ val AxiomLightColors = AxiomColorScheme(
 )
 
 val LocalAxiomColors = staticCompositionLocalOf { AxiomDarkColors }
+

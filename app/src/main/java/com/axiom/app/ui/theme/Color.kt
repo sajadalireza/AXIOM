@@ -26,6 +26,10 @@ val CommonGray: Color = AxiomDarkColors.commonGray
 
 // ─── Status ─────────────────────────────────────────────────────
 val PenaltyRed: Color = AxiomDarkColors.penaltyRed
+val StatusSuccess: Color = AxiomDarkColors.statusSuccess
+val StatusWarning: Color = AxiomDarkColors.statusWarning
+val StatusError: Color = AxiomDarkColors.statusError
+val StatusInfo: Color = AxiomDarkColors.statusInfo
 
 // ─── Text ───────────────────────────────────────────────────────
 val TextPrimary: Color = AxiomDarkColors.textPrimary
