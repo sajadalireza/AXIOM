@@ -125,6 +125,28 @@
     <string name="add_mission_power_score">امتیاز تخصیص قدرت</string>
     <string name="add_mission_success_chance">نسبت همسویی برآورد شده: %d%%</string>
     <string name="add_mission_accept">[ تعهد به اجرای مداوم عادت ]</string>
+    <string name="add_mission_quick_create_badge">حالت سریع</string>
+    <string name="add_mission_title_label">عنوان مأموریت</string>
+    <string name="add_mission_title_placeholder">مثال: تدوین نهایی سند معماری سیستم</string>
+    <string name="add_mission_done_condition_label">شرط اتمام (معیار عینی تکمیل)</string>
+    <string name="add_mission_done_condition_placeholder">مثال: ثبت Pull Request همراه با تأیید هر ۴ بررسی</string>
+    <string name="add_mission_context_label">محرک یا بافت اجرا (اختیاری)</string>
+    <string name="add_mission_context_placeholder">مثال: اگر پشت میز نشستم، تایمر تمرکز ۴۵ دقیقه‌ای را فعال کن</string>
+    <string name="add_mission_duration_label">مدت زمان جلسه</string>
+    <string name="add_mission_duration_min">%d دقیقه</string>
+    <string name="add_mission_schedule_label">زمان‌بندی اجرا</string>
+    <string name="add_mission_schedule_now">اکنون</string>
+    <string name="add_mission_schedule_morning">صبح (۰۹:۰۰)</string>
+    <string name="add_mission_schedule_afternoon">بعدازظهر (۱۴:۰۰)</string>
+    <string name="add_mission_schedule_evening">عصر (۱۹:۰۰)</string>
+    <string name="add_mission_evidence_label">سطح شواهد موردنیاز</string>
+    <string name="add_mission_evidence_none">مستقیم (بدون شواهد)</string>
+    <string name="add_mission_evidence_checklist">چک‌لیست (معیارهای دوگانه)</string>
+    <string name="add_mission_evidence_metric">متریک / یادداشت بازتابی</string>
+    <string name="add_mission_advanced_toggle_expand">+ تنظیمات پیشرفته و بازدهی (ROI)</string>
+    <string name="add_mission_advanced_toggle_collapse">- بستن تنظیمات پیشرفته</string>
+    <string name="add_mission_primary_cta">تأیید مأموریت</string>
+    <string name="add_mission_validation_hint">برای تأیید مأموریت، عنوان و شرط اتمام الزامی است</string>
 
     <!-- Mission Card -->
     <string name="mission_complete">تکمیل مأموریت</string>

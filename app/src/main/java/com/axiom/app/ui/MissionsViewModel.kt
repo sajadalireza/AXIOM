@@ -263,6 +263,26 @@ class MissionsViewModel @Inject constructor(
         }
     }
 
+    fun createMissionFromPayload(
+        payload: com.axiom.app.domain.model.MissionAuthoringPayload,
+        onSuccess: (String) -> Unit = {}
+    ) {
+        viewModelScope.launch {
+            if (!payload.isValid) return@launch
+            val missionId = createMissionUseCase(payload)
+            if (payload.logAsCompleted) {
+                completeMission(
+                    id = missionId,
+                    actualHours = payload.estimatedHours,
+                    goalSet = payload.sessionGoalSet,
+                    gotFeedback = payload.sessionGotFeedback,
+                    pushedComfortZone = payload.sessionPushedComfortZone
+                )
+            }
+            onSuccess(missionId)
+        }
+    }
+
     fun createMission(
         title: String,
         track: String,
