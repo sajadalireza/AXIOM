@@ -45,7 +45,8 @@ import com.axiom.app.ui.theme.LocalAxiomColors
 @Composable
 fun RecoveryTimelineBar(
     muscles: List<MuscleGroup>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onMuscleClick: ((MuscleGroup) -> Unit)? = null
 ) {
     val context = LocalContext.current
     val colors = LocalAxiomColors.current
@@ -92,10 +93,11 @@ fun RecoveryTimelineBar(
                 Card(
                     modifier = Modifier
                         .width(160.dp)
-                        .sizeIn(minHeight = 96.dp)
+                        .height(96.dp)
                         .semantics {
                             contentDescription = cardDescription
                         },
+                    onClick = { onMuscleClick?.invoke(muscle) },
                     colors = CardDefaults.cardColors(containerColor = colors.shadowSurface),
                     border = BorderStroke(AxiomBorder.hairline, colors.borderFaint),
                     shape = RoundedCornerShape(AxiomRadius.m)

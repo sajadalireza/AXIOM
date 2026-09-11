@@ -78,9 +78,9 @@
 | Training Session Logging | **PRESERVE** | Preserved workout / set logging directly from muscle detail panel. |
 
 ### C. Remediation of Known Donor Deficiencies
-1. **Bitmap Retinting Jank Loop:** Donor re-ran an expensive 153,600-pixel BFS loop on every frame during bounce animations whenever selection changed. Remediated: Highlight overlay rendered dynamically via native Canvas overlay (< 0.1 ms); bitmap strength tinting offloaded to `Dispatchers.Default` and cached on `(muscles, sex)`.
-2. **First-Frame UI Stall:** Heavy flood-fill decoding in composition caused first-frame jank. Remediated: Background decoding with instant native Compose Canvas vector paths fallback ensuring 0 ms stall.
-3. **Draw-Time Allocations:** Donor instantiated Path objects and region lists during Canvas draw passes. Remediated: Hoisted all anatomical paths and atlas regions into static immutable singletons (`StaticFacePath`, `FrontAtlasRegions`, etc.). Zero heap allocations in draw loop.
+1. **Bitmap Retinting Jank Loop:** Donor re-ran an expensive 153,600-pixel BFS CPU loop on every frame during bounce animations whenever selection changed. Remediated: Highlight overlay decoupled from bitmap pixel loops and rendered dynamically via GPU-accelerated Compose Canvas draw overlay; bitmap strength tinting offloaded to `Dispatchers.Default` and cached on `(muscles, sex)`.
+2. **First-Frame UI Stall:** Heavy flood-fill decoding in main-thread composition caused first-frame UI jank. Remediated: Offloaded image cleaning to background `Dispatchers.Default` coroutines with instant native Compose Canvas vector paths fallback, preventing main-thread layout stalls.
+3. **Draw-Time Allocations:** Donor instantiated Path objects and region lists during Canvas draw passes. Remediated: Hoisted all anatomical paths and atlas regions into static immutable singletons (`StaticFacePath`, `FrontAtlasRegions`, `BackAtlasRegions`), eliminating heap allocations in the `Canvas` draw loop.
 4. **Hardcoded / Off-Brand Palettes:** Donor contained raw hex colors (`0xFF051624`, `0xFF6257F2`, `0xFF6C56F5`, `0xFF12255C`). Remediated: 100% tokenized to `LocalAxiomColors.current` (`systemGreen`, `legendaryGold`, `penaltyRed`, `rareBlue`, `dimSurface`, `shadowSurface`, `borderFaint`, `voidBlack`). Zero raw color literals in production code.
 5. **Forbidden Transfers (§13):** Donor build scripts, static fonts, routing bypasses, personal seed data, and AI egress changes were completely rejected and untransferred.
 

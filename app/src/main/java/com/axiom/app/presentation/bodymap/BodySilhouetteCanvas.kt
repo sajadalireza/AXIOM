@@ -438,10 +438,14 @@ fun BodySilhouetteCanvas(
                         artworkTopTrim
                     ) {
                         detectTapGestures { tapLoc ->
+                            val vw = size.width.toFloat()
+                            val vh = size.height.toFloat()
+                            if (vw <= 0f || vh <= 0f || !vw.isFinite() || !vh.isFinite()) return@detectTapGestures
+
                             val localTap = if (usesFrontArtwork) {
                                 val transform = BodyMapGeometry.artworkTransformFor(
-                                    viewportWidth = size.width.toFloat(),
-                                    viewportHeight = size.height.toFloat(),
+                                    viewportWidth = vw,
+                                    viewportHeight = vh,
                                     sourceWidth = frontArtworkBitmap.width.toFloat(),
                                     sourceHeight = frontArtworkBitmap.height.toFloat(),
                                     topTrim = artworkTopTrim.toFloat(),
@@ -449,10 +453,7 @@ fun BodySilhouetteCanvas(
                                 )
                                 BodyMapGeometry.artworkViewportToAtlas(tapLoc, transform)
                             } else {
-                                val transform = BodyMapGeometry.transformFor(
-                                    size.width.toFloat(),
-                                    size.height.toFloat()
-                                )
+                                val transform = BodyMapGeometry.transformFor(vw, vh)
                                 BodyMapGeometry.viewportToAtlas(tapLoc, transform)
                             }
 
@@ -487,6 +488,10 @@ fun BodySilhouetteCanvas(
                         }
                     }
             ) {
+                if (size.width <= 0f || size.height <= 0f || !size.width.isFinite() || !size.height.isFinite()) {
+                    return@Canvas
+                }
+
                 if (usesFrontArtwork && frontArtworkPainter != null) {
                     val transform = BodyMapGeometry.artworkTransformFor(
                         viewportWidth = size.width,

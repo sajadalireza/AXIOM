@@ -251,6 +251,7 @@ fun BodyMapScreen(
                                     // Recovery Timeline Bar
                                     RecoveryTimelineBar(
                                         muscles = muscles,
+                                        onMuscleClick = { viewModel.selectMuscle(it.id) },
                                         modifier = Modifier.padding(bottom = AxiomSpacing.s)
                                     )
                                 }
