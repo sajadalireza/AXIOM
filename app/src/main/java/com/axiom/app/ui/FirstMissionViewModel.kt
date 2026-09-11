@@ -34,6 +34,42 @@ class FirstMissionViewModel @Inject constructor(
 
     private var isSubmitting = false
 
+    init {
+        // Gate G4: emit Assignment event upon First-Win initialization
+        viewModelScope.launch {
+            val ring = preferences.releaseRingFlow.first().name
+            val variant = preferences.firstWinVariantFlow.first() ?: "CONTROL_DEFAULT"
+            com.axiom.app.core.AnalyticsLogger.log(
+                com.axiom.app.core.CanonicalAnalyticsEvents.FIRST_WIN_ASSIGNED,
+                mapOf(
+                    "treatment_id" to variant,
+                    "template_id" to "FIRST_WIN_ONBOARDING",
+                    "cohort_ring" to ring
+                )
+            )
+        }
+    }
+
+    /**
+     * Gate G4: emit Exposure event when FirstMissionScreen renders.
+     * Assignment and exposure remain strictly segregated.
+     */
+    fun onScreenExposed() {
+        viewModelScope.launch {
+            val ring = preferences.releaseRingFlow.first().name
+            val variant = preferences.firstWinVariantFlow.first() ?: "CONTROL_DEFAULT"
+            com.axiom.app.core.AnalyticsLogger.log(
+                com.axiom.app.core.CanonicalAnalyticsEvents.FIRST_WIN_EXPOSED,
+                mapOf(
+                    "treatment_id" to variant,
+                    "template_id" to "FIRST_WIN_ONBOARDING",
+                    "screen_name" to "FirstMissionScreen",
+                    "cohort_ring" to ring
+                )
+            )
+        }
+    }
+
     fun createAndStart(title: String) {
         val trimmedTitle = title.trim()
         if (trimmedTitle.length < 3) return
@@ -61,7 +97,23 @@ class FirstMissionViewModel @Inject constructor(
                 // WP-205: first-mission-done is now flipped inside CompleteMissionUseCase PHASE C
                 // (gated by the first-win receipt), so completion + onboarding flag are one atomic
                 // authority. No separate setFirstMissionDone here.
-                com.axiom.app.core.AnalyticsLogger.log("onboarding_completed")
+                val ring = preferences.releaseRingFlow.first().name
+                val variant = preferences.firstWinVariantFlow.first() ?: "CONTROL_DEFAULT"
+
+                com.axiom.app.core.AnalyticsLogger.log(
+                    com.axiom.app.core.CanonicalAnalyticsEvents.FIRST_WIN_COMPLETED,
+                    mapOf(
+                        "treatment_id" to variant,
+                        "template_id" to "FIRST_WIN_ONBOARDING",
+                        "duration_seconds" to "1",
+                        "cohort_ring" to ring
+                    )
+                )
+
+                com.axiom.app.core.AnalyticsLogger.log(
+                    "onboarding_completed",
+                    mapOf("cohort_ring" to ring)
+                )
 
                 // Feed the existing XP float animation with the real XP gained
                 if (xpResult != null) {

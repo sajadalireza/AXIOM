@@ -44,6 +44,9 @@ class AnalyticsPayloadPolicyTest {
     // §29/§40 Hard Cap — every sensitive alias MUST be rejected regardless of event.
     @Test fun rejects_missionTitle() { assertTrue(reject("mission_completed", mapOf("title" to "Do 50 pushups")).reason.isNotEmpty()) }
     @Test fun rejects_missionTitle_alias() { assertTrue(reject("mission_completed", mapOf("missionTitle" to "x")).reason.isNotEmpty()) }
+    @Test fun rejects_goalTitle() { assertTrue(reject("wmpu_achieved", mapOf("goal_title" to "Become Fit")).reason.isNotEmpty()) }
+    @Test fun rejects_healthData() { assertTrue(reject("mission_completed", mapOf("health" to "cardiac_info")).reason.isNotEmpty()) }
+    @Test fun rejects_financialData() { assertTrue(reject("mission_completed", mapOf("salary" to "100000")).reason.isNotEmpty()) }
     @Test fun rejects_reflection() { assertTrue(reject("mission_completed", mapOf("reflection" to "I felt strong today")).reason.isNotEmpty()) }
     @Test fun rejects_reflectionText() { assertTrue(reject("mission_completed", mapOf("reflectionText" to "x")).reason.isNotEmpty()) }
     @Test fun rejects_journal() { assertTrue(reject("mission_completed", mapOf("journal" to "x")).reason.isNotEmpty()) }
@@ -56,6 +59,7 @@ class AnalyticsPayloadPolicyTest {
     @Test fun blacklist_isCaseInsensitive() {
         assertTrue(reject("mission_completed", mapOf("REFLECTION" to "x")).reason.isNotEmpty())
         assertTrue(reject("mission_completed", mapOf("Title" to "x")).reason.isNotEmpty())
+        assertTrue(reject("wmpu_achieved", mapOf("GOAL_TITLE" to "x")).reason.isNotEmpty())
     }
 
     @Test fun firstWinCausalPayload_carriesOnlyMissionIdAndXp() {
@@ -69,7 +73,13 @@ class AnalyticsPayloadPolicyTest {
 
     @Test fun catalog_classifiesAllAnalyticsTypes() {
         assertEquals(
-            setOf("mission_completed", "onboarding_completed", "ai_call", "streak_shield_used", "streak_broken", "FIRST_WIN_COMPLETION"),
+            setOf(
+                "mission_completed", "onboarding_completed", "ai_call", "streak_shield_used", "streak_broken",
+                "FIRST_WIN_COMPLETION", "first_win_assigned", "first_win_exposed", "first_win_completed",
+                "onboarding_started", "mission_created", "mission_started", "wmpu_achieved",
+                "weekly_review_exposed", "weekly_review_completed", "experiment_assigned",
+                "experiment_exposed", "operational_error", "integrity_heartbeat"
+            ),
             AnalyticsPayloadPolicy.ANALYTICS_EVENT_TYPES
         )
     }

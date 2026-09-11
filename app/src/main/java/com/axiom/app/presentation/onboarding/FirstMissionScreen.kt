@@ -44,6 +44,10 @@ fun FirstMissionScreen(
     var title by remember { mutableStateOf("") }
     val isButtonEnabled = title.trim().length >= 3 && !loading
 
+    LaunchedEffect(Unit) {
+        viewModel.onScreenExposed()
+    }
+
     LaunchedEffect(done) {
         if (done) {
             onMissionCreatedAndCompleted()

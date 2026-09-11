@@ -62,6 +62,19 @@ class CreateMissionUseCase @Inject constructor(
         )
 
         missionRepository.insertMission(mission)
+
+        val hasGoal = !mission.goalId.isNullOrBlank()
+        val hasKpi = mission.powerScore > 1.0f
+        com.axiom.app.core.AnalyticsLogger.log(
+            com.axiom.app.core.CanonicalAnalyticsEvents.MISSION_CREATED,
+            mapOf(
+                "mission_id" to missionId,
+                "has_goal" to hasGoal,
+                "has_kpi" to hasKpi,
+                "is_custom" to (dungeonId == null)
+            )
+        )
+
         return missionId
     }
 

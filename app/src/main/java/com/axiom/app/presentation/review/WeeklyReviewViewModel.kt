@@ -10,6 +10,7 @@ import com.axiom.app.domain.repository.MissionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -22,6 +23,20 @@ class WeeklyReviewViewModel @Inject constructor(
     private val preferences: AxiomPreferences,
     private val weeklyReviewDao: WeeklyReviewDao
 ) : ViewModel() {
+
+    init {
+        viewModelScope.launch {
+            val ring = preferences.releaseRingFlow.first().name
+            val cycleWeek = com.axiom.app.domain.analytics.WmpuCalculationEngine.currentCycleWeek()
+            com.axiom.app.core.AnalyticsLogger.log(
+                com.axiom.app.core.CanonicalAnalyticsEvents.WEEKLY_REVIEW_EXPOSED,
+                mapOf(
+                    "cycle_week" to cycleWeek,
+                    "cohort_ring" to ring
+                )
+            )
+        }
+    }
 
     val completedMissionsThisWeek: StateFlow<List<Mission>> = missionRepository.getAllMissions()
         .map { missions ->
@@ -91,6 +106,18 @@ class WeeklyReviewViewModel @Inject constructor(
             )
             weeklyReviewDao.insertReview(reviewEntity)
             preferences.setLastReviewTimestamp(now)
+
+            val ring = preferences.releaseRingFlow.first().name
+            val cycleWeek = com.axiom.app.domain.analytics.WmpuCalculationEngine.currentCycleWeek(now)
+            com.axiom.app.core.AnalyticsLogger.log(
+                com.axiom.app.core.CanonicalAnalyticsEvents.WEEKLY_REVIEW_COMPLETED,
+                mapOf(
+                    "cycle_week" to cycleWeek,
+                    "actions_taken" to "1",
+                    "cohort_ring" to ring
+                )
+            )
+
             onComplete()
         }
     }

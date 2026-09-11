@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.axiom.app.domain.model.CharacterStats
 import com.axiom.app.domain.analytics.AnalyticsConsentState
+import com.axiom.app.domain.analytics.ReleaseRing
 import com.axiom.app.ui.theme.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -77,6 +78,9 @@ open class AxiomPreferences @Inject constructor(
         private val FIRST_WIN_ASSIGNED_ELIGIBILITY_VERSION = intPreferencesKey("first_win_assigned_eligibility_version")
         private val FIRST_WIN_ASSIGNMENT_TIMESTAMP = longPreferencesKey("first_win_assignment_timestamp")
         private val FIRST_WIN_REMOTE_KILL_ACTIVE = booleanPreferencesKey("first_win_remote_kill_active")
+        // Gate G4 — Release ring and WMPU tracking
+        private val RELEASE_RING = stringPreferencesKey("release_ring")
+        private val LAST_WMPU_CYCLE_WEEK = intPreferencesKey("last_wmpu_cycle_week")
         private val IS_PREMIUM = booleanPreferencesKey("is_premium")
         private val PREMIUM_PLAN = stringPreferencesKey("premium_plan")
         private val EQUIPPED_PASSIVE_SKILL_ID = stringPreferencesKey("equipped_passive_skill_id")
@@ -531,6 +535,30 @@ open class AxiomPreferences @Inject constructor(
     /** One-shot consent read for the drain worker / atomic-completion snapshot. */
     suspend fun analyticsConsentStateOnce(): AnalyticsConsentState = analyticsConsentStateFlow.first()
 
+    // ---- Gate G4 Beta Telemetry & Cohort (§6) ----
+    val releaseRingFlow: Flow<ReleaseRing> = context.dataStore.data.map { prefs ->
+        try {
+            ReleaseRing.valueOf(prefs[RELEASE_RING] ?: ReleaseRing.ALPHA.name)
+        } catch (e: Exception) {
+            ReleaseRing.ALPHA
+        }
+    }
+
+    suspend fun setReleaseRing(ring: ReleaseRing) {
+        context.dataStore.edit { prefs ->
+            prefs[RELEASE_RING] = ring.name
+        }
+    }
+
+    val lastWmpuCycleWeekFlow: Flow<Int> = context.dataStore.data.map { prefs ->
+        prefs[LAST_WMPU_CYCLE_WEEK] ?: 0
+    }
+
+    suspend fun setLastWmpuCycleWeek(cycleWeek: Int) {
+        context.dataStore.edit { prefs ->
+            prefs[LAST_WMPU_CYCLE_WEEK] = cycleWeek
+        }
+    }
 
     // Language (also saved to SharedPreferences via MainActivity for attachBaseContext)
     val languageFlow: Flow<String> = context.dataStore.data.map { prefs ->

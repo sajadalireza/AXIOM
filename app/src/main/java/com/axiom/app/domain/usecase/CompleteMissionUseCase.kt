@@ -428,10 +428,45 @@ class CompleteMissionUseCase @Inject constructor(
         }
 
         if (result != null) {
+            val hasGoal = !mission.goalId.isNullOrBlank()
             com.axiom.app.core.AnalyticsLogger.log(
                 "mission_completed",
-                mapOf("rarity" to mission.rarity, "xp_gained" to result.hunterXPGained, "leveled_up" to result.leveledUp)
+                mapOf(
+                    "mission_id" to mission.id,
+                    "rarity" to mission.rarity,
+                    "xp_gained" to result.hunterXPGained,
+                    "leveled_up" to result.leveledUp,
+                    "has_goal" to hasGoal,
+                    "contributes_to_wmpu" to hasGoal
+                )
             )
+
+            // Gate G4: evaluate and record WMPU if this completed mission contributes to a Goal
+            if (hasGoal) {
+                try {
+                    val allMissions = missionRepository.getAllMissions().first()
+                    val eval = com.axiom.app.domain.analytics.WmpuCalculationEngine.evaluate(
+                        missions = allMissions,
+                        activeGoalsCount = 1
+                    )
+                    val lastWeek = preferences.lastWmpuCycleWeekFlow.first()
+                    if (com.axiom.app.domain.analytics.WmpuCalculationEngine.shouldEmitWmpuEvent(eval, lastWeek)) {
+                        val ring = preferences.releaseRingFlow.first().name
+                        com.axiom.app.core.AnalyticsLogger.log(
+                            com.axiom.app.core.CanonicalAnalyticsEvents.WMPU_ACHIEVED,
+                            mapOf(
+                                "cycle_week" to eval.cycleWeek,
+                                "meaningful_mission_count" to eval.meaningfulMissionsCount,
+                                "goal_count" to eval.activeGoalsCount,
+                                "cohort_ring" to ring
+                            )
+                        )
+                        preferences.setLastWmpuCycleWeek(eval.cycleWeek)
+                    }
+                } catch (e: Exception) {
+                    // Non-critical telemetry failure must never block or fail mission completion
+                }
+            }
         }
 
         return result
