@@ -48,7 +48,7 @@ class CeremonyViewModel @Inject constructor(
         viewModelScope.launch {
             createMissionUseCase(
                 title = title,
-                track = "Penalty Protocol",
+                track = "Recovery Protocol",
                 rarity = "COMMON",
                 skillId = "",
                 xpReward = xp,

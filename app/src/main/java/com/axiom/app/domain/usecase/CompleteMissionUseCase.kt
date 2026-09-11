@@ -388,6 +388,39 @@ class CompleteMissionUseCase @Inject constructor(
             } catch (e: Exception) { }
         }
 
+        // Gate G5: Check if this mission repaired an active pending streak recovery
+        try {
+            if (mission.track == "Recovery Protocol") {
+                val recoveryState = preferences.streakRecoveryStateFlow.first()
+                if (recoveryState.status == com.axiom.app.domain.streak.RecoveryStatus.PENDING &&
+                    recoveryState.isWithinGrace(now)
+                ) {
+                    val (repairedResult, updatedState) = com.axiom.app.domain.streak.FlexibleStreakEngine.onRecoveryMissionCompleted(
+                        recoveryState = recoveryState,
+                        today = java.time.LocalDate.now()
+                    )
+                    preferences.setStreak(repairedResult.restoredStreak)
+                    preferences.setStreakRecoveryState(updatedState)
+                    val ring = preferences.releaseRingFlow.first().name
+                    com.axiom.app.core.AnalyticsLogger.log(
+                        com.axiom.app.core.CanonicalAnalyticsEvents.STREAK_RECOVERY_COMPLETED,
+                        mapOf(
+                            "streak_length" to repairedResult.restoredStreak,
+                            "recovery_mission_id" to (recoveryState.recoveryMissionId ?: ""),
+                            "cohort_ring" to ring
+                        )
+                    )
+                    systemFeedRepository.emitMessage(
+                        SystemMessage(
+                            id = java.util.UUID.randomUUID().toString(),
+                            message = "⬡ Cadence Restored. Your ${repairedResult.restoredStreak}-day streak is actively re-anchored.",
+                            timestamp = now
+                        )
+                    )
+                }
+            }
+        } catch (e: Exception) { /* Best-effort recovery restoration */ }
+
         // Post-commit, best-effort like every other Phase-C side effect: a throw from a ceremony
         // or system-message sink must not discard the already-durable XPResult (§5/§13).
         try { deferredCeremonies.forEach { ceremonyEngine.emit(it) } } catch (e: Exception) { }

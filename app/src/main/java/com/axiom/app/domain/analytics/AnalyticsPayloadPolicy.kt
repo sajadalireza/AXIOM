@@ -31,7 +31,13 @@ object AnalyticsPayloadPolicy {
         "experiment_assigned",
         "experiment_exposed",
         "operational_error",
-        "integrity_heartbeat"
+        "integrity_heartbeat",
+        "streak_paused",
+        "streak_resumed",
+        "streak_recovery_offered",
+        "streak_recovery_completed",
+        "streak_recovery_expired",
+        "streak_opt_out_changed"
     )
 
     /** Per-event allowlist. A property key MUST appear here (case-sensitive) to be carried. */
@@ -54,7 +60,13 @@ object AnalyticsPayloadPolicy {
         "experiment_assigned" to setOf("experiment_id", "variant_id", "cohort_ring"),
         "experiment_exposed" to setOf("experiment_id", "variant_id", "screen_name", "cohort_ring"),
         "operational_error" to setOf("component", "error_category", "error_code", "status"),
-        "integrity_heartbeat" to setOf("schema_version", "pending_events_count", "cohort_ring", "status")
+        "integrity_heartbeat" to setOf("schema_version", "pending_events_count", "cohort_ring", "status"),
+        "streak_paused" to setOf("days_paused", "resume_date", "cohort_ring"),
+        "streak_resumed" to setOf("reason", "cohort_ring"),
+        "streak_recovery_offered" to setOf("streak_length", "cadence", "cohort_ring"),
+        "streak_recovery_completed" to setOf("streak_length", "recovery_mission_id", "cohort_ring"),
+        "streak_recovery_expired" to setOf("streak_length", "cohort_ring"),
+        "streak_opt_out_changed" to setOf("opt_out_state", "cohort_ring")
     )
 
     /**

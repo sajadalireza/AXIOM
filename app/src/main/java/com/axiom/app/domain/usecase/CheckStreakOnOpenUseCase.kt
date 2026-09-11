@@ -1,12 +1,20 @@
 package com.axiom.app.domain.usecase
 
+import com.axiom.app.core.AnalyticsLogger
+import com.axiom.app.core.CanonicalAnalyticsEvents
 import com.axiom.app.data.local.AxiomPreferences
 import com.axiom.app.domain.model.SystemMessage
 import com.axiom.app.domain.repository.SystemFeedRepository
+import com.axiom.app.domain.streak.FlexibleStreakEngine
+import com.axiom.app.domain.streak.RecoveryStatus
+import com.axiom.app.domain.streak.StreakEvaluationResult
 import com.axiom.app.presentation.ceremony.CeremonyEngine
 import com.axiom.app.presentation.ceremony.CeremonyEvent
 import kotlinx.coroutines.flow.first
-import java.util.Calendar
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.util.UUID
 import javax.inject.Inject
 
 class CheckStreakOnOpenUseCase @Inject constructor(
@@ -16,45 +24,115 @@ class CheckStreakOnOpenUseCase @Inject constructor(
 ) {
     suspend operator fun invoke() {
         preferences.resetWeeklyIfNeeded()
-        val currentStreak  = preferences.streakFlow.first()
+
+        // Opt-out guard
+        val isTrackingEnabled = preferences.streakTrackingEnabledFlow.first()
+        if (!isTrackingEnabled) return
+
+        val currentStreak = preferences.streakFlow.first()
         preferences.setWeeklyStreakBest(currentStreak)
-        val lastComplete   = preferences.lastCompleteTimestampFlow.first()
-        val now            = System.currentTimeMillis()
+        val lastComplete = preferences.lastCompleteTimestampFlow.first()
+        val nowMillis = System.currentTimeMillis()
+        val nowDate = LocalDate.now()
+        val lastActivityDate = if (lastComplete > 0L) {
+            Instant.ofEpochMilli(lastComplete).atZone(ZoneId.systemDefault()).toLocalDate()
+        } else null
 
-        if (lastComplete == 0L || currentStreak == 0) return
+        val cadence = preferences.streakCadenceFlow.first()
+        val pauseState = preferences.streakPauseStateFlow.first()
+        val availableShields = preferences.streakFreezeFlow.first()
+        val recoveryState = preferences.streakRecoveryStateFlow.first()
 
-        if (!isSameDay(lastComplete, now) && !isYesterday(lastComplete, now)) {
-            if (currentStreak >= 1 && preferences.consumeStreakFreeze()) {
-                val remaining = preferences.streakFreezeFlow.first()
-                ceremonyEngine.emit(CeremonyEvent.StreakShieldUsed(currentStreak, remaining))
-                com.axiom.app.core.AnalyticsLogger.log("streak_shield_used", mapOf("streak_length" to currentStreak))
+        val (evalResult, updatedRecoveryState) = FlexibleStreakEngine.evaluateStreak(
+            now = nowDate,
+            nowMillis = nowMillis,
+            lastActivityDate = lastActivityDate,
+            currentStreak = currentStreak,
+            cadence = cadence,
+            pauseState = pauseState,
+            availableShields = availableShields,
+            recoveryState = recoveryState,
+            isStreakTrackingEnabled = isTrackingEnabled
+        )
+
+        preferences.setStreakRecoveryState(updatedRecoveryState)
+
+        when (evalResult) {
+            is StreakEvaluationResult.OptedOut,
+            is StreakEvaluationResult.RestDay,
+            is StreakEvaluationResult.Paused -> {
+                // Streak preserved without penalty
+                return
+            }
+            is StreakEvaluationResult.ShieldUsed -> {
+                preferences.consumeStreakFreeze()
+                ceremonyEngine.emit(CeremonyEvent.StreakShieldUsed(currentStreak, evalResult.remainingShields))
+                AnalyticsLogger.log(
+                    "streak_shield_used",
+                    mapOf("streak_length" to currentStreak)
+                )
                 feedRepository.emitMessage(
                     SystemMessage(
-                        id = java.util.UUID.randomUUID().toString(),
+                        id = UUID.randomUUID().toString(),
                         message = "⬡ Streak Shield activated. $currentStreak-day streak preserved.",
-                        timestamp = now
+                        timestamp = nowMillis
                     )
                 )
-                return  // streak survives — do NOT reset
+                return
             }
-            preferences.setStreak(0)
-            if (currentStreak >= 1) {
-                ceremonyEngine.emit(CeremonyEvent.StreakBroken(currentStreak))
-                com.axiom.app.core.AnalyticsLogger.log("streak_broken", mapOf("streak_length" to currentStreak))
+            is StreakEvaluationResult.GraceRecoveryOffered -> {
+                ceremonyEngine.emit(CeremonyEvent.StreakBroken(evalResult.frozenStreak))
+                AnalyticsLogger.log(
+                    CanonicalAnalyticsEvents.STREAK_RECOVERY_OFFERED,
+                    mapOf(
+                        "streak_length" to evalResult.frozenStreak,
+                        "cadence" to cadence.type.name
+                    )
+                )
+                feedRepository.emitMessage(
+                    SystemMessage(
+                        id = UUID.randomUUID().toString(),
+                        message = "⬡ Cadence interrupted. 48-hour recovery window active. Complete a recovery mission to restore your streak.",
+                        timestamp = nowMillis
+                    )
+                )
+                return
             }
-            return
+            is StreakEvaluationResult.Broken -> {
+                preferences.setStreak(0)
+                if (recoveryState.status == RecoveryStatus.PENDING) {
+                    AnalyticsLogger.log(
+                        CanonicalAnalyticsEvents.STREAK_RECOVERY_EXPIRED,
+                        mapOf("streak_length" to evalResult.previousStreak)
+                    )
+                }
+                if (evalResult.previousStreak >= 1) {
+                    ceremonyEngine.emit(CeremonyEvent.StreakBroken(evalResult.previousStreak))
+                    AnalyticsLogger.log(
+                        "streak_broken",
+                        mapOf("streak_length" to evalResult.previousStreak)
+                    )
+                }
+                return
+            }
+            is StreakEvaluationResult.Repaired -> {
+                return
+            }
+            is StreakEvaluationResult.Active -> {
+                checkMilestones(currentStreak, nowMillis)
+            }
         }
+    }
 
-        // Streak intact — check milestones (7, 14, 21, 30, 60, 90, 180, 365)
-        val milestones  = listOf(7, 14, 21, 30, 60, 90, 180, 365)
-        val lastShown   = preferences.lastShownStreakMilestoneFlow.first()
+    private suspend fun checkMilestones(currentStreak: Int, now: Long) {
+        val milestones = listOf(7, 14, 21, 30, 60, 90, 180, 365)
+        val lastShown = preferences.lastShownStreakMilestoneFlow.first()
         val newMilestone = milestones
             .filter { it <= currentStreak && it > lastShown }
             .maxOrNull()
 
-        // Guard: only fire once per milestone level
         if (newMilestone != null) {
-            preferences.setLastShownStreakMilestone(newMilestone)   // set BEFORE emit
+            preferences.setLastShownStreakMilestone(newMilestone)
             val label = when (newMilestone) {
                 7    -> "CONSECRATION PROTOCOL"
                 14   -> "DOMINANCE PROTOCOL"
@@ -85,29 +163,15 @@ class CheckStreakOnOpenUseCase @Inject constructor(
                 } else {
                     "⬡ Streak Protocol $label achieved. Your $currentStreak-day streak is now an asset worth protecting."
                 }
-                feedRepository.emitMessage(SystemMessage(
-                    id        = java.util.UUID.randomUUID().toString(),
-                    message   = finalMsg,
-                    timestamp = now
-                ))
+                feedRepository.emitMessage(
+                    SystemMessage(
+                        id = UUID.randomUUID().toString(),
+                        message = finalMsg,
+                        timestamp = now
+                    )
+                )
             }
         }
     }
-
-    private fun isSameDay(t1: Long, t2: Long): Boolean {
-        if (t1 == 0L || t2 == 0L) return false
-        val cal1 = Calendar.getInstance().apply { timeInMillis = t1 }
-        val cal2 = Calendar.getInstance().apply { timeInMillis = t2 }
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
-    }
-
-    private fun isYesterday(t1: Long, t2: Long): Boolean {
-        if (t1 == 0L || t2 == 0L) return false
-        val cal1 = Calendar.getInstance().apply { timeInMillis = t1 }
-        val cal2 = Calendar.getInstance().apply { timeInMillis = t2 }
-        cal1.add(Calendar.DAY_OF_YEAR, 1)
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
-    }
 }
+

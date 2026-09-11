@@ -28,14 +28,14 @@ import com.axiom.app.ui.components.neonGlow
 import com.axiom.app.ui.components.StreakShieldIndicator
 import kotlinx.coroutines.delay
 
-private data class PenaltyOption(
+private data class RecoveryOption(
     val titleEn: String,
     val titleFa: String,
     val descEn: String,
     val descFa: String,
     val rewardText: String,
-    val penaltyTextEn: String,
-    val penaltyTextFa: String,
+    val recoveryHintEn: String,
+    val recoveryHintFa: String,
     val xpToAdd: Int
 )
 
@@ -56,47 +56,47 @@ fun StreakBrokenOverlay(
 
     val isFa = stringResource(id = R.string.setup_lang_fa) == "فارسی"
 
-    val penaltyOptions = remember {
+    val recoveryOptions = remember {
         listOf(
-            PenaltyOption(
-                titleEn = "Protocol 404: System Calibration",
-                titleFa = "[ پروتکل ۴۰۴: کالیبره‌سازی زیرآرایه‌ها ]",
-                descEn = "Perform manual calibration logs on memory buffers and review system indices.",
-                descFa = "بررسی پارامترهای توجه و هم‌ترازی مجدد ریجسترهای حافظه سیستم برای هم‌گام‌سازی مجدد جریان اطلاعات.",
-                rewardText = "+10 XP",
-                penaltyTextEn = "Negative temporal lag added temporarily.",
-                penaltyTextFa = "جریمه داستانی: افزوده شدن تاخیر زمانی موقت در گزارش تحلیل‌ها.",
-                xpToAdd = 10
-            ),
-            PenaltyOption(
-                titleEn = "Gravity Chamber: 5G Discipline",
-                titleFa = "[ اتاق گرانش: شرطی‌سازی توان منفی ]",
-                descEn = "Perform 100 physical repetitions or a high-resistance deep focus cycle.",
-                descFa = "جبران نقض پروتکل دوره گذشته با انجام ۱۰۰ تکرار فیزیکی یا جلسه تمرکز عمیق با مقاومت شبیه‌سازی شده.",
+            RecoveryOption(
+                titleEn = "Momentum Re-anchor: Core Goal Action",
+                titleFa = "[ لنگر مجدد شتاب: اقدام محوری هدف ]",
+                descEn = "Execute one concrete action advancing your active primary Goal.",
+                descFa = "یک اقدام ملموس برای پیشبرد هدف اصلی خود انجام دهید و ریتم خود را بازیابی کنید.",
                 rewardText = "+15 XP",
-                penaltyTextEn = "High pressure conditioning. Temporary performance reduction.",
-                penaltyTextFa = "جریمه داستانی: فشار جاذبه مصنوعی سنگین بر نرخ سرعت رشد اولیه.",
+                recoveryHintEn = "Focuses attention on the next immediate win.",
+                recoveryHintFa = "تمرکز مجدد روی پیروزی ملموس بعدی.",
                 xpToAdd = 15
             ),
-            PenaltyOption(
-                titleEn = "Data Purification: Chrono-Logs",
-                titleFa = "[ پاکسازی داده‌ها: بازرسی بسته‌های زمانی ]",
-                descEn = "Manually extract code fragments from corrupted telemetry records.",
-                descFa = "کاوش در قطعات زمانی از دست رفته روزهای گذشته برای استخراج و بازسازی فاز کدهای معیوب تله‌متری.",
-                rewardText = "+5 XP",
-                penaltyTextEn = "Requires tedious static telemetry checks.",
-                penaltyTextFa = "جریمه داستانی: نیاز به بررسی‌های خسته‌کننده تله‌متری ایستا.",
-                xpToAdd = 5
+            RecoveryOption(
+                titleEn = "Deep Focus Re-calibration: 15-min Session",
+                titleFa = "[ تنظیم مجدد تمرکز: چرخه ۱۵ دقیقه‌ای ]",
+                descEn = "Perform an uninterrupted 15-minute deep focus session on high-priority work.",
+                descFa = "یک جلسه تمرکز عمیق ۱۵ دقیقه‌ای بدون حواس‌پرتی روی کار دارای اولویت بالا انجام دهید.",
+                rewardText = "+15 XP",
+                recoveryHintEn = "Rebuilds working memory and deep work capacity.",
+                recoveryHintFa = "بازسازی ظرفیت کار عمیق و حافظه کاری.",
+                xpToAdd = 15
+            ),
+            RecoveryOption(
+                titleEn = "Reflection & Alignment: Log Lesson & Intention",
+                titleFa = "[ بازاندیشی و هم‌راستایی: ثبت درس و قصد ]",
+                descEn = "Record what caused the pause and define one constructive boundary.",
+                descFa = "علت وقفه را بدون سرزنش بررسی کرده و یک حد مرزی سازنده برای فردا ثبت کنید.",
+                rewardText = "+10 XP",
+                recoveryHintEn = "Turns interruption into permanent learning.",
+                recoveryHintFa = "تبدیل وقفه به داده و یادگیری ماندگار.",
+                xpToAdd = 10
             )
         )
     }
 
     val infiniteTransition = rememberInfiniteTransition(label = "streak_warning_blink")
     val warningBlinkAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
+        initialValue = 0.4f,
         targetValue = 1.0f,
         animationSpec = infiniteRepeatable(
-            animation = tween(400, easing = LinearEasing),
+            animation = tween(500, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "blink_alpha"
@@ -111,15 +111,12 @@ fun StreakBrokenOverlay(
             contentAlphaState = v
         }
 
-        // 1.5 seconds on Screen 1
         delay(1500)
         if (currentScreen == 1) {
             currentScreen = 2
         }
 
-        // 1.5 seconds on Screen 2
         delay(1500)
-        // If they don't have a shield, auto-advance to Screen 3. If they have one, pause to let them choose.
         if (currentScreen == 2 && shieldCount <= 0) {
             currentScreen = 3
         }
@@ -152,13 +149,13 @@ fun StreakBrokenOverlay(
         ) {
             when (currentScreen) {
                 1 -> {
-                    // SCREEN 1: THE CRACKED LOSS
+                    // SCREEN 1: DIGNITY & CADENCE CHECK-IN
                     Spacer(modifier = Modifier.height(32.dp))
-                    
+
                     Text(
-                        text = "⚡ SYSTEM BREACH DETECTED ⚡",
+                        text = if (isFa) "⚡ توقف موقت ریتم ⚡" else "⚡ CADENCE INTERRUPTED ⚡",
                         style = SystemMsg.copy(
-                            color = colors.penaltyRed,
+                            color = colors.statusWarning,
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 2.sp
                         ),
@@ -168,22 +165,22 @@ fun StreakBrokenOverlay(
                     Spacer(modifier = Modifier.height(40.dp))
 
                     Text(
-                        text = "💔🔥",
+                        text = "⏳⬡",
                         fontSize = 72.sp,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.neonGlow(colors.penaltyRed, intensity = 0.5f)
+                        modifier = Modifier.neonGlow(colors.statusWarning, intensity = 0.4f)
                     )
 
                     Spacer(modifier = Modifier.height(32.dp))
 
                     Text(
-                        text = "STREAK BROKEN",
+                        text = if (isFa) "ریتم متوقف شد" else "RHYTHM PAUSED",
                         style = DisplayL.copy(
-                            color = colors.penaltyRed,
+                            color = colors.statusWarning,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center
                         ),
-                        modifier = Modifier.neonGlow(colors.penaltyRed, intensity = 0.3f)
+                        modifier = Modifier.neonGlow(colors.statusWarning, intensity = 0.3f)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -191,15 +188,15 @@ fun StreakBrokenOverlay(
                     Text(
                         text = "$lostStreak",
                         style = HudXL.copy(
-                            color = colors.penaltyRed,
+                            color = colors.statusWarning,
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 80.sp
                         ),
-                        modifier = Modifier.neonGlow(colors.penaltyRed, intensity = 0.2f)
+                        modifier = Modifier.neonGlow(colors.statusWarning, intensity = 0.2f)
                     )
 
                     Text(
-                        text = "DAYS LOST",
+                        text = if (isFa) "روز پیشرفت ساخته‌شده" else "DAYS ACHIEVED",
                         style = HudS.copy(color = colors.textSecondary),
                         textAlign = TextAlign.Center
                     )
@@ -207,7 +204,7 @@ fun StreakBrokenOverlay(
                     Spacer(modifier = Modifier.height(48.dp))
 
                     Text(
-                        text = "TAP TO SCAN FOR MITIGATION STATUS",
+                        text = if (isFa) "برای بررسی گزینه‌های بازیابی ضربه بزنید" else "TAP TO SCAN FOR RECOVERY STATUS",
                         style = SystemMsg.copy(color = colors.textDim),
                         modifier = Modifier.alpha(warningBlinkAlpha)
                     )
@@ -218,7 +215,7 @@ fun StreakBrokenOverlay(
                     Spacer(modifier = Modifier.height(32.dp))
 
                     Text(
-                        text = "SCANNING SYSTEM REGISTER...",
+                        text = if (isFa) "در حال بررسی وضعیت بازیابی..." else "SCANNING RECOVERY STATUS...",
                         style = SystemMsg.copy(
                             color = if (shieldCount > 0) colors.systemGlint else colors.commonGray,
                             fontWeight = FontWeight.Bold
@@ -229,7 +226,7 @@ fun StreakBrokenOverlay(
                     Spacer(modifier = Modifier.height(32.dp))
 
                     Text(
-                        text = "SHIELD AVAILABLE?",
+                        text = if (isFa) "سپر شناختی موجود است؟" else "SHIELD AVAILABLE?",
                         style = DisplayL.copy(
                             color = if (shieldCount > 0) colors.systemGlint else colors.textPrimary,
                             fontWeight = FontWeight.Bold,
@@ -252,7 +249,7 @@ fun StreakBrokenOverlay(
 
                     if (shieldCount > 0) {
                         Text(
-                            text = "A STREAK SHIELD CAN PREVENT LOSS.\nDO YOU WISH TO ACTIVATE IT NOW?",
+                            text = if (isFa) "سپر زنجیره می‌تواند ریتم شما را حفظ کند.\nآیا مایلید آن را فعال کنید؟" else "A STREAK SHIELD CAN PRESERVE YOUR CADENCE.\nDO YOU WISH TO ACTIVATE IT NOW?",
                             fontFamily = JetBrainsMono,
                             fontSize = 12.sp,
                             color = colors.textPrimary,
@@ -275,7 +272,7 @@ fun StreakBrokenOverlay(
                                 .neonGlow(colors.systemGlint, intensity = 0.3f)
                         ) {
                             Text(
-                                text = "YES, ACTIVATE SHIELD",
+                                text = if (isFa) "بله، فعال‌سازی سپر" else "YES, ACTIVATE SHIELD",
                                 style = HudS.copy(fontWeight = FontWeight.Bold, color = colors.voidBlack)
                             )
                         }
@@ -287,13 +284,13 @@ fun StreakBrokenOverlay(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                text = "NO, ACCEPT PROTOCOL RESET",
+                                text = if (isFa) "خیر، ورود به پنجره بازیابی" else "NO, PROCEED TO RECOVERY",
                                 style = HudS.copy(color = colors.textDim)
                             )
                         }
                     } else {
                         Text(
-                            text = "NO COGNITIVE SHIELDS DETECTED.\nTHE CHRONO-LOGS MUST RESET.",
+                            text = if (isFa) "سپری در رجیستر یافت نشد.\nپنجره ۴۸ ساعته بازیابی برای بازسازی ریتم فعال شد." else "NO COGNITIVE SHIELDS DETECTED.\n48-HOUR GRACE RECOVERY WINDOW ACTIVATED.",
                             fontFamily = JetBrainsMono,
                             fontSize = 12.sp,
                             color = colors.commonGray,
@@ -316,7 +313,7 @@ fun StreakBrokenOverlay(
                                 .border(1.dp, colors.borderFaint, RoundedCornerShape(4.dp))
                         ) {
                             Text(
-                                text = "PROCEED TO PROTOCOL CALIBRATION",
+                                text = if (isFa) "ورود به مأموریت‌های بازیابی" else "PROCEED TO RECOVERY MISSIONS",
                                 style = HudS.copy(fontWeight = FontWeight.Bold)
                             )
                         }
@@ -324,11 +321,11 @@ fun StreakBrokenOverlay(
                 }
 
                 3 -> {
-                    // SCREEN 3: CALIBRATION DISCIPLINE & EMOTIONAL RECOVERY
+                    // SCREEN 3: MEANINGFUL RECOVERY & EMOTIONAL STRENGTH
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "WARRIOR, YOU RESTART FROM DAY 1.\nBUT YOUR STRENGTH REMAINS.",
+                        text = if (isFa) "مهارت‌ها و دستاوردهای شما دائمی هستند.\nریتم خود را با یک اقدام واقعی بازسازی کنید." else "WARRIOR, YOUR CAPABILITIES ARE PERMANENT.\nRESTORE YOUR CADENCE WITH REAL EFFORT.",
                         fontFamily = Fraunces,
                         fontStyle = FontStyle.Italic,
                         fontSize = 18.sp,
@@ -342,7 +339,7 @@ fun StreakBrokenOverlay(
                     Spacer(modifier = Modifier.height(18.dp))
 
                     Text(
-                        text = "REBUILD YOUR MOMENTUM BY ACCEPTING A SYSTEM CALIBRATION PROTOCOL:",
+                        text = if (isFa) "یک مأموریت بازیابی انتخاب کنید تا ریتم شما بازسازی شود:" else "SELECT A GOAL-ALIGNED RECOVERY MISSION TO RESTORE YOUR CADENCE:",
                         style = HudS.copy(color = colors.textSecondary, fontSize = 10.sp),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(horizontal = 8.dp)
@@ -355,10 +352,10 @@ fun StreakBrokenOverlay(
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        penaltyOptions.forEachIndexed { index, option ->
+                        recoveryOptions.forEachIndexed { index, option ->
                             val isSelected = selectedOptionIndex == index
-                            val cardBorderColor = if (isSelected) colors.penaltyRed else colors.borderFaint
-                            val cardBg = if (isSelected) colors.penaltyRed.copy(alpha = 0.12f) else colors.shadowSurface
+                            val cardBorderColor = if (isSelected) colors.systemGlint else colors.borderFaint
+                            val cardBg = if (isSelected) colors.systemGlint.copy(alpha = 0.12f) else colors.shadowSurface
 
                             Column(
                                 modifier = Modifier
@@ -381,20 +378,20 @@ fun StreakBrokenOverlay(
                                         text = if (isFa) option.titleFa else option.titleEn,
                                         fontFamily = JetBrainsMono,
                                         fontSize = 11.sp,
-                                        color = if (isSelected) colors.penaltyRed else colors.textPrimary,
+                                        color = if (isSelected) colors.systemGlint else colors.textPrimary,
                                         fontWeight = FontWeight.Bold
                                     )
                                     Box(
                                         modifier = Modifier
-                                            .background(colors.penaltyRed.copy(alpha = 0.2f), RoundedCornerShape(2.dp))
-                                            .border(0.5.dp, colors.penaltyRed, RoundedCornerShape(2.dp))
+                                            .background(colors.systemGlint.copy(alpha = 0.2f), RoundedCornerShape(2.dp))
+                                            .border(0.5.dp, colors.systemGlint, RoundedCornerShape(2.dp))
                                             .padding(horizontal = 6.dp, vertical = 2.dp)
                                     ) {
                                         Text(
                                             text = option.rewardText,
                                             fontFamily = JetBrainsMono,
                                             fontSize = 9.sp,
-                                            color = colors.penaltyRed,
+                                            color = colors.systemGlint,
                                             fontWeight = FontWeight.Bold
                                         )
                                     }
@@ -405,7 +402,7 @@ fun StreakBrokenOverlay(
                                         text = option.titleEn,
                                         fontFamily = JetBrainsMono,
                                         fontSize = 9.sp,
-                                        color = colors.penaltyRed.copy(alpha = 0.7f)
+                                        color = colors.systemGlint.copy(alpha = 0.7f)
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(4.dp))
@@ -418,7 +415,7 @@ fun StreakBrokenOverlay(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "⚠ " + (if (isFa) option.penaltyTextFa else option.penaltyTextEn),
+                                    text = "⬡ " + (if (isFa) option.recoveryHintFa else option.recoveryHintEn),
                                     fontFamily = Inter,
                                     fontSize = 9.sp,
                                     color = colors.textDim,
@@ -433,22 +430,22 @@ fun StreakBrokenOverlay(
                     // Action Buttons
                     Button(
                         onClick = {
-                            val opt = penaltyOptions[selectedOptionIndex]
+                            val opt = recoveryOptions[selectedOptionIndex]
                             onAcceptPenalty(opt.titleEn, opt.xpToAdd)
                             onDismissAndNavigateToMissions()
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = colors.penaltyRed,
+                            containerColor = colors.systemGlint,
                             contentColor = colors.voidBlack
                         ),
                         shape = RoundedCornerShape(4.dp),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(48.dp)
-                            .neonGlow(colors.penaltyRed, intensity = 0.3f)
+                            .neonGlow(colors.systemGlint, intensity = 0.3f)
                     ) {
                         Text(
-                            text = if (isFa) "پذیرش جریمه و کالیبراسیون" else "ACCEPT CALIBRATION & RESTART",
+                            text = if (isFa) "پذیرش مأموریت و بازیابی ریتم" else "ACCEPT RECOVERY MISSION & RESTORE",
                             style = HudS.copy(fontWeight = FontWeight.Bold, color = colors.voidBlack)
                         )
                     }
