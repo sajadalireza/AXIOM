@@ -31,6 +31,7 @@ fun CaliberInsightsView(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val colors = LocalAxiomColors.current
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -269,13 +270,13 @@ fun CaliberInsightsView(
         if (weakestMuscle != null) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0x11FF5555)),
-                border = BorderStroke(1.dp, Color(0x33FF5555))
+                colors = CardDefaults.cardColors(containerColor = colors.penaltyRed.copy(alpha = 0.1f)),
+                border = BorderStroke(1.dp, colors.penaltyRed.copy(alpha = 0.25f))
             ) {
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
                         text = "⚠️ اولویت کالیبراسیون و ضعف عضلانی",
-                        color = Color(0xFFFF5555),
+                        color = colors.penaltyRed,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
                     )
