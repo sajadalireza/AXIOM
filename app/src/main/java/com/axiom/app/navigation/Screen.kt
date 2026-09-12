@@ -2,6 +2,7 @@ package com.axiom.app.navigation
 
 sealed class Screen(val route: String) {
     object Setup : Screen("setup")
+    object MomentumBridge : Screen("momentum_bridge")
     object Splash : Screen("splash")
     object Activation : Screen("activation")
     object Onboarding : Screen("onboarding")

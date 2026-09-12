@@ -112,11 +112,18 @@ fun AwakenNavGraph(
         composable(Screen.Setup.route) {
             com.axiom.app.presentation.setup.LanguageThemeSetupScreen(
                 onSetupComplete = {
-                    navController.navigate(Screen.Splash.route) {
+                    navController.navigate(Screen.MomentumBridge.route) {
                         popUpTo(Screen.Setup.route) { inclusive = true }
                     }
-                    // Recreate activity to apply new locale, then splash handles routing
-                    (navController.context as? android.app.Activity)?.recreate()
+                }
+            )
+        }
+        composable(Screen.MomentumBridge.route) {
+            com.axiom.app.presentation.onboarding.MomentumBridgeScreen(
+                onContinue = {
+                    navController.navigate(Screen.FirstWin.route) {
+                        popUpTo(Screen.MomentumBridge.route) { inclusive = true }
+                    }
                 }
             )
         }

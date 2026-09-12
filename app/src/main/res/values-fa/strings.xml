@@ -42,22 +42,22 @@
     <string name="nav_skill_tree">درخت مهارت</string>
 
     <!-- Setup Screen (first launch) -->
-    <string name="setup_welcome">[ سیستم‌عامل WARRIOR ]</string>
+    <string name="setup_welcome">پروتکل بیداری سیستم AXIOM</string>
     <string name="setup_language_title">زبان واسط کاربری</string>
     <string name="setup_language_subtitle">زبان رابط کاربری خود را انتخاب کنید</string>
     <string name="setup_lang_en">English</string>
     <string name="setup_lang_fa">فارسی</string>
-    <string name="setup_theme_title">تم فرماندهی را انتخاب کنید</string>
-    <string name="setup_theme_system">سیستم فرماندهی</string>
+    <string name="setup_theme_title">انتخاب پوسته</string>
+    <string name="setup_theme_system">سیستم</string>
     <string name="setup_theme_light">روشن</string>
     <string name="setup_theme_dark">تاریک</string>
-    <string name="setup_continue">[ راه‌اندازی هسته سیستم‌عامل ]</string>
+    <string name="setup_continue">پذیرش و ورود به سیستم</string>
     <string name="setup_language_label">زبان</string>
     <string name="setup_theme_label">پوسته</string>
 
     <!-- Splash -->
-    <string name="splash_subtitle">سیستم‌عامل وریر</string>
-    <string name="splash_initializing">[ در حال بارگذاری سیستم‌عامل WARRIOR… ]</string>
+    <string name="splash_subtitle">سیستم AXIOM</string>
+    <string name="splash_initializing">در حال بارگذاری سیستم AXIOM…</string>
 
     <!-- Onboarding -->
     <string name="onboarding_continue">[ ادامه ]</string>
@@ -752,4 +752,49 @@
     <string name="strength_1rm_weight_label">وزنه جابجا شده (کیلوگرم)</string>
     <string name="strength_1rm_reps_label">تعداد تکرار اجرا شده</string>
     <string name="strength_1rm_result_label">تخمین رکورد تک‌تکرار (1RM)</string>
+
+    <!-- WP-UIUX-01 Exact Onboarding References Copy (Persian) -->
+    <string name="launch_tagline_1">گام‌های کوچک.</string>
+    <string name="launch_tagline_2">پیشرفت واقعی.</string>
+    <string name="launch_btn_begin">شروع</string>
+    <string name="lang_choose_title">زبان خود را انتخاب کنید</string>
+    <string name="lang_choose_subtitle">می‌توانید بعداً این را تغییر دهید.</string>
+    <string name="lang_english">English</string>
+    <string name="lang_persian">فارسی</string>
+    <string name="btn_continue">ادامه</string>
+    <string name="momentum_title_1">شتاب بسازید،</string>
+    <string name="momentum_title_2">گام‌به‌گام</string>
+    <string name="momentum_subtitle">اکسیوم طراحی شده تا به شما کمک کند\nتمرکز کنید، عمل کنید و رو به جلو پیش بروید.</string>
+    <string name="momentum_footer">می‌توانید بعداً تنظیمات را تغییر دهید.</string>
+    <string name="first_win_step_indicator">گام %1$d از %2$d</string>
+    <string name="first_win_step1_title_1">یک پیروزی کوچک\nدر کجا </string>
+    <string name="first_win_step1_title_gold">بیشترین کمک</string>
+    <string name="first_win_step1_title_2"> را می‌کند؟</string>
+    <string name="first_win_step1_subtitle">یک حوزه را برای شروع انتخاب کنید.</string>
+    <string name="first_win_area_work_desc">پیش بردن یک کار.</string>
+    <string name="first_win_area_study_desc">یادگیری یک موضوع مهم.</string>
+    <string name="first_win_area_health_desc">حمایت از تندرستی خود.</string>
+    <string name="first_win_area_personal_desc">سبک‌تر کردن احساس زندگی.</string>
+    <string name="first_win_step2_title_1">یک اقدام کوچک\n</string>
+    <string name="first_win_step2_title_gold">انتخاب کنید</string>
+    <string name="first_win_step2_subtitle">یک کار مشخص و آسان برای انجام امروز انتخاب کنید.</string>
+    <string name="first_win_step2_input_placeholder">اقدام کوچک خود را اینجا بنویسید...</string>
+    <string name="first_win_step2_examples_header">نمونه‌ها</string>
+    <string name="first_win_example_1">پاسخ به\nیک ایمیل</string>
+    <string name="first_win_example_2">خواندن ۲\nصفحه</string>
+    <string name="first_win_example_3">۱۰ دقیقه\nپیاده‌روی</string>
+    <string name="first_win_step3_title_1">حالا اقدام کوچک خود را\n</string>
+    <string name="first_win_step3_title_gold">انجام دهید.</string>
+    <string name="first_win_step3_instruction">وقتی انجام شد، آن را کامل علامت بزنید.</string>
+    <string name="first_win_step3_btn">انجامش دادم</string>
+    <string name="first_win_duration_estimate">۵–۱۰ دقیقه</string>
+    <string name="first_win_step4_title_gold">عالی بود!</string>
+    <string name="first_win_step4_title_2">اولین اقدام خود را\nتکمیل کردید.</string>
+    <string name="first_win_stat_action">اقدام</string>
+    <string name="first_win_stat_completed">تکمیل شد</string>
+    <string name="first_win_stat_time">زمان</string>
+    <string name="first_win_stat_progress">پیشرفت</string>
+    <string name="first_win_quote">«گام‌های کوچک، شتاب بزرگ.»</string>
+    <string name="first_win_quote_author">— اکسیوم</string>
+    <string name="first_win_btn_home">بازگشت به خانه</string>
 </resources>

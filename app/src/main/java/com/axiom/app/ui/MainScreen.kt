@@ -266,62 +266,13 @@ fun MainScreen(
                 }
             )
 
-            val isSplash = currentRoute == Screen.Splash.route
-            val shouldShowXionWidget = shouldShowBottomBar || isSplash
+            val shouldShowXionWidget = shouldShowBottomBar && currentRoute != Screen.Splash.route
 
             if (shouldShowXionWidget) {
                 BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                    val avatarScale = remember { Animatable(0f) }
-                    var splashMood by remember { mutableStateOf(XionMood.GLITCHED) }
-
-                    LaunchedEffect(currentRoute) {
-                        if (isSplash) {
-                            avatarScale.snapTo(0f)
-                            splashMood = XionMood.GLITCHED
-                            delay(1200)
-
-                            launch {
-                                splashMood = XionMood.GLITCHED
-                                delay(150)
-                                splashMood = XionMood.THINKING
-                                delay(300)
-                                splashMood = XionMood.EXCITED
-                                delay(150)
-                                splashMood = XionMood.HAPPY
-                            }
-
-                            avatarScale.animateTo(
-                                targetValue = 1f,
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                                    stiffness = Spring.StiffnessLow
-                                )
-                            )
-                        } else {
-                            avatarScale.snapTo(1f)
-                        }
-                    }
-
-                    val avatarSize by animateDpAsState(
-                        targetValue = if (isSplash) 160.dp else 62.dp,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessLow
-                        ),
-                        label = "avatar_size"
-                    )
-
-                    val targetX = if (isSplash) {
-                        (maxWidth - avatarSize) / 2
-                    } else {
-                        maxWidth - avatarSize - 16.dp
-                    }
-
-                    val targetY = if (isSplash) {
-                        (maxHeight - avatarSize) / 2 + 60.dp
-                    } else {
-                        maxHeight - avatarSize - (if (isTimerActive) 80.dp else 24.dp)
-                    }
+                    val avatarSize = 62.dp
+                    val targetX = maxWidth - avatarSize - 16.dp
+                    val targetY = maxHeight - avatarSize - (if (isTimerActive) 80.dp else 24.dp)
 
                     val animatedX by animateDpAsState(
                         targetValue = targetX,
@@ -345,9 +296,6 @@ fun MainScreen(
                         onNavigate = { route ->
                             safeNavigate(route)
                         },
-                        isSplashMode = isSplash,
-                        splashScale = avatarScale.value,
-                        splashMood = splashMood,
                         modifier = Modifier
                             .size(avatarSize)
                             .offset(x = animatedX, y = animatedY)
