@@ -38,7 +38,9 @@ val Outfit = FontFamily(
     Font(R.font.outfit_variable, FontWeight.Light, variationSettings = FontVariation.Settings(FontVariation.weight(300))),
     Font(R.font.outfit_variable, FontWeight.Normal, variationSettings = FontVariation.Settings(FontVariation.weight(400))),
     Font(R.font.outfit_variable, FontWeight.Medium, variationSettings = FontVariation.Settings(FontVariation.weight(500))),
-    Font(R.font.outfit_variable, FontWeight.SemiBold, variationSettings = FontVariation.Settings(FontVariation.weight(600)))
+    Font(R.font.outfit_variable, FontWeight.SemiBold, variationSettings = FontVariation.Settings(FontVariation.weight(600))),
+    Font(R.font.outfit_variable, FontWeight.Bold, variationSettings = FontVariation.Settings(FontVariation.weight(700))),
+    Font(R.font.outfit_variable, FontWeight.Black, variationSettings = FontVariation.Settings(FontVariation.weight(900)))
 )
 
 // ─────────────────────────────────────────────

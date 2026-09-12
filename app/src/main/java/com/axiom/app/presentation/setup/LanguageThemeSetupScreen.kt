@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,11 +18,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.axiom.app.ui.components.AxiomPillButton
+import com.axiom.app.ui.components.AxiomWordmarkHeader
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -95,176 +103,196 @@ fun LanguageThemeSetupScreen(
     var selectedLang by remember { mutableStateOf("en") }
     var selectedTheme by remember { mutableStateOf(ThemeMode.DARK) }
 
-    // Entrance animation
-    var visible by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { delay(120); visible = true }
+    val layoutDir = if (selectedLang == "fa") LayoutDirection.Rtl else LayoutDirection.Ltr
 
-    val alpha by animateFloatAsState(
-        targetValue = if (visible) 1f else 0f,
-        animationSpec = tween(500), label = "fade"
-    )
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDir) {
+        AwakenTheme(themeMode = selectedTheme) {
+            val colors = LocalAxiomColors.current
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(colors.voidBlack)
+            ) {
+                // Upper Atmospheric Light Arc from 02_language_selection.png
+                Image(
+                    painter = painterResource(R.drawable.bg_language_header),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.TopCenter)
+                )
 
-    // Wrap the screen content inside an instant local AwakenTheme to preview the selected theme!
-    AwakenTheme(themeMode = selectedTheme) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(LocalAxiomColors.current.voidBlack)
-                .alpha(alpha),
-            contentAlignment = Alignment.Center
-        ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 28.dp),
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 24.dp, vertical = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(32.dp)
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
+                Spacer(modifier = Modifier.height(16.dp))
 
-                // ── Logo ──────────────────────────────
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "AXIOM",
-                        fontFamily = JetBrainsMono,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 42.sp,
-                        color = TextPrimary,
-                        letterSpacing = 6.sp
-                    )
-                    Spacer(Modifier.height(6.dp))
-                    Text(
-                        text = localizedString(R.string.setup_welcome, selectedLang),
-                        fontFamily = JetBrainsMono,
-                        fontSize = 11.sp,
-                        color = SystemGreen,
-                        letterSpacing = 3.sp
-                    )
-                }
-
-                // ── Language ─────────────────────────
-                SetupSection(label = localizedString(R.string.setup_language_label, selectedLang)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                // Middle: Titles and Language Cards
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    // Header text
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        ChoiceChip(
-                            text = "English",
-                            selected = selectedLang == "en",
-                            modifier = Modifier.weight(1f)
-                        ) { selectedLang = "en" }
-                        ChoiceChip(
-                            text = "فارسی",
-                            selected = selectedLang == "fa",
-                            modifier = Modifier.weight(1f)
-                        ) { selectedLang = "fa" }
+                        Text(
+                            text = localizedString(R.string.lang_choose_title, selectedLang),
+                            fontFamily = Outfit,
+                            fontWeight = FontWeight.Light,
+                            fontSize = 30.sp,
+                            color = colors.textPrimary,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = localizedString(R.string.lang_choose_subtitle, selectedLang),
+                            fontFamily = Outfit,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 15.sp,
+                            color = colors.textSecondary,
+                            textAlign = TextAlign.Center
+                        )
                     }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // English Card (with Big Ben artwork)
+                    LanguageCard(
+                        title = "English",
+                        artDrawableId = R.drawable.art_big_ben,
+                        artDescription = "Big Ben",
+                        isSelected = selectedLang == "en",
+                        onClick = { selectedLang = "en" }
+                    )
+
+                    // Persian Card (with Azadi Tower artwork)
+                    LanguageCard(
+                        title = "فارسی",
+                        artDrawableId = R.drawable.art_azadi_tower,
+                        artDescription = "Azadi Tower",
+                        isSelected = selectedLang == "fa",
+                        onClick = { selectedLang = "fa" }
+                    )
                 }
 
-                // ── Theme ─────────────────────────────
-                SetupSection(label = localizedString(R.string.setup_theme_label, selectedLang)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        listOf(
-                            ThemeMode.SYSTEM to localizedString(R.string.setup_theme_system, selectedLang),
-                            ThemeMode.LIGHT  to localizedString(R.string.setup_theme_light, selectedLang),
-                            ThemeMode.DARK   to localizedString(R.string.setup_theme_dark, selectedLang)
-                        ).forEach { (mode, label) ->
-                            ChoiceChip(
-                                text = label,
-                                selected = selectedTheme == mode,
-                                modifier = Modifier.weight(1f)
-                              ) { selectedTheme = mode }
-                        }
-                    }
-                }
-
-                // ── Begin button ──────────────────────
-                Box(
+                // Bottom: Continue CTA
+                AxiomPillButton(
+                    text = localizedString(R.string.btn_continue, selectedLang),
+                    onClick = {
+                        viewModel.completeSetup(
+                            lang = selectedLang,
+                            theme = selectedTheme,
+                            onDone = onSetupComplete
+                        )
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 52.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(SystemGreen)
-                        .clickable {
-                            viewModel.completeSetup(
-                                lang = selectedLang,
-                                theme = selectedTheme,
-                                onDone = onSetupComplete
-                            )
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = localizedString(R.string.setup_continue, selectedLang),
-                        fontFamily = JetBrainsMono,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        color = VoidBlack,
-                        letterSpacing = 2.sp,
-                        textAlign = TextAlign.Center,
-                        maxLines = 2,
-                        softWrap = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp, vertical = 8.dp),
-                    )
-                }
+                        .padding(bottom = 12.dp)
+                )
             }
         }
     }
 }
-
-// ── Helpers ──────────────────────────────────
-
-@Composable
-private fun SetupSection(
-    label: String,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        Text(
-            text = label,
-            fontFamily = JetBrainsMono,
-            fontSize = 10.sp,
-            color = TextDim,
-            letterSpacing = 3.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-        content()
-    }
 }
 
 @Composable
-private fun ChoiceChip(
-    text: String,
-    selected: Boolean,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
+private fun LanguageCard(
+    title: String,
+    artDrawableId: Int,
+    artDescription: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val bg = if (selected) SystemGreen.copy(alpha = 0.15f) else Color.Transparent
-    val border = if (selected) SystemGreen else BorderFaint
+    val cardShape = RoundedCornerShape(20.dp)
+    val borderColor = if (isSelected) Color(0xFF2EE6A8) else Color(0x334E655C)
+    val borderWidth = if (isSelected) 1.5.dp else 1.dp
+    val bgBrush = if (isSelected) {
+        androidx.compose.ui.graphics.Brush.verticalGradient(
+            listOf(
+                Color(0xEE092019),
+                Color(0xFA04120E)
+            )
+        )
+    } else {
+        androidx.compose.ui.graphics.Brush.verticalGradient(
+            listOf(
+                Color(0xCC0A1411),
+                Color(0xEE060C0A)
+            )
+        )
+    }
 
     Box(
         modifier = modifier
-            .height(44.dp)
-            .clip(RoundedCornerShape(4.dp))
-            .background(bg)
-            .border(1.dp, border, RoundedCornerShape(4.dp))
-            .clickable(onClick = onClick),
+            .fillMaxWidth()
+            .heightIn(min = 96.dp)
+            .clip(cardShape)
+            .background(bgBrush)
+            .border(BorderStroke(borderWidth, borderColor), cardShape)
+            .clickable(
+                role = androidx.compose.ui.semantics.Role.RadioButton,
+                onClick = onClick
+            )
+            .padding(horizontal = 20.dp, vertical = 14.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = text,
-            fontFamily = JetBrainsMono,
-            fontSize = 12.sp,
-            color = if (selected) SystemGreen else TextSecondary,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-            textAlign = TextAlign.Center
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Left: Architectural artwork
+            Image(
+                painter = painterResource(artDrawableId),
+                contentDescription = artDescription,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(width = 72.dp, height = 68.dp)
+            )
+
+            // Center: Language Name
+            Text(
+                text = title,
+                fontFamily = Outfit,
+                fontWeight = FontWeight.Normal,
+                fontSize = 22.sp,
+                color = if (isSelected) Color(0xFFF0FDF8) else Color(0xFFD1DDD7),
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            // Right: Glowing Radio Indicator
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(androidx.compose.foundation.shape.CircleShape)
+                    .border(
+                        width = if (isSelected) 2.dp else 1.5.dp,
+                        color = if (isSelected) Color(0xFF2EE6A8) else Color(0x667A8C84),
+                        shape = androidx.compose.foundation.shape.CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isSelected) {
+                    Box(
+                        modifier = Modifier
+                            .size(12.dp)
+                            .clip(androidx.compose.foundation.shape.CircleShape)
+                            .background(Color(0xFF2EE6A8))
+                    )
+                }
+            }
+        }
     }
 }

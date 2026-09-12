@@ -42,22 +42,22 @@
     <string name="nav_skill_tree">SKILL STACK</string>
 
     <!-- Setup Screen (first launch) -->
-    <string name="setup_welcome">[ WARRIOR OS ]</string>
+    <string name="setup_welcome">SYSTEM AWAKENING PROTOCOL</string>
     <string name="setup_language_title">SELECT LANGUAGE</string>
     <string name="setup_language_subtitle">Choose your interface language</string>
     <string name="setup_lang_en">English</string>
     <string name="setup_lang_fa">Persian</string>
-    <string name="setup_theme_title">SELECT COMMAND THEME</string>
-    <string name="setup_theme_system">COMMAND</string>
+    <string name="setup_theme_title">SELECT THEME</string>
+    <string name="setup_theme_system">SYSTEM</string>
     <string name="setup_theme_light">LIGHT</string>
     <string name="setup_theme_dark">DARK</string>
-    <string name="setup_continue">[ INITIALIZE SYSTEM ]</string>
+    <string name="setup_continue">ACCEPT AWAKENING</string>
     <string name="setup_language_label">LANGUAGE</string>
     <string name="setup_theme_label">THEME</string>
 
     <!-- Splash -->
-    <string name="splash_subtitle">WARRIOR OS</string>
-    <string name="splash_initializing">[ WARRIOR OS LOADING… ]</string>
+    <string name="splash_subtitle">AXIOM SYSTEM</string>
+    <string name="splash_initializing">AWAKENING SYSTEM…</string>
 
     <!-- Onboarding -->
     <string name="onboarding_continue">[ CONTINUE ]</string>
@@ -752,4 +752,49 @@
     <string name="strength_1rm_weight_label">Weight Lifted (kg)</string>
     <string name="strength_1rm_reps_label">Repetitions Completed</string>
     <string name="strength_1rm_result_label">Estimated 1RM</string>
+
+    <!-- WP-UIUX-01 Exact Onboarding References Copy -->
+    <string name="launch_tagline_1">Small steps.</string>
+    <string name="launch_tagline_2">Real progress.</string>
+    <string name="launch_btn_begin">Begin</string>
+    <string name="lang_choose_title">Choose your language</string>
+    <string name="lang_choose_subtitle">You can change this later.</string>
+    <string name="lang_english">English</string>
+    <string name="lang_persian">فارسی</string>
+    <string name="btn_continue">Continue</string>
+    <string name="momentum_title_1">Build momentum,</string>
+    <string name="momentum_title_2">one step at a time</string>
+    <string name="momentum_subtitle">AXIOM is designed to help you\nfocus, act, and keep moving forward.</string>
+    <string name="momentum_footer">You can change settings later.</string>
+    <string name="first_win_step_indicator">Step %1$d of %2$d</string>
+    <string name="first_win_step1_title_1">Where would </string>
+    <string name="first_win_step1_title_gold">one small</string>
+    <string name="first_win_step1_title_2">\nwin help most?</string>
+    <string name="first_win_step1_subtitle">Choose one area to focus on first.</string>
+    <string name="first_win_area_work_desc">Move a task forward.</string>
+    <string name="first_win_area_study_desc">Learn something important.</string>
+    <string name="first_win_area_health_desc">Support your well-being.</string>
+    <string name="first_win_area_personal_desc">Make life feel lighter.</string>
+    <string name="first_win_step2_title_1">Choose one\n</string>
+    <string name="first_win_step2_title_gold">small action</string>
+    <string name="first_win_step2_subtitle">Pick something specific and easy to finish today.</string>
+    <string name="first_win_step2_input_placeholder">Type your small action here...</string>
+    <string name="first_win_step2_examples_header">Examples</string>
+    <string name="first_win_example_1">Reply to\none email</string>
+    <string name="first_win_example_2">Read 2\npages</string>
+    <string name="first_win_example_3">Take a\n10-minute walk</string>
+    <string name="first_win_step3_title_1">Now do your\n</string>
+    <string name="first_win_step3_title_gold">small action.</string>
+    <string name="first_win_step3_instruction">When you’re done, mark it complete.</string>
+    <string name="first_win_step3_btn">I finished it</string>
+    <string name="first_win_duration_estimate">5–10 min</string>
+    <string name="first_win_step4_title_gold">Great job!</string>
+    <string name="first_win_step4_title_2">You completed\nyour first action.</string>
+    <string name="first_win_stat_action">Action</string>
+    <string name="first_win_stat_completed">Completed</string>
+    <string name="first_win_stat_time">Time</string>
+    <string name="first_win_stat_progress">Progress</string>
+    <string name="first_win_quote">“Small steps, big momentum.”</string>
+    <string name="first_win_quote_author">— AXIOM</string>
+    <string name="first_win_btn_home">Back to Home</string>
 </resources>
