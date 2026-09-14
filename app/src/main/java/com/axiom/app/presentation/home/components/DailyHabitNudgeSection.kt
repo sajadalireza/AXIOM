@@ -9,9 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.axiom.app.R
 import com.axiom.app.data.local.entity.DailyHabitLogEntity
 import com.axiom.app.ui.theme.*
 
@@ -88,7 +90,7 @@ fun DailyHabitNudgeSection(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "$water / 8 gl",
+                        text = stringResource(R.string.home_habit_water_format, water, 8),
                         fontFamily = FiraCode,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,

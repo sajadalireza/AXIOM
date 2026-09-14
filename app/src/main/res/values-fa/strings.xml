@@ -6,7 +6,7 @@
     <string name="privacy_policy_link">حریم خصوصی</string>
 
     <!-- Navigation -->
-    <string name="nav_home">کارت</string>
+    <string name="nav_home">خانه</string>
     <string name="nav_missions">مأموریت‌ها</string>
     <string name="nav_dungeons">اسپرینت‌ها</string>
     <string name="nav_gates">مأموریت‌ها</string>
@@ -94,6 +94,16 @@
     <string name="home_system_error">خطای انتقال تلماتری هسته اصلی</string>
     <string name="home_awaiting_mission">[ OS ] در حالت انتظار. اولین جلسه تمرکز را آغاز کنید.</string>
     <string name="home_xp_active">%s برابر ضریب تکانه‌ فعال است</string>
+    <string name="home_body_status_title">وضعیت بدن</string>
+    <string name="home_system_feed_title">رویدادهای سیستم</string>
+    <string name="home_system_feed_empty">فعالیت تازه‌ای وجود ندارد</string>
+    <string name="home_active_mission_stage_boss">نبرد باس</string>
+    <string name="home_active_mission_stage">مرحله %1$d</string>
+    <string name="home_active_mission_quick_complete_cd">تکمیل سریع</string>
+    <string name="home_vitals_teeth">دندان</string>
+    <string name="home_vitals_teeth_complete">کامل</string>
+    <string name="home_vitals_teeth_pending">ناتمام</string>
+    <string name="home_habit_water_format">%1$d / %2$d لیوان</string>
 
     <!-- Missions -->
     <string name="missions_title">عادت‌ها و جلسات کالیبره‌شده</string>
@@ -693,17 +703,35 @@
     <string name="first_win_next_title">این حرکت را ادامه بده</string>
     <string name="first_win_next_body">انتخاب کن بعدش چه شود. می‌توانی یک کار کوچک دیگر را زمان‌بندی کنی یا فعلاً تمام کنی.</string>
 
-    <!-- G3-P3 Home Primary Action & Hero Card -->
+    <!-- G3-P3 & WP-UIUX-02 Home Primary Action & Hero Card -->
     <string name="home_hero_label">مأموریت معنادار بعدی</string>
+    <string name="home_hero_active_label">مأموریت فعال</string>
     <string name="home_hero_start_mission">شروع مأموریت</string>
+    <string name="home_hero_complete_mission">تکمیل مأموریت</string>
+    <string name="home_hero_continue_mission">ادامه مأموریت</string>
     <string name="home_hero_commit_mission">+ ثبت مأموریت جدید</string>
     <string name="home_hero_no_mission_desc">هیچ مأموریت فعالی ثبت نشده است. اقدام معنادار بعدی خود را برای پیشبرد اهداف انتخاب کنید.</string>
     <string name="home_hero_advances_goal">پیشبرد هدف: %s</string>
     <string name="home_hero_advances_project">پروژه: %s</string>
-    <string name="home_hero_view_all_missions">مشاهده همه مأموریت‌ها</string>
+    <string name="home_hero_view_all_missions">مشاهده همه مأموریت‌ها ←</string>
+    <string name="home_hero_timed_sprint">ماراتن زمان‌دار</string>
+    <string name="home_hero_duration_minutes">%d دقیقه</string>
+    <string name="home_hero_duration_hours">%d ساعت</string>
+    <string name="home_hero_duration_hours_mins">%1$d ساعت و %2$d دقیقه</string>
+    <string name="home_hero_duration_unspecified">—</string>
+    <string name="home_hero_xp_reward_format">+%d امتیاز تجربه</string>
+    <string name="home_hunter_profile_cd">پروفایل هانتر: %1$s، رتبه %2$s، سطح %3$d</string>
+    <string name="home_hunter_profile_icon_cd">پروفایل</string>
+    <string name="home_hunter_default_name">هانتر</string>
+    <string name="home_hunter_xp_format">%1$d / %2$d امتیاز تجربه</string>
+    <string name="home_weekly_review_overdue_title">مرور هفتگی به تعویق افتاده</string>
+    <string name="home_weekly_review_overdue_desc">پروتکل ارزیابی ۶ مرحله‌ای را برای هماهنگی اهداف هفته اجرا کنید.</string>
+    <string name="home_weekly_review_start">شروع</string>
     <string name="home_secondary_surfaces_title">پروتکل‌ها و وضعیت سلامت</string>
     <string name="home_secondary_surfaces_expand">نمایش جزئیات</string>
     <string name="home_secondary_surfaces_collapse">پنهان کردن جزئیات</string>
+    <string name="home_momentum_and_streak">پیشرفت و استمرار</string>
+    <string name="home_streak_day_count">%d روز استمرار</string>
 
     <!-- WP-BODY-01 Body Map Integration & Accessibility -->
     <string name="bodymap_title">هسته اطلس فیزیولوژیک کالیبر</string>
@@ -797,4 +825,10 @@
     <string name="first_win_quote">«گام‌های کوچک، شتاب بزرگ.»</string>
     <string name="first_win_quote_author">— اکسیوم</string>
     <string name="first_win_btn_home">بازگشت به خانه</string>
+
+    <!-- Main HUD (app shell telemetry strip) -->
+    <string name="main_hud_level">⚔ سطح %1$d</string>
+    <string name="main_hud_xp">%1$d/%2$d تجربه</string>
+    <string name="main_hud_streak">🔥 %1$d روز</string>
+    <string name="main_hud_rank">رتبه: %1$s</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.axiom.app.presentation.home.components
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.axiom.app.R
 import com.axiom.app.domain.model.MuscleGroup
 import com.axiom.app.ui.theme.*
+import java.util.Locale
 
 @Composable
 fun BodyStatusSection(
@@ -45,7 +47,7 @@ fun BodyStatusSection(
         // Muscle Recovery Tactical Mini-Grid
         if (muscles.isNotEmpty()) {
             Text(
-                text = "BIOLOGICAL HARDWARE STATUS",
+                text = stringResource(R.string.home_body_status_title),
                 fontFamily = FiraCode,
                 fontSize = 11.sp,
                 color = colors.textDim,
@@ -85,7 +87,7 @@ fun BodyStatusSection(
                             ) {
                                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                     Text(
-                                        text = muscle.displayName.uppercase(),
+                                        text = localizedMuscleName(muscle).uppercase(),
                                         fontFamily = FiraCode,
                                         fontSize = 9.sp,
                                         fontWeight = FontWeight.Bold,
@@ -142,10 +144,18 @@ private fun CombatReadinessWidget(
     val freshestGroup = muscles.maxByOrNull { com.axiom.app.domain.engine.MuscleEngine.calculateFreshness(it.lastTrainedAt, it.recoveryWindowHours, now) }
     val fatiguedGroup = muscles.minByOrNull { com.axiom.app.domain.engine.MuscleEngine.calculateFreshness(it.lastTrainedAt, it.recoveryWindowHours, now) }
 
-    val freshestName = freshestGroup?.displayName ?: (if (isFa) "عضلات" else "Muscles")
+    val freshestName = if (freshestGroup != null) {
+        localizedMuscleName(freshestGroup)
+    } else {
+        if (isFa) "عضلات" else "Muscles"
+    }
     val freshestFreshness = freshestGroup?.let { com.axiom.app.domain.engine.MuscleEngine.calculateFreshness(it.lastTrainedAt, it.recoveryWindowHours, now) } ?: 100f
 
-    val fatiguedName = fatiguedGroup?.displayName ?: (if (isFa) "هیچ‌کدام" else "None")
+    val fatiguedName = if (fatiguedGroup != null) {
+        localizedMuscleName(fatiguedGroup)
+    } else {
+        if (isFa) "هیچ‌کدام" else "None"
+    }
     val fatiguedFreshness = fatiguedGroup?.let { com.axiom.app.domain.engine.MuscleEngine.calculateFreshness(it.lastTrainedAt, it.recoveryWindowHours, now) } ?: 100f
 
     val lastTrained = fatiguedGroup?.lastTrainedAt
@@ -250,4 +260,34 @@ private fun CombatReadinessWidget(
             }
         }
     }
+}
+
+/**
+ * Presentation-layer localization of the system muscle taxonomy.
+ *
+ * The system seeds a fixed set of stable [MuscleGroup.id] values. Mapping those IDs to
+ * localized string resources keeps Persian Home free of system-seeded English muscle
+ * names. Unknown/custom IDs resolve to null so callers fall back to the stored
+ * [MuscleGroup.displayName].
+ *
+ * Uses the same canonical `muscle_<id>` resource convention as the Body Atlas, so no
+ * domain, data, seed or schema value is modified.
+ */
+@StringRes
+internal fun muscleLabelResId(muscleId: String): Int? = when (muscleId.trim().lowercase(Locale.ROOT)) {
+    "chest" -> R.string.muscle_chest
+    "back" -> R.string.muscle_back
+    "shoulders" -> R.string.muscle_shoulders
+    "biceps" -> R.string.muscle_biceps
+    "triceps" -> R.string.muscle_triceps
+    "legs" -> R.string.muscle_legs
+    "core" -> R.string.muscle_core
+    "forearms" -> R.string.muscle_forearms
+    else -> null
+}
+
+@Composable
+private fun localizedMuscleName(muscle: MuscleGroup): String {
+    val resId = muscleLabelResId(muscle.id)
+    return if (resId != null) stringResource(resId) else muscle.displayName
 }

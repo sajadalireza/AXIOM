@@ -13,10 +13,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.axiom.app.R
 import com.axiom.app.domain.model.Hunter
 import com.axiom.app.ui.theme.*
 import androidx.compose.foundation.Canvas
@@ -79,7 +81,7 @@ fun MainHUDContent(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = "⚔ Lv.${hunter.level}",
+                text = stringResource(R.string.main_hud_level, hunter.level),
                 style = HudS,
                 fontFamily = FiraCode,
                 color = colors.systemGreen,
@@ -122,7 +124,7 @@ fun MainHUDContent(
             )
 
             Text(
-                text = "${hunter.currentXP}/${hunter.xpToNextLevel} XP",
+                text = stringResource(R.string.main_hud_xp, hunter.currentXP, hunter.xpToNextLevel),
                 style = HudSmall,
                 fontFamily = FiraCode,
                 color = colors.textSecondary
@@ -135,7 +137,7 @@ fun MainHUDContent(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = "🔥 ${streak}d",
+                text = stringResource(R.string.main_hud_streak, streak),
                 style = HudS,
                 fontFamily = FiraCode,
                 color = LegendaryGold,
@@ -151,7 +153,7 @@ fun MainHUDContent(
         ) {
             val displayRank = hunter.rankLabel.replace("-Rank", "").trim()
             Text(
-                text = "RANK: $displayRank",
+                text = stringResource(R.string.main_hud_rank, displayRank),
                 style = HudSmall,
                 fontFamily = FiraCode,
                 color = resolvedRankColor,

@@ -10,9 +10,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.axiom.app.R
 import com.axiom.app.domain.model.SystemMessage
 import com.axiom.app.ui.components.SystemMessageItem
 import com.axiom.app.ui.theme.*
@@ -30,7 +32,7 @@ fun SystemFeedSection(
     ) {
         // Section Header
         Text(
-            text = "SYSTEM INTELLIGENCE FEED",
+            text = stringResource(R.string.home_system_feed_title),
             fontFamily = FiraCode,
             fontSize = 11.sp,
             color = colors.textDim,
@@ -49,7 +51,7 @@ fun SystemFeedSection(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "NO INTEL FEED DETECTED",
+                    text = stringResource(R.string.home_system_feed_empty),
                     fontFamily = FiraCode,
                     fontSize = 11.sp,
                     color = colors.textDim,

@@ -33,6 +33,17 @@ import com.axiom.app.ui.VitalsViewModel
 import com.axiom.app.ui.theme.*
 import java.util.Calendar
 
+/**
+ * High-fidelity, calm premium Home content architecture.
+ *
+ * Implements the 4-layer hierarchy specified in WP-UIUX-02:
+ * - LAYER 1 — NOW: Compact Hunter identity, Next Meaningful Mission (single primary CTA), active mission state.
+ * - LAYER 2 — TODAY: Daily Outcomes, Next Best Action, Daily Habit Nudge, Vitals Row, Program Countdown.
+ * - LAYER 3 — PROGRESS: Momentum & Streak 7-day timeline, Weekly Review Overdue, Weekly Challenges, Body Recovery Status.
+ * - LAYER 4 — SECONDARY / PROGRESSIVE DISCLOSURE: Operational Tracks, System Feed inside collapsible section.
+ *
+ * Preserves 100% of existing Home capabilities with zero data/domain mutations.
+ */
 @Composable
 fun SuccessContent(
     state: HomeUiState.Success,
@@ -54,7 +65,9 @@ fun SuccessContent(
     val lastReviewTimestamp by viewModel.lastReviewTimestampFlow.collectAsStateWithLifecycle(initialValue = 0L)
     val vehicleProgramStartDate by viewModel.vehicleProgramStartDateFlow.collectAsStateWithLifecycle(initialValue = 0L)
 
-    val actualStartDate = remember(vehicleProgramStartDate) { if (vehicleProgramStartDate == 0L) System.currentTimeMillis() else vehicleProgramStartDate }
+    val actualStartDate = remember(vehicleProgramStartDate) {
+        if (vehicleProgramStartDate == 0L) System.currentTimeMillis() else vehicleProgramStartDate
+    }
 
     val isReviewOverdue = remember(lastReviewTimestamp) {
         val now = System.currentTimeMillis()
@@ -100,21 +113,21 @@ fun SuccessContent(
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 24.dp),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 96.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Zone 1: Identity & Hunter Header
+            // ─────────────────────────────────────────────────────────────────
+            // LAYER 1 — NOW (Identity, Center of Gravity, Primary Action)
+            // ─────────────────────────────────────────────────────────────────
             item(key = "identity") {
                 HunterHeaderSection(
                     hunter = state.hunter,
                     streakDays = state.streakDays,
                     streakMultiplier = state.streakMultiplier,
-                    onNavigateToProfile = { onNavigate(Screen.Profile.route) },
-                    onNavigateToPremium = { onNavigate(Screen.Premium.route) }
+                    onNavigateToProfile = { onNavigate(Screen.Profile.route) }
                 )
             }
 
-            // Zone 2: Next Meaningful Mission Hero Card (Center of Gravity & Single Primary CTA)
             item(key = "next_meaningful_mission") {
                 val primaryMission = state.topMissions.firstOrNull()
                 NextMissionHeroCard(
@@ -133,7 +146,6 @@ fun SuccessContent(
                 )
             }
 
-            // Subordinate Mission Strip (for secondary active missions if > 1)
             if (state.topMissions.size > 1) {
                 item(key = "other_missions") {
                     ActiveMissionStrip(
@@ -147,82 +159,170 @@ fun SuccessContent(
                 }
             }
 
-            // Zone 3: Collapsible Secondary Surfaces
-            item(key = "secondary_surfaces") {
-                SecondarySurfacesSection(initiallyExpanded = false) {
+            // ─────────────────────────────────────────────────────────────────
+            // LAYER 2 — TODAY (Daily Outcomes, Next Best Action, Habits, Vitals)
+            // ─────────────────────────────────────────────────────────────────
+            item(key = "daily_outcomes") {
+                DailyOutcomesSection()
+            }
+
+            state.nextBestAction?.let { action ->
+                item(key = "next_best_action") {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(colors.shadowSurface)
+                            .border(1.dp, colors.borderFaint, RoundedCornerShape(16.dp))
+                            .clickable { state.nextBestActionRoute?.let { onNavigate(it) } }
+                            .padding(16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .width(3.dp)
+                                    .height(36.dp)
+                                    .background(colors.systemGreen, RoundedCornerShape(1.5.dp))
+                            )
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = stringResource(R.string.home_next_action),
+                                    fontFamily = Outfit,
+                                    fontSize = 11.sp,
+                                    color = colors.systemGreen,
+                                    fontWeight = FontWeight.SemiBold,
+                                    letterSpacing = 1.sp
+                                )
+                                Spacer(Modifier.height(3.dp))
+                                Text(
+                                    text = action,
+                                    fontFamily = Outfit,
+                                    fontSize = 14.sp,
+                                    color = colors.textPrimary,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            item(key = "daily_habits") {
+                DailyHabitNudgeSection(
+                    log = todayHabitLog,
+                    onClick = { onNavigate(Screen.DailyCheckin.route) }
+                )
+            }
+
+            item(key = "vitals") {
+                com.axiom.app.ui.components.VitalsRow(
+                    viewModel = vitalsViewModel,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            if (vehicleProgramStartDate != 0L) {
+                item(key = "countdown_banner") {
                     CountdownBannerSection(
                         programStartDate = actualStartDate,
                         onEditProgramStart = { datePickerDialog.show() }
                     )
+                }
+            }
+
+            // ─────────────────────────────────────────────────────────────────
+            // LAYER 3 — PROGRESS (Streak 7-Day Timeline, Challenges, Body Status)
+            // ─────────────────────────────────────────────────────────────────
+            item(key = "momentum_streak") {
+                MomentumStreakSection(
+                    streakDays = state.streakDays
+                )
+            }
+
+            if (isReviewOverdue) {
+                item(key = "weekly_review_overdue") {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onNavigate(Screen.WeeklyReview.route) }
+                            .testTag("weekly_review_overdue_banner"),
+                        colors = CardDefaults.cardColors(containerColor = colors.shadowSurface),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, colors.legendaryGold.copy(alpha = 0.5f)),
+                        shape = RoundedCornerShape(18.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text("⚠️", fontSize = 20.sp)
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = stringResource(R.string.home_weekly_review_overdue_title),
+                                    fontFamily = Outfit,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.legendaryGold,
+                                    letterSpacing = 0.5.sp
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = stringResource(R.string.home_weekly_review_overdue_desc),
+                                    fontFamily = Outfit,
+                                    fontSize = 12.sp,
+                                    color = colors.textSecondary,
+                                    lineHeight = 16.sp
+                                )
+                            }
+                            Text(
+                                text = stringResource(R.string.home_weekly_review_start),
+                                fontFamily = Outfit,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.legendaryGold,
+                                modifier = Modifier
+                                    .background(colors.legendaryGold.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
+                                    .padding(horizontal = 10.dp, vertical = 6.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            item(key = "weekly_challenges") {
+                WeeklyChallengeSection(
+                    challenges = challenges,
+                    allClaimed = weekly.allClaimed,
+                    onClaimBonus = { axiomViewModel.claimWeeklyBonus() }
+                )
+            }
+
+            item(key = "body_status") {
+                BodyStatusSection(
+                    muscles = muscles,
+                    onNavigateToBodyMap = { onNavigate(Screen.BodyMap.route) }
+                )
+            }
+
+            // ─────────────────────────────────────────────────────────────────
+            // LAYER 4 — SECONDARY / PROGRESSIVE DISCLOSURE (Operational Tracks, System Feed)
+            // ─────────────────────────────────────────────────────────────────
+            item(key = "secondary_surfaces") {
+                SecondarySurfacesSection(initiallyExpanded = false) {
+                    if (vehicleProgramStartDate == 0L) {
+                        CountdownBannerSection(
+                            programStartDate = actualStartDate,
+                            onEditProgramStart = { datePickerDialog.show() }
+                        )
+                    }
 
                     OperationalTracksSection(
                         onNavigate = onNavigate
-                    )
-
-                    if (isReviewOverdue) {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onNavigate(Screen.WeeklyReview.route) }
-                                .testTag("weekly_review_overdue_banner"),
-                            colors = CardDefaults.cardColors(containerColor = colors.legendaryGold.copy(alpha = 0.08f)),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, colors.legendaryGold.copy(alpha = 0.5f))
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Text("⚠️", fontSize = 20.sp)
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text("WEEKLY REVIEW RITUAL OVERDUE", fontFamily = FiraCode, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = colors.legendaryGold, letterSpacing = 1.sp)
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Text("Run the 6-Step Evaluation Protocol to strip away denial and commit weekly alignment.", fontFamily = Inter, fontSize = 11.sp, color = colors.textSecondary, lineHeight = 15.sp)
-                                }
-                                Text("[ START ]", fontFamily = FiraCode, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = colors.legendaryGold, modifier = Modifier.background(colors.legendaryGold.copy(alpha = 0.15f), RoundedCornerShape(4.dp)).padding(horizontal = 8.dp, vertical = 4.dp))
-                            }
-                        }
-                    }
-
-                    DailyOutcomesSection()
-
-                    state.nextBestAction?.let { action ->
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(colors.shadowSurface)
-                                .border(1.dp, colors.borderFaint, RoundedCornerShape(4.dp))
-                                .clickable { state.nextBestActionRoute?.let { onNavigate(it) } }
-                        ) {
-                            Box(modifier = Modifier.align(Alignment.CenterStart).width(3.dp).fillMaxHeight().background(colors.systemGreen))
-                            Column(modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 12.dp, top = 10.dp, bottom = 10.dp)) {
-                                Text(text = stringResource(R.string.home_next_action), fontFamily = FiraCode, fontSize = 9.sp, color = colors.systemGreen, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-                                Spacer(Modifier.height(3.dp))
-                                Text(text = action, fontFamily = Inter, fontSize = 13.sp, color = colors.textPrimary, fontWeight = FontWeight.Medium)
-                            }
-                        }
-                    }
-
-                    WeeklyChallengeSection(
-                        challenges = challenges,
-                        allClaimed = weekly.allClaimed,
-                        onClaimBonus = { axiomViewModel.claimWeeklyBonus() }
-                    )
-
-                    DailyHabitNudgeSection(
-                        log = todayHabitLog,
-                        onClick = { onNavigate(Screen.DailyCheckin.route) }
-                    )
-
-                    com.axiom.app.ui.components.VitalsRow(
-                        viewModel = vitalsViewModel,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    BodyStatusSection(
-                        muscles = muscles,
-                        onNavigateToBodyMap = { onNavigate(Screen.BodyMap.route) }
                     )
 
                     SystemFeedSection(recentFeed = state.recentFeed)
@@ -244,9 +344,28 @@ fun LoadingShimmerScreen() {
 fun ErrorScreen(message: String) {
     val colors = LocalAxiomColors.current
     Box(modifier = Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.border(1.dp, colors.penaltyRed, RoundedCornerShape(4.dp)).background(colors.shadowSurface).padding(24.dp)) {
-            Text(text = stringResource(R.string.home_system_error), fontFamily = FiraCode, fontSize = 15.sp, color = colors.penaltyRed, fontWeight = FontWeight.Bold)
-            Text(text = message, fontFamily = Inter, fontSize = 13.sp, color = colors.textSecondary, textAlign = TextAlign.Center)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .border(1.dp, colors.penaltyRed, RoundedCornerShape(12.dp))
+                .background(colors.shadowSurface)
+                .padding(24.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.home_system_error),
+                fontFamily = Outfit,
+                fontSize = 15.sp,
+                color = colors.penaltyRed,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = message,
+                fontFamily = Outfit,
+                fontSize = 13.sp,
+                color = colors.textSecondary,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
