@@ -45,7 +45,7 @@ fun BodyStatusSection(
         // Muscle Recovery Tactical Mini-Grid
         if (muscles.isNotEmpty()) {
             Text(
-                text = "BIOLOGICAL HARDWARE STATUS",
+                text = stringResource(R.string.home_body_status_title),
                 fontFamily = FiraCode,
                 fontSize = 11.sp,
                 color = colors.textDim,

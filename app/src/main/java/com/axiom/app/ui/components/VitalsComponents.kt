@@ -461,7 +461,7 @@ private fun VitalTeethCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "TEETH",
+                text = stringResource(R.string.home_vitals_teeth),
                 fontFamily = JetBrainsMono,
                 fontSize = 8.sp,
                 fontWeight = FontWeight.Bold,
@@ -511,7 +511,9 @@ private fun VitalTeethCard(
             }
 
             Text(
-                text = if (teethBothComplete) "COMPLETE" else "PENDING",
+                text = stringResource(
+                    if (teethBothComplete) R.string.home_vitals_teeth_complete else R.string.home_vitals_teeth_pending
+                ),
                 fontFamily = JetBrainsMono,
                 fontSize = 7.sp,
                 color = if (teethBothComplete) SystemGreen else TextSecondary

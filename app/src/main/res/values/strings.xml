@@ -94,6 +94,15 @@
     <string name="home_system_error">OS CONDUIT TELEMETRY FAILURE</string>
     <string name="home_awaiting_mission">[ OS ] Standby. Initialize first focused session.</string>
     <string name="home_xp_active">×%s MOMENTUM MULTIPLIER ACTIVE</string>
+    <string name="home_body_status_title">Body Status</string>
+    <string name="home_system_feed_title">System Feed</string>
+    <string name="home_system_feed_empty">No recent activity</string>
+    <string name="home_active_mission_stage_boss">BOSS FIGHT</string>
+    <string name="home_active_mission_stage">STAGE %1$d</string>
+    <string name="home_active_mission_quick_complete_cd">Quick Complete</string>
+    <string name="home_vitals_teeth">TEETH</string>
+    <string name="home_vitals_teeth_complete">COMPLETE</string>
+    <string name="home_vitals_teeth_pending">PENDING</string>
  
     <!-- Missions -->
     <string name="missions_title">HABITS &amp; SESSIONS</string>
@@ -815,4 +824,10 @@
     <string name="first_win_quote">“Small steps, big momentum.”</string>
     <string name="first_win_quote_author">— AXIOM</string>
     <string name="first_win_btn_home">Back to Home</string>
+
+    <!-- Main HUD (app shell telemetry strip) -->
+    <string name="main_hud_level">⚔ Lv.%1$d</string>
+    <string name="main_hud_xp">%1$d/%2$d XP</string>
+    <string name="main_hud_streak">🔥 %1$dd</string>
+    <string name="main_hud_rank">RANK: %1$s</string>
 </resources>

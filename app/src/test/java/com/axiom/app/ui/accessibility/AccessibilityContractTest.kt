@@ -239,7 +239,11 @@ class AccessibilityContractTest {
             "first_mission_desc",
             "first_mission_label",
             "first_mission_placeholder",
-            "first_mission_btn_open"
+            "first_mission_btn_open",
+            "main_hud_level",
+            "main_hud_xp",
+            "main_hud_streak",
+            "main_hud_rank"
         )
 
         for (key in criticalKeys) {

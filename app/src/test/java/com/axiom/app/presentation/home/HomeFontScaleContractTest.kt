@@ -108,7 +108,16 @@ class HomeFontScaleContractTest {
             "home_hero_view_all_missions",
             "home_secondary_surfaces_title",
             "home_secondary_surfaces_expand",
-            "home_secondary_surfaces_collapse"
+            "home_secondary_surfaces_collapse",
+            "home_body_status_title",
+            "home_system_feed_title",
+            "home_system_feed_empty",
+            "home_active_mission_stage_boss",
+            "home_active_mission_stage",
+            "home_active_mission_quick_complete_cd",
+            "home_vitals_teeth",
+            "home_vitals_teeth_complete",
+            "home_vitals_teeth_pending"
         )
 
         for (key in requiredKeys) {

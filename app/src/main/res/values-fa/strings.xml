@@ -94,6 +94,15 @@
     <string name="home_system_error">خطای انتقال تلماتری هسته اصلی</string>
     <string name="home_awaiting_mission">[ OS ] در حالت انتظار. اولین جلسه تمرکز را آغاز کنید.</string>
     <string name="home_xp_active">%s برابر ضریب تکانه‌ فعال است</string>
+    <string name="home_body_status_title">وضعیت بدن</string>
+    <string name="home_system_feed_title">رویدادهای سیستم</string>
+    <string name="home_system_feed_empty">فعالیت تازه‌ای وجود ندارد</string>
+    <string name="home_active_mission_stage_boss">نبرد باس</string>
+    <string name="home_active_mission_stage">مرحله %1$d</string>
+    <string name="home_active_mission_quick_complete_cd">تکمیل سریع</string>
+    <string name="home_vitals_teeth">دندان</string>
+    <string name="home_vitals_teeth_complete">کامل</string>
+    <string name="home_vitals_teeth_pending">ناتمام</string>
 
     <!-- Missions -->
     <string name="missions_title">عادت‌ها و جلسات کالیبره‌شده</string>
@@ -815,4 +824,10 @@
     <string name="first_win_quote">«گام‌های کوچک، شتاب بزرگ.»</string>
     <string name="first_win_quote_author">— اکسیوم</string>
     <string name="first_win_btn_home">بازگشت به خانه</string>
+
+    <!-- Main HUD (app shell telemetry strip) -->
+    <string name="main_hud_level">⚔ سطح %1$d</string>
+    <string name="main_hud_xp">%1$d/%2$d تجربه</string>
+    <string name="main_hud_streak">🔥 %1$d روز</string>
+    <string name="main_hud_rank">رتبه: %1$s</string>
 </resources>

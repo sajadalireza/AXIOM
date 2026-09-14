@@ -89,10 +89,15 @@ fun ActiveMissionStrip(
                         dungeons.find { it.id == linkId }
                     }
                     val dungeonName = dungeon?.name
+                    val bossFightLabel = stringResource(R.string.home_active_mission_stage_boss)
                     val stageLabel = dungeon?.let { d ->
                         val parsedNames = d.stageDescriptions.split("||").map { it.trim() }
                         parsedNames.getOrNull(d.completedStages)?.takeIf { it.isNotBlank() }
-                            ?: if (d.completedStages == d.totalStages - 1) "BOSS FIGHT" else "STAGE ${d.completedStages + 1}"
+                            ?: if (d.completedStages == d.totalStages - 1) {
+                                bossFightLabel
+                            } else {
+                                stringResource(R.string.home_active_mission_stage, d.completedStages + 1)
+                            }
                     }
                     val isEssential = mission.dungeonId != null
                     val missionAlpha = if (isRestMode && !isEssential) 0.4f else 1f
@@ -132,7 +137,7 @@ fun ActiveMissionStrip(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Check,
-                                    contentDescription = "Quick Complete",
+                                    contentDescription = stringResource(R.string.home_active_mission_quick_complete_cd),
                                     tint = colors.systemGreen,
                                     modifier = Modifier.size(20.dp)
                                 )
