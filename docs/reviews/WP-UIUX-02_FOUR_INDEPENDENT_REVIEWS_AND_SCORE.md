@@ -5,9 +5,9 @@
 **Tracking Issue:** [#85](https://github.com/sajadalireza/AXIOM/issues/85) (`state:active`, WIP = 1)  
 **Branch:** `codex/ui-ux-phase2-home-navigation`  
 **Base Commit:** [`a91d5659ab390cdbead7f0c31dc14d59a1e6c8b6`](https://github.com/sajadalireza/AXIOM/commit/a91d5659ab390cdbead7f0c31dc14d59a1e6c8b6) (main HEAD post-WP-UIUX-01)  
-**Date:** 2026-09-13 (first closure) · 2026-09-14 (second PO repair gate — Final Localization Acceptance Repair, see §8)  
+**Date:** 2026-09-13 (first closure) · 2026-09-14 (second PO repair gate — Final Localization Acceptance Repair, see §8) · 2026-09-14 (third PO repair gate — Final Persian Localization Closure, see §9)  
 **Lead / Maintainer:** `sajadalireza`  
-**Canonical Status:** **READY FOR PRODUCT OWNER FINAL ACCEPTANCE (UNANIMOUS PASS)** — §5 composite score `9.8800` retained unchanged after the §8 localization repair  
+**Canonical Status:** **READY FOR PRODUCT OWNER FINAL ACCEPTANCE (UNANIMOUS PASS)** — §5 composite score `9.8800` retained unchanged after the §8 and §9 localization repairs  
 **PR:** [#86](https://github.com/sajadalireza/AXIOM/pull/86) against `main` (linked to #85)
 
 ---
@@ -296,6 +296,8 @@ The five authorized Operational Tracks also re-rendered Persian in the same expa
 
 ### 8.5 Residual risks (honest, carried forward)
 
+> **Status update after the third repair gate:** items **1**, **2** and **5** below are **CLOSED in §9** — the system muscle taxonomy now localizes at the presentation layer, and `nav_home` now reads `خانه`. The text below is preserved verbatim as the historical record of the state *before* §9.
+
 1. **Muscle-group labels remain English by *data*, not by UI string:** `BodyStatusSection` renders `muscle.displayName.uppercase()`, seeded at `data/SeedDataHelper.kt:144-151` (`Chest`, `Back`, `Shoulders`, `Biceps`, `Triceps`, `Legs`, `Core`, `Forearms`) and persisted in Room. Localizing them requires a `data`/seed change, which this repair's boundary forbids. This is the largest remaining EN/FA gap *visible* on Home.
 2. **Combat-readiness summary interpolates the same English data:** `home_combat_readiness_summary` is a correctly localized FA template, but its `%s` muscle names come from the same seed, so the sentence reads as mixed script (`Chest مهیا شد …`). Same root cause and same boundary as (1).
 3. **Hunter default name is seeded English:** the starter profile is created with `name = "Hunter"`, so Persian Home addresses the user as `Hunter` (and `HomeViewModel`'s FA sentence ends `… حفظ کن، Hunter.`). User-editable data; a localized default would be a domain/seed change.
@@ -310,3 +312,112 @@ The five authorized Operational Tracks also re-rendered Persian in the same expa
 - **Hard caps triggered: 0** (unchanged).
 - **Must Acceptance — EN/FA parity: now SATISFIED** for the packet's Home surface. Zero hardcoded English UI strings and zero English TalkBack strings remain on the rendered Persian Home surface; all surviving Latin text is data, a canonical token, or a deliberate bilingual gloss (§8.2). Residual EN/FA gaps that are **data-owned** (muscle names, hunter default name) are recorded in §8.5 and require a separately authorized data/seed change.
 - **Merge:** explicitly **NOT** performed. STOP gate observed for the second time.
+
+---
+
+## 9. Third PO Repair Gate — Final Persian Localization Closure (2026-09-14)
+
+Independent Product Owner review confirmed canonical CI **4/4 PASS on `acb44d0`**, but three concrete EN/FA defects remained on the rendered Persian Home surface. All three are closed here. No redesign, no scope expansion, and **no Room / domain / data / schema / navigation change**.
+
+Pre-repair state: `state:review` → moved back to `state:active` for the duration of the repair, per directive.
+
+### 9.1 Localization changes
+
+| # | Defect | Before (live code) | After | File(s) |
+|:---:|---|---|---|---|
+| 1 | Home dock copy | `nav_home` = `کارت` (*card*) | `nav_home` = `خانه` | `values-fa/strings.xml:9` |
+| 2 | Water unit leaked an English abbreviation | hardcoded `text = "$water / 8 gl"` | `stringResource(R.string.home_habit_water_format, water, 8)` → EN `%1$d / %2$d glasses` · FA `%1$d / %2$d لیوان` | `DailyHabitNudgeSection.kt:93`, `values/strings.xml:106`, `values-fa/strings.xml:106` |
+| 3 | System muscle taxonomy rendered as seeded English | grid `muscle.displayName.uppercase()`; summary `freshestGroup?.displayName` / `fatiguedGroup?.displayName` | `muscleLabelResId(muscle.id)` → canonical `muscle_<id>` resource, `displayName` used **only** as fallback for unknown/custom IDs | `BodyStatusSection.kt` |
+
+**Muscle mapping — presentation layer only, keyed on the stable `MuscleGroup.id`:**
+
+| id | resource | EN | FA (shipped) |
+|---|---|---|---|
+| `chest` | `muscle_chest` | Chest | سینه |
+| `back` | `muscle_back` | Back | پشت و زیربغل |
+| `shoulders` | `muscle_shoulders` | Shoulders | سرشانه |
+| `biceps` | `muscle_biceps` | Biceps | جلو بازو |
+| `triceps` | `muscle_triceps` | Triceps | پشت بازو |
+| `legs` | `muscle_legs` | Legs | پاها |
+| `core` | `muscle_core` | Core | شکم و میان‌تنه |
+| `forearms` | `muscle_forearms` | Forearms | ساعد |
+
+**Declared deviation (for PO override, not a silent divergence):** two FA values differ from the suggested list — `back` shipped as `پشت و زیربغل` (suggested `پشت`) and `core` as `شکم و میان‌تنه` (suggested `میان‌تنه`). Both are the **pre-existing canonical `muscle_*` resources already used by the Body Atlas for the same IDs**. Reusing them keeps one taxonomy app-wide; overriding would mean either a Home-only copy of the naming or editing shared Body Atlas copy inside this packet. Recorded here so the PO can choose.
+
+Additive, Home-owned helper (no shared module touched):
+
+```kotlin
+@StringRes internal fun muscleLabelResId(muscleId: String): Int?   // 8 canonical ids -> muscle_<id>, else null
+@Composable private fun localizedMuscleName(muscle: MuscleGroup)   // stringResource(resId) else muscle.displayName
+```
+
+Same `muscle_<id>` convention as the Body Atlas (`BodySilhouetteCanvas.getLocalizedMuscleName`, line 255). Side effect: those 8 resources are now *statically* referenced, so lint's `UnusedResources` findings cleared and the total warning count fell 344 → 337.
+
+### 9.2 Static Home copy audit (all reachable Home states)
+
+Rendered-literal scan (`text = "`, `Text("`, `contentDescription = "`, `label = "`) over the 15 files of the Home render tree (`SuccessContent` + children, the nav dock, and the shell HUD):
+
+* **Zero system-owned English UI strings.**
+* Remaining literals are glyphs/emoji (`⚠️`, `◈`, `⏱`, `✍`, `🔥`), separators (`:`, `%`), the counter `"$teethCount / 2"`, and Compose animation `label =` identifiers that are never user-visible.
+* No hardcoded `"/ 8 gl"` remains anywhere under `presentation/home` or `ui/`.
+
+Reachable states checked statically: Home nav labels · Daily Habit Nudge · Body Status grid · Combat readiness summary · active mission state (`ActiveMissionStrip`) · empty mission state (`NextMissionHeroCard`) · System Feed · Operational Tracks · TalkBack content descriptions.
+
+### 9.3 FA RTL runtime evidence (fresh APK, Android 14 / API 34)
+
+Device: `warrior_test` AVD, `sdk=34`, arm64-v8a, 1080 × 2400, `persist.sys.locale = fa-IR`, `font_scale = 1.0`, in-app language `fa` (both stores). Fresh APK `adb install -r` → `Success`.
+
+| # | Filename | Verified rendering (`uiautomator` bounds) | SHA-256 |
+|:---:|---|---|---|
+| **14** | `14_home_fa_rtl_nav_home.png` | Bottom dock Home tab now reads **`خانه`** `[519,2229][563,2292]` (was `کارت`); HUD on the same frame: `رتبه: RECRUIT`, `🔥 ۱ روز`, `۲۰/۱۰۰ تجربه`, `⚔ سطح ۱` | `93e797efaf95bed87a1a2cbb29daf6a7a39768da73e1f6e74d61a69ce137a06d` |
+| **15** | `15_home_fa_rtl_habit_water_unit.png` | Daily Habit card: title `پروتکل‌های حیاتی روزانه`, water counter **`۰ / ۸ لیوان`** (Persian digits + Persian unit, no `gl`), sleep `ثبت‌نشده` | `a8bb9fdf7536e0651678f5f98262e5893817e9da37fad6150dfae75c834de81b` |
+| **16** | `16_home_fa_rtl_combat_readiness_summary.png` | Header `آمادگی رزمی فیزیکی (COMBAT READINESS)` `[238,1146][796,1209]` with the summary now reading **`سینه مهیا شد (۱۰۰%) · سینه به میزان ۰ روز نیازمند ریکاوری مطلوب است (۱۰۰%)`** — Persian muscle names in the sentence | `a8be2dfb4c8bb185cdaa4e9220cee44c4b36265092b709b1bdb810b9ab7992b9` |
+| **17** | `17_home_fa_rtl_body_status_muscles.png` | Body Status grid under `وضعیت بدن` — all 8 groups in Persian: `سینه` `[975,1586][1017,1649]`, `پشت و زیربغل` `[539,1586][678,1649]`, `سرشانه` `[273,1586][339,1649]`, `جلو بازو` `[937,1786][1017,1849]`, `پشت بازو` `[587,1786][678,1849]`, `پاها` `[305,1786][339,1849]`, `شکم و میان‌تنه` `[873,1986][1017,2049]`, `ساعد` `[632,1986][678,2049]` | `7939067e5768653897b930e753e2c02901d8c8768f7348a30830db9a65ecc23d` |
+
+**Full-surface runtime leak scan** (4 captured states, **80 distinct rendered texts**): **13** contain Latin, every one classified as non-UI:
+
+* **Data** — `Hunter`, `RECRUIT-Rank`, `رتبه: RECRUIT`, `Customer Problem Interview (1-on-1)`, `پیشبرد هدف: Capability`, `تکمیل کنید: Customer Problem Interview (1-on-1)`
+* **Units / meridiem tokens** — `0ml`, `۰٫۰h`, `AM`, `PM`
+* **Numeral shaping (not English text)** — `1 مأموریت فعال است. زنجیره: 1 روز. … Hunter.`
+* **Deliberate bilingual gloss** — `آمادگی رزمی فیزیکی (COMBAT READINESS)`
+* **Entity artifact** — `به‌روزرسانی &gt;` (renders as `>`; matched only because of XML entity encoding)
+
+**TalkBack:** 8 unique `content-desc` values on the Home surface, **all Persian** (`خانه`, `سایه‌ها`, `مأموریت‌ها`, `هانتر`, `وضعیت بدنی`, `پروفایل`, `پروفایل هانتر: Hunter، رتبه RECRUIT-Rank، سطح ۱`, `پیشرفت و استمرار: ۱ روز استمرار`). The single Latin-bearing description interpolates *data* (hunter name / rank token); every owned string is Persian.
+
+### 9.4 Local gates on the exact repaired head
+
+| Gate | Result |
+|---|---|
+| `git diff --check` | **PASS** — clean, exit 0 |
+| `./gradlew testDebugUnitTest` | **PASS** — **65 suites / 429 tests / 0 failures / 0 errors / 0 skipped** (426 → 429, +3 new guards) |
+| `./gradlew testDebugUnitTest --tests com.axiom.app.db.NoWp207MigrationGuardTest` | **PASS** — 6/6, 0 failures |
+| `./gradlew lintDebug` (`lintAnalyzeDebug` + `lintReportDebug`) | **PASS** — **0 errors**, 337 warnings (was 344) |
+| `./gradlew assembleDebug` | **PASS** — `BUILD SUCCESSFUL`; APK `8149799bcc2ea65b8381c36799da0baaa03b86f92c5fc00a572170de87206eaa` |
+| `HomeFontScaleContractTest` | **PASS** — 7/7 |
+| Room schema | **v18 unchanged**; **zero** `domain/` + `data/` entries in `git status` |
+
+### 9.5 Regression tests added (so none of the three defects can silently return)
+
+| Test | Guards |
+|---|---|
+| `persianNavHome_resolvesToHomeAndNeverRevertsToCard` | `nav_home` FA must equal `خانه` and must never contain `کارت` |
+| `homeMuscleTaxonomy_resolvesToLocalizedPresentationLabels` | All 8 canonical ids map to their `muscle_*` resource; unknown/custom ids return `null` (→ `displayName` fallback); FA muscle resources contain no Latin script; Home routes through `muscleLabelResId(muscle.id)` and no longer renders raw `displayName` in the grid or the readiness summary |
+| `homeWaterUnit_isLocalizedAndNoHardcodedEnglishAbbreviationRemains` | EN/FA `home_habit_water_format` both exist and keep `%1$d` / `%2$d`; EN reads `glasses`, FA reads `لیوان`; no `"/ 8 gl"` remains and the card renders the resource |
+| `homeHeroStrings_haveCompleteEnglishAndPersianParity` (extended) | `requiredKeys` now also covers `home_habit_water_format`, `nav_home` and all 8 `muscle_*` keys |
+
+### 9.6 Residual risks (honest)
+
+1. **`AM` / `PM` meridiem tokens still render Latin on Persian Home** (vitals sleep card), as do the unit abbreviations `ml` and `h`. These were **not** among the three PO-identified defects and were previously accepted as locale-neutral abbreviations; native forms (`ق.ظ` / `ب.ظ`) would require editing the shared Vitals components, which is outside this repair's named scope.
+2. **Numeral shaping inconsistency:** two otherwise-Persian strings still carry Latin `1` — `HomeViewModel`'s next-best-action sentence (`1 مأموریت فعال است. زنجیره: 1 روز.`) and the habit teeth counter (`0 / 2`). Not English text, so the zero-English criterion holds; the new water counter correctly renders `۰ / ۸ لیوان`, which highlights the inconsistency.
+3. **Hunter default name is still seeded English** (`Hunter`) — user-editable data; a localized default is a domain/seed change outside this boundary.
+4. **Two mechanisms now resolve the same taxonomy:** Home uses a static `when` map (`muscleLabelResId`), the Body Atlas uses `getIdentifier("muscle_<id>")`. Identical results for the 8 canonical ids; for a hypothetical non-canonical id Home falls back to `displayName` while the Atlas would resolve any matching resource. A future consolidation could put both behind one helper.
+5. **`MainHUD` / nav dock are shared shell surfaces** — their FA copy changes on every screen, not just Home. The nav dock is explicitly in WP-UIUX-02 scope; the HUD was PO-authorized in §8.
+6. **Environment:** the AVD's `systemui` / `system_server` raised `isn't responding` overlays under host CPU contention during earlier rounds; AXIOM itself never crashed or ANR'd (`logcat -b crash` clean, pid alive, window focus verified). All Gradle gates in this round ran cleanly with the emulator left running at ~28% CPU.
+
+### 9.7 Score and Must Acceptance status
+
+- **Composite score: `9.8800 / 10.00` — deliberately UNCHANGED.** This repair closes Must Acceptance gaps; it does not license a re-score. No reviewer re-scored; §4 and §5 stand as recorded.
+- **Hard caps triggered: 0** (unchanged).
+- **Must Acceptance — Complete EN/FA parity: SATISFIED.** Zero hardcoded system-owned English UI strings and zero English TalkBack strings remain on the rendered Persian Home surface, **including the system muscle taxonomy**, which previously leaked through the seed data layer (§8.5 items 1–2 are now closed). All surviving Latin text is data, a locale-neutral unit/meridiem abbreviation, a numeral-shaping artifact, or a deliberate bilingual gloss (§9.3).
+- **PR:** repair pushed to the same **PR #86**; canonical CI required 4/4 PASS on the new exact head before #85 returns to `state:review`.
+- **Merge:** explicitly **NOT** performed. STOP gate observed for the third time.
