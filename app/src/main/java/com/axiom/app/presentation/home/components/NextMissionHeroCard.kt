@@ -1,8 +1,6 @@
 package com.axiom.app.presentation.home.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -17,8 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,9 +25,11 @@ import com.axiom.app.R
 import com.axiom.app.domain.model.Dungeon
 import com.axiom.app.domain.model.Mission
 import com.axiom.app.ui.theme.*
+import kotlin.math.roundToInt
 
 /**
  * Visual and operational center of gravity on the Home screen.
+ * Matches binding PO visual target 01_home_target.jpg.
  *
  * Enforces the AXIOM Product Constitution Section 3.5 invariant:
  * "هر Screen فقط یک Primary CTA دارد." (Every Screen has exactly one Primary CTA).
@@ -49,62 +47,56 @@ fun NextMissionHeroCard(
 ) {
     val colors = LocalAxiomColors.current
 
-    com.axiom.app.ui.components.AxiomCard(
+    Card(
         modifier = modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(22.dp))
             .testTag("next_mission_hero_card"),
-        accentColor = colors.systemGreen,
-        glowEnabled = true,
-        backgroundColor = colors.shadowSurface,
-        borderColor = colors.systemGreen.copy(alpha = 0.6f),
-        borderWidth = com.axiom.app.ui.theme.AxiomBorder.medium,
-        shape = RoundedCornerShape(com.axiom.app.ui.theme.AxiomRadius.xl)
+        colors = CardDefaults.cardColors(containerColor = colors.shadowSurface),
+        border = BorderStroke(1.dp, colors.borderFaint),
+        shape = RoundedCornerShape(22.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
-                .wrapContentHeight(),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+                .padding(22.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Header: Category Label & Indicator
+            // Header: Category Label ("ACTIVE MISSION" or "NEXT MEANINGFUL MISSION")
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(colors.systemGreen)
-                    )
-                    Text(
-                        text = stringResource(R.string.home_hero_label),
-                        fontFamily = FiraCode,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = colors.systemGreen,
-                        letterSpacing = 1.5.sp
-                    )
-                }
+                Text(
+                    text = if (mission != null) {
+                        stringResource(R.string.home_hero_active_label)
+                    } else {
+                        stringResource(R.string.home_hero_label)
+                    },
+                    fontFamily = Outfit,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = colors.systemGreen,
+                    letterSpacing = 1.sp
+                )
 
                 if (mission?.isTimedMission == true) {
-                    Text(
-                        text = "TIMED SPRINT",
-                        fontFamily = FiraCode,
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = colors.legendaryGold,
+                    Box(
                         modifier = Modifier
-                            .background(colors.legendaryGold.copy(alpha = 0.12f), RoundedCornerShape(4.dp))
-                            .border(1.dp, colors.legendaryGold.copy(alpha = 0.35f), RoundedCornerShape(4.dp))
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
-                    )
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(colors.legendaryGold.copy(alpha = 0.12f))
+                            .border(1.dp, colors.legendaryGold.copy(alpha = 0.35f), RoundedCornerShape(6.dp))
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.home_hero_timed_sprint),
+                            fontFamily = Outfit,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = colors.legendaryGold
+                        )
+                    }
                 }
             }
 
@@ -112,11 +104,11 @@ fun NextMissionHeroCard(
                 // Mission Title
                 Text(
                     text = mission.title,
-                    fontFamily = Inter,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontFamily = Outfit,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.SemiBold,
                     color = colors.textPrimary,
-                    lineHeight = 24.sp,
+                    lineHeight = 30.sp,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -129,10 +121,10 @@ fun NextMissionHeroCard(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(6.dp))
+                            .clip(RoundedCornerShape(8.dp))
                             .background(colors.dimSurface)
-                            .border(1.dp, colors.borderFaint, RoundedCornerShape(6.dp))
-                            .padding(horizontal = 10.dp, vertical = 6.dp),
+                            .border(1.dp, colors.borderFaint, RoundedCornerShape(8.dp))
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
@@ -143,8 +135,8 @@ fun NextMissionHeroCard(
                         )
                         Text(
                             text = stringResource(R.string.home_hero_advances_goal, projectOrGoalTitle),
-                            fontFamily = FiraCode,
-                            fontSize = 11.sp,
+                            fontFamily = Outfit,
+                            fontSize = 12.sp,
                             color = colors.textSecondary,
                             fontWeight = FontWeight.Medium,
                             maxLines = 1,
@@ -153,25 +145,64 @@ fun NextMissionHeroCard(
                     }
                 }
 
-                // Execution Context details
+                // Execution Context details: Canonical Duration & XP Reward
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val durationMin = (mission.estimatedHours * 60).toInt()
-                    Text(
-                        text = "⏱ $durationMin min",
-                        fontFamily = FiraCode,
-                        fontSize = 12.sp,
-                        color = colors.textDim
-                    )
-                    Text(
-                        text = "⚡ +${mission.xpReward} XP",
-                        fontFamily = FiraCode,
-                        fontSize = 12.sp,
-                        color = colors.legendaryGold
-                    )
+                    val durationText = when {
+                        mission.estimatedHours <= 0f -> stringResource(R.string.home_hero_duration_unspecified)
+                        mission.estimatedHours < 1.0f -> {
+                            val totalMinutes = (mission.estimatedHours * 60).roundToInt()
+                            if (totalMinutes > 0) {
+                                stringResource(R.string.home_hero_duration_minutes, totalMinutes)
+                            } else {
+                                stringResource(R.string.home_hero_duration_unspecified)
+                            }
+                        }
+                        else -> {
+                            val totalMinutes = (mission.estimatedHours * 60).roundToInt()
+                            val hours = totalMinutes / 60
+                            val remainingMins = totalMinutes % 60
+                            if (remainingMins == 0) {
+                                stringResource(R.string.home_hero_duration_hours, hours)
+                            } else {
+                                stringResource(R.string.home_hero_duration_hours_mins, hours, remainingMins)
+                            }
+                        }
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text(
+                            text = "⏱",
+                            fontSize = 14.sp
+                        )
+                        Text(
+                            text = durationText,
+                            fontFamily = Outfit,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = colors.textSecondary
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(colors.systemGreen.copy(alpha = 0.15f))
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.home_hero_xp_reward_format, mission.xpReward),
+                            fontFamily = Outfit,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = colors.systemGreen
+                        )
+                    }
                 }
 
                 // THE SINGLE DOMINANT PRIMARY CTA
@@ -183,16 +214,20 @@ fun NextMissionHeroCard(
                         .testTag("home_primary_cta"),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colors.systemGreen,
-                        contentColor = Color.Black
+                        contentColor = colors.voidBlack
                     ),
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(26.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.home_hero_start_mission),
-                        fontFamily = FiraCode,
-                        fontSize = 14.sp,
+                        text = if (mission.status == "ACTIVE") {
+                            stringResource(R.string.home_hero_continue_mission)
+                        } else {
+                            stringResource(R.string.home_hero_start_mission)
+                        },
+                        fontFamily = Outfit,
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp
+                        letterSpacing = 0.5.sp
                     )
                 }
 
@@ -205,8 +240,8 @@ fun NextMissionHeroCard(
                 ) {
                     Text(
                         text = stringResource(R.string.home_hero_view_all_missions),
-                        fontFamily = FiraCode,
-                        fontSize = 11.sp,
+                        fontFamily = Outfit,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
                         color = colors.textDim,
                         modifier = Modifier
@@ -218,7 +253,7 @@ fun NextMissionHeroCard(
                 // Empty state: Guide to commit to the next mission
                 Text(
                     text = stringResource(R.string.home_hero_no_mission_desc),
-                    fontFamily = Inter,
+                    fontFamily = Outfit,
                     fontSize = 14.sp,
                     color = colors.textSecondary,
                     lineHeight = 20.sp
@@ -233,16 +268,16 @@ fun NextMissionHeroCard(
                         .testTag("home_primary_cta"),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colors.systemGreen,
-                        contentColor = Color.Black
+                        contentColor = colors.voidBlack
                     ),
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(26.dp)
                 ) {
                     Text(
                         text = stringResource(R.string.home_hero_commit_mission),
-                        fontFamily = FiraCode,
-                        fontSize = 14.sp,
+                        fontFamily = Outfit,
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp
+                        letterSpacing = 0.5.sp
                     )
                 }
             }

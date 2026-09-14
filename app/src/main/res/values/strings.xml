@@ -693,17 +693,35 @@
     <string name="first_win_next_title">Keep the momentum</string>
     <string name="first_win_next_body">Choose what should happen next. You can schedule another small action or finish for now.</string>
 
-    <!-- G3-P3 Home Primary Action & Hero Card -->
+    <!-- G3-P3 & WP-UIUX-02 Home Primary Action & Hero Card -->
     <string name="home_hero_label">NEXT MEANINGFUL MISSION</string>
-    <string name="home_hero_start_mission">START MISSION</string>
-    <string name="home_hero_commit_mission">+ COMMIT TO A MISSION</string>
+    <string name="home_hero_active_label">ACTIVE MISSION</string>
+    <string name="home_hero_start_mission">Start Mission</string>
+    <string name="home_hero_complete_mission">Complete Mission</string>
+    <string name="home_hero_continue_mission">Continue Mission</string>
+    <string name="home_hero_commit_mission">+ Commit to a Mission</string>
     <string name="home_hero_no_mission_desc">No active mission committed. Choose your next meaningful step to advance your goals.</string>
-    <string name="home_hero_advances_goal">ADVANCES GOAL: %s</string>
-    <string name="home_hero_advances_project">PROJECT: %s</string>
-    <string name="home_hero_view_all_missions">VIEW ALL MISSIONS</string>
+    <string name="home_hero_advances_goal">Advances Goal: %s</string>
+    <string name="home_hero_advances_project">Project: %s</string>
+    <string name="home_hero_view_all_missions">View all missions →</string>
+    <string name="home_hero_timed_sprint">TIMED SPRINT</string>
+    <string name="home_hero_duration_minutes">%d min</string>
+    <string name="home_hero_duration_hours">%d hr</string>
+    <string name="home_hero_duration_hours_mins">%1$d hr %2$d min</string>
+    <string name="home_hero_duration_unspecified">—</string>
+    <string name="home_hero_xp_reward_format">+%d XP</string>
+    <string name="home_hunter_profile_cd">Hunter Profile: %1$s, Rank %2$s, Level %3$d</string>
+    <string name="home_hunter_profile_icon_cd">Profile</string>
+    <string name="home_hunter_default_name">Hunter</string>
+    <string name="home_hunter_xp_format">%1$d / %2$d XP</string>
+    <string name="home_weekly_review_overdue_title">WEEKLY REVIEW RITUAL OVERDUE</string>
+    <string name="home_weekly_review_overdue_desc">Run the 6-Step Evaluation Protocol to strip away denial and commit weekly alignment.</string>
+    <string name="home_weekly_review_start">START</string>
     <string name="home_secondary_surfaces_title">VITALS &amp; PROTOCOLS</string>
     <string name="home_secondary_surfaces_expand">SHOW DETAILS</string>
     <string name="home_secondary_surfaces_collapse">HIDE DETAILS</string>
+    <string name="home_momentum_and_streak">MOMENTUM &amp; STREAK</string>
+    <string name="home_streak_day_count">%d DAY STREAK</string>
 
     <!-- WP-BODY-01 Body Map Integration & Accessibility -->
     <string name="bodymap_title">CALIBER HIGH-FI CORE</string>

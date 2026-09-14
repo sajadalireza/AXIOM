@@ -91,27 +91,27 @@ fun AwakenBottomNavBar(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(start = 24.dp, end = 24.dp, bottom = 12.dp),
+            .padding(start = 20.dp, end = 20.dp, bottom = 12.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(72.dp)
-                .background(Color(0xEB141413), RoundedCornerShape(20.dp))
-                .border(1.dp, Color(0xFF2A3A32), RoundedCornerShape(20.dp))
+                .background(colors.shadowSurface.copy(alpha = 0.95f), RoundedCornerShape(20.dp))
+                .border(1.dp, colors.borderFaint, RoundedCornerShape(20.dp))
                 .clip(RoundedCornerShape(20.dp))
         ) {
             val totalWidth = maxWidth
             val tabWidth = totalWidth / tabs.size
-            val podWidth = 44.dp
-            
+            val podWidth = 40.dp
+
             // Linear horizontal top highlight (1dp) inner glow accent line
             Canvas(modifier = Modifier.fillMaxWidth().height(1.dp)) {
                 drawLine(
-                    color = BorderFaint.copy(alpha = 0.5f),
-                    start = Offset(28.dp.toPx(), 0f),
-                    end = Offset(size.width - 28.dp.toPx(), 0f),
+                    color = colors.borderFaint.copy(alpha = 0.4f),
+                    start = Offset(24.dp.toPx(), 0f),
+                    end = Offset(size.width - 24.dp.toPx(), 0f),
                     strokeWidth = 1.dp.toPx()
                 )
             }
@@ -124,7 +124,7 @@ fun AwakenBottomNavBar(
                 if (selectedIndex != lastSelectedIndex) {
                     lastSelectedIndex = selectedIndex
                     scaleAnim.animateTo(
-                        targetValue = 1.20f,
+                        targetValue = 1.15f,
                         animationSpec = spring(
                             dampingRatio = Spring.DampingRatioMediumBouncy,
                             stiffness = Spring.StiffnessHigh
@@ -159,14 +159,15 @@ fun AwakenBottomNavBar(
                 Canvas(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .offset { IntOffset(animatedXPx.roundToInt(), -with(density) { 4.dp.roundToPx() }) }
-                        .size(width = 44.dp, height = 2.dp)
+                        .offset { IntOffset(animatedXPx.roundToInt(), -with(density) { 5.dp.roundToPx() }) }
+                        .size(width = 40.dp, height = 3.dp)
                         .graphicsLayer {
                             scaleX = scaleAnim.value
                         }
                 ) {
-                    drawRect(
-                        color = SystemGreen
+                    drawRoundRect(
+                        color = colors.systemGreen,
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(1.5.dp.toPx(), 1.5.dp.toPx())
                     )
                 }
             }
@@ -179,15 +180,15 @@ fun AwakenBottomNavBar(
                 tabs.forEachIndexed { index, tab ->
                     val isSelected = index == selectedIndex
                     val iconColor by animateColorAsState(
-                        targetValue = if (isSelected) SystemGreen else TextDim,
-                        animationSpec = tween(durationMillis = 300, easing = LinearOutSlowInEasing),
+                        targetValue = if (isSelected) colors.systemGreen else colors.textDim,
+                        animationSpec = tween(durationMillis = 250, easing = LinearOutSlowInEasing),
                         label = "tab_icon_color"
                     )
 
                     val interactionSource = remember { MutableInteractionSource() }
                     val isPressed by interactionSource.collectIsPressedAsState()
                     val scale by animateFloatAsState(
-                        targetValue = if (isPressed) 0.96f else 1.0f,
+                        targetValue = if (isPressed) 0.95f else 1.0f,
                         animationSpec = spring(
                             dampingRatio = Spring.DampingRatioMediumBouncy,
                             stiffness = Spring.StiffnessHigh
@@ -220,6 +221,17 @@ fun AwakenBottomNavBar(
                             verticalArrangement = Arrangement.Center
                         ) {
                             Box(contentAlignment = Alignment.Center) {
+                                // For Home tab: circular emerald halo when selected (matching 01_home_target.jpg)
+                                if (tab.screen == Screen.Home && isSelected) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(36.dp)
+                                            .clip(RoundedCornerShape(18.dp))
+                                            .background(colors.systemGreen.copy(alpha = 0.15f))
+                                            .border(1.dp, colors.systemGreen.copy(alpha = 0.40f), RoundedCornerShape(18.dp))
+                                    )
+                                }
+
                                 Icon(
                                     painter = painterResource(id = tab.iconRes),
                                     contentDescription = stringResource(tab.labelRes),
@@ -227,7 +239,7 @@ fun AwakenBottomNavBar(
                                     modifier = Modifier.size(24.dp)
                                 )
 
-                                // Holographic/Cyber numeric badge overlay
+                                // Refined numeric badge overlay
                                 val badgeCount = when (tab.screen) {
                                     Screen.BodyMap -> pendingCheckinCount
                                     Screen.Home -> newSystemMessagesCount
@@ -239,18 +251,18 @@ fun AwakenBottomNavBar(
                                     Box(
                                         modifier = Modifier
                                             .align(Alignment.TopEnd)
-                                            .offset(x = 10.dp, y = (-6).dp)
-                                            .background(Color(0xFFE53935), RoundedCornerShape(10.dp))
-                                            .border(1.dp, VoidBlack, RoundedCornerShape(10.dp))
+                                            .offset(x = 8.dp, y = (-5).dp)
+                                            .background(colors.penaltyRed, RoundedCornerShape(8.dp))
+                                            .border(1.dp, colors.shadowSurface, RoundedCornerShape(8.dp))
                                             .padding(horizontal = 4.dp, vertical = 1.dp),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
                                             text = badgeCount.toString(),
-                                            fontFamily = JetBrainsMono,
-                                            fontSize = 8.sp,
+                                            fontFamily = Outfit,
+                                            fontSize = 9.sp,
                                             fontWeight = FontWeight.Bold,
-                                            color = TextPrimary
+                                            color = Color.White
                                         )
                                     }
                                 }
@@ -262,10 +274,10 @@ fun AwakenBottomNavBar(
                             ) {
                                 Text(
                                     text = stringResource(tab.labelRes),
-                                    fontFamily = JetBrainsMono,
-                                    fontSize = 9.sp,
-                                    color = SystemGreen,
-                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = Outfit,
+                                    fontSize = 10.sp,
+                                    color = colors.systemGreen,
+                                    fontWeight = FontWeight.SemiBold,
                                     letterSpacing = 0.5.sp,
                                     modifier = Modifier.padding(top = 2.dp)
                                 )

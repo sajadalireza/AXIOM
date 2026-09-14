@@ -70,7 +70,7 @@ class HomeFontScaleContractTest {
     }
 
     @Test
-    fun hunterHeader_constrainsWatermarkToPreventOverlap() {
+    fun hunterHeader_preventsLayoutOverlapAndProtectsTypographyAt200Percent() {
         val header = locate(
             "src/main/java/com/axiom/app/presentation/home/components/HunterHeaderSection.kt"
         ).readText()
@@ -80,8 +80,16 @@ class HomeFontScaleContractTest {
             header.contains("fontSize = 130.sp")
         )
         assertTrue(
-            "Hunter header must constrain watermark font size and softWrap to prevent layout overlap",
-            header.contains("softWrap = false") && header.contains("fontSize = 64.sp")
+            "Hunter header name must prevent multi-line collision using TextOverflow.Ellipsis",
+            header.contains("overflow = TextOverflow.Ellipsis")
+        )
+        assertTrue(
+            "Hunter header must guarantee at least a 48dp touch target for accessibility",
+            header.contains(".size(48.dp)")
+        )
+        assertTrue(
+            "Hunter header must protect avatar clickability with content description",
+            header.contains("home_hunter_profile_icon_cd")
         )
     }
 

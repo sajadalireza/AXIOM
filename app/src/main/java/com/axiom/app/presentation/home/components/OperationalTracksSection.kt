@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -56,7 +55,7 @@ fun OperationalTracksSection(
             )
         }
 
-        // 3x2 Grid of launch items
+        // Grid of 5 authorized operational tracks
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -110,39 +109,6 @@ fun OperationalTracksSection(
                     onClick = { onNavigate(Screen.WeeklyAnalytics.route) },
                     modifier = Modifier.weight(1f)
                 )
-                // Item 6: Pro
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(82.dp)
-                        .clip(RoundedCornerShape(AxiomRadius.l))
-                        .background(
-                            Brush.linearGradient(
-                                colors = listOf(colors.dimSurface, colors.shadowSurface)
-                            )
-                        )
-                        .border(AxiomBorder.thin, colors.legendaryGold.copy(alpha = 0.35f), RoundedCornerShape(AxiomRadius.l))
-                        .clickable { onNavigate(Screen.Premium.route) }
-                        .padding(vertical = 14.dp, horizontal = 8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(7.dp)
-                    ) {
-                        Text(
-                            text = "👑",
-                            fontSize = 18.sp
-                        )
-                        Text(
-                            text = if (isFa) "حرفه‌ای" else "PRO",
-                            fontFamily = JetBrainsMono,
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.legendaryGold
-                        )
-                    }
-                }
             }
         }
     }
