@@ -6,7 +6,7 @@
     <string name="privacy_policy_link">حریم خصوصی</string>
 
     <!-- Navigation -->
-    <string name="nav_home">کارت</string>
+    <string name="nav_home">خانه</string>
     <string name="nav_missions">مأموریت‌ها</string>
     <string name="nav_dungeons">اسپرینت‌ها</string>
     <string name="nav_gates">مأموریت‌ها</string>
@@ -103,6 +103,7 @@
     <string name="home_vitals_teeth">دندان</string>
     <string name="home_vitals_teeth_complete">کامل</string>
     <string name="home_vitals_teeth_pending">ناتمام</string>
+    <string name="home_habit_water_format">%1$d / %2$d لیوان</string>
 
     <!-- Missions -->
     <string name="missions_title">عادت‌ها و جلسات کالیبره‌شده</string>
