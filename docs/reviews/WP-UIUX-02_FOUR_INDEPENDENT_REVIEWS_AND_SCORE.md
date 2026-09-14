@@ -5,9 +5,10 @@
 **Tracking Issue:** [#85](https://github.com/sajadalireza/AXIOM/issues/85) (`state:active`, WIP = 1)  
 **Branch:** `codex/ui-ux-phase2-home-navigation`  
 **Base Commit:** [`a91d5659ab390cdbead7f0c31dc14d59a1e6c8b6`](https://github.com/sajadalireza/AXIOM/commit/a91d5659ab390cdbead7f0c31dc14d59a1e6c8b6) (main HEAD post-WP-UIUX-01)  
-**Date:** 2026-09-13  
+**Date:** 2026-09-13 (first closure) · 2026-09-14 (second PO repair gate — Final Localization Acceptance Repair, see §8)  
 **Lead / Maintainer:** `sajadalireza`  
-**Canonical Status:** **READY FOR PRODUCT OWNER FINAL ACCEPTANCE (UNANIMOUS PASS)**
+**Canonical Status:** **READY FOR PRODUCT OWNER FINAL ACCEPTANCE (UNANIMOUS PASS)** — §5 composite score `9.8800` retained unchanged after the §8 localization repair  
+**PR:** [#86](https://github.com/sajadalireza/AXIOM/pull/86) against `main` (linked to #85)
 
 ---
 
@@ -210,7 +211,7 @@ Device: Android 14 (API 34, `sdk=34`), `sdk_gphone64_arm64`, arm64-v8a, 1080 × 
 2. **`showPremiumNudge` is computed but never rendered:** `ui/HomeViewModel.kt:36,122,133` produces the flag and no UI consumer reads it. Harmless today (no exposure), but a latent surface if a future consumer re-renders it.
 3. **Evidence independence:** screenshots `01`, `05`, and `07` are byte-identical (`33f1db52…`) while being presented as three distinct verification targets, so `05` (hero CTA state) and `07` (nav dock) do not independently evidence their own claims. Screenshot `10` plus the accessibility-tree assertions in §7.2 independently cover the Operational Tracks claim.
 4. **Ad-hoc captures left untracked:** `home_check.png`, `home_check2.png`, `home_check3.png`, `home_check4.png` are unlabeled working-session captures and were deliberately **excluded** from the packet commit to keep the evidence manifest canonical (hashes: `4106d4b9…`, `a75f4dfc…`, `8cfc143e…`, `8afd98b6…`).
-5. **Interface-text localization gap in *unmodified* Home sections (pre-existing, outside packet boundary):** the changed files are fully string-resource backed, but three hardcoded English labels remain in Home sections that this packet did not touch — `BodyStatusSection.kt:48` (`"BIOLOGICAL HARDWARE STATUS"`), `SystemFeedSection.kt:33` (`"SYSTEM INTELLIGENCE FEED"`), and `SystemFeedSection.kt:52` (`"NO INTEL FEED DETECTED"`). These render as English even in Persian mode, so full Home EN/FA parity is not yet complete at the screen level. They are deliberately not fixed here to respect the packet's authorized-surface boundary. `SecondarySurfacesSection.kt:65` renders literal `▼` / `▶` glyphs, which is acceptable (directionless punctuation glyphs, not user-facing copy); its labels are correctly localized via `home_secondary_surfaces_expand` / `_collapse`.
+5. **Interface-text localization gap in *unmodified* Home sections — CLOSED in §8 (superseded):** this residual previously recorded three hardcoded English labels (`BodyStatusSection.kt` `BIOLOGICAL HARDWARE STATUS`; `SystemFeedSection.kt` `SYSTEM INTELLIGENCE FEED` and `NO INTEL FEED DETECTED`). The Product Owner escalated them as a **failed Must Acceptance criterion** (`Complete EN/FA parity is not true`), and they were repaired under the bounded second-repair gate documented in **§8**. The statement that *full Home EN/FA parity is not yet complete at the screen level* no longer holds for the packet's Home surface; see §8.2 for the residual items that remain and their classification. `SecondarySurfacesSection.kt:65` renders literal `▼` / `▶` glyphs, which is acceptable (directionless punctuation glyphs, not user-facing copy); its labels are correctly localized via `home_secondary_surfaces_expand` / `_collapse`.
 6. Emulator System UI entered an ANR loop during the run after a `font_scale` write; resolved by device reboot. Environmental only — AXIOM itself showed no ANR or crash (`logcat -b crash` clean; app pid alive throughout; `LaunchState` verified after recovery).
 
 ### 7.5 Status at closure
@@ -220,3 +221,92 @@ Device: Android 14 (API 34, `sdk=34`), `sdk_gphone64_arm64`, arm64-v8a, 1080 × 
 - **Issue #85:** sole `state:active` WIP owner (verified: exactly one open issue carries `state:active`; the only other open issue, #75, is `state:suspended` and consumes no WIP)
 - **Next step:** bounded commit → push `codex/ui-ux-phase2-home-navigation` → PR against `main` linked to #85 → canonical CI (Assemble Debug / Lint / Room Schema / Unit Tests) PASS on the exact PR head → #85 moves `state:active` → `state:review`.
 - **Merge:** explicitly **NOT** performed. STOP gate observed.
+
+---
+
+## 8. Second PO Repair Gate — Final Localization Acceptance Repair (2026-09-14)
+
+**Trigger.** Product Owner independent verification of PR #86 confirmed the packet was technically green but that one **Must Acceptance** requirement still failed: *Complete EN/FA parity is not true.* Live Persian-mode Home still rendered hardcoded English. Issue #85 was moved `state:review` → `state:active` for the duration of the repair, and returned to `state:review` only after the canonical CI suite reported all four jobs green on the exact repaired PR head.
+
+**Repaired source head:** `d21b1ed5b6b2c9fba34d84439418b9d64f4747b0` — the commit carrying the localization code, tests and FA evidence screenshots 11/12/13. The review-artifact update you are reading is a follow-up documentation commit on the same PR; the canonical CI gate is evaluated on the final PR head.
+
+**Boundary observed.** No merge, no Home redesign, no domain/data/schema/navigation change, no Room v18 change, no new packet started. Repair is confined to string extraction (resources), the consuming composables, and the parity guard tests.
+
+### 8.1 Localization files changed
+
+| # | File | Change |
+|:---:|---|---|
+| 1 | `presentation/home/components/BodyStatusSection.kt` | `BIOLOGICAL HARDWARE STATUS` → `@string/home_body_status_title` |
+| 2 | `presentation/home/components/SystemFeedSection.kt` | `SYSTEM INTELLIGENCE FEED` → `@string/home_system_feed_title`; `NO INTEL FEED DETECTED` → `@string/home_system_feed_empty` |
+| 3 | `presentation/home/components/ActiveMissionStrip.kt` | `BOSS FIGHT` → `@string/home_active_mission_stage_boss`; `STAGE <n>` → `@string/home_active_mission_stage`; TalkBack `Quick Complete` → `@string/home_active_mission_quick_complete_cd` |
+| 4 | `ui/components/VitalsComponents.kt` | `TEETH` / `COMPLETE` / `PENDING` → `@string/home_vitals_teeth`, `_teeth_complete`, `_teeth_pending` (Home-exclusive `VitalTeethCard`, reached only from `SuccessContent`) |
+| 5 | `ui/MainHUD.kt` | `RANK: <rank>` / `⚔ Lv.<n>` / `<x>/<y> XP` / `🔥 <n>d` → `@string/main_hud_rank`, `_level`, `_xp`, `_streak` |
+| 6 | `res/values/strings.xml` | +9 Home keys, +4 Main HUD keys (English) |
+| 7 | `res/values-fa/strings.xml` | Same 13 keys (Persian) |
+| 8 | `presentation/home/HomeFontScaleContractTest.kt` | The 9 new Home keys added to the EN/FA parity guard |
+| 9 | `ui/accessibility/AccessibilityContractTest.kt` | The 4 new Main HUD keys added to the cross-locale `criticalKeys` parity guard |
+
+**Scope decision recorded.** `MainHUD` is the app-shell telemetry strip rendered by `MainScreen.kt:252` above every screen (not by `SuccessContent`), and the packet never touched it. Because it is nevertheless *visibly rendered on Home* — the Product Owner's own in-scope criterion — the PO explicitly authorized localizing its four tokens during this repair. No other shared component was modified.
+
+### 8.2 Hardcoded Home string audit (rendered FA surface, accessibility-tree scan)
+
+Method: `uiautomator dump` of the live Persian-mode Home surface (top HUD, hero, outcomes, Body Status, expanded secondary surfaces), then a regex scan for every text node containing a run of ≥ 2 Latin letters; `content-desc` (TalkBack) audited the same way.
+
+**Result — zero unlocalized English UI strings remain.** Every surviving Latin run is one of: seed/user **data**, a canonical **token**, or a deliberate **bilingual gloss**:
+
+| Latin text rendered in FA mode | Source | Classification | In scope to fix? |
+|---|---|---|---|
+| `رتبه: RECRUIT` | `main_hud_rank` template + `hunter.rankLabel` | Localized template + rank **data** token | n/a — correct |
+| `RECRUIT-Rank` | `hunter.rankLabel` (Room) | Canonical taxonomy **data** | No — domain/data change |
+| `Hunter` | `hunter.name`, default seeded by `EnsureFirstWinHunterUseCase` | **Data** (user-editable name) | No — domain/data change |
+| `Customer Problem Interview (1-on-1)` | user-entered mission title | **Data** | No |
+| `پیشبرد هدف: Capability` | localized template + goal name | Template + **data** | n/a — correct |
+| `1 مأموریت فعال است. زنجیره: 1 روز. … حفظ کن، Hunter.` | `HomeViewModel` FA branch | Localized FA sentence + **data** name | n/a — correct (see §8.5.4) |
+| `آمادگی رزمی فیزیکی (COMBAT READINESS)` | `BodyStatusSection` `isFa` branch | Deliberate **bilingual gloss** | n/a — by design |
+| `Chest مهیا شد (۱۰۰%) · Chest …` | `home_combat_readiness_summary` + muscle name | Localized template + **data** | No — domain/data change |
+| `CHEST` `BACK` `SHOULDERS` `BICEPS` `TRICEPS` `LEGS` `CORE` `FOREARMS` | `muscle.displayName.uppercase()`; seeded at `data/SeedDataHelper.kt:144-151` | Room-seeded **data** | No — domain/data change |
+
+- **TalkBack / `content-desc`:** 12 distinct values on the rendered FA Home surface, **12/12 Persian**. The single value containing Latin letters is `پروفایل هانتر: Hunter، رتبه RECRUIT-Rank، سطح ۱` — a localized Persian template interpolating *data* tokens.
+- **Corrected earlier claim:** screenshot `10` in §7.2 asserted `RANK: RECRUIT` as an expected truthful value. It was truthful *data* but an English *label*; that label is now `رتبه: RECRUIT` under FA.
+
+### 8.3 FA RTL runtime evidence (fresh APK, Android 14 / API 34)
+
+Device: `warrior_test` AVD, `sdk=34`, arm64-v8a, 1080 × 2400, system `persist.sys.locale = fa-IR`, `font_scale = 1.0`. Install: `adb install -r` → `Success` (`lastUpdateTime = 2026-09-14 20:54:27`).
+
+| # | Filename | Verification target | SHA-256 |
+|:---:|---|---|---|
+| **11** | `11_home_fa_rtl_hud_localized.png` | Localized shell HUD on Persian Home. `uiautomator` bounds: `رتبه: RECRUIT` `[48,136]`, `🔥 ۱ روز` `[249,157]`, `۲۰/۱۰۰ تجربه` `[388,157]`, `⚔ سطح ۱` `[893,157]` — all inside the viewport, no clipping. Persian digits confirmed. | `cfbcd55ac5c9c4dc1311f0ab360502eeb55646ba59f43667ea5a4cb37159a782` |
+| **12** | `12_home_fa_rtl_body_status.png` | `وضعیت بدن` rendered at `y=1321` (was `BIOLOGICAL HARDWARE STATUS`), right-aligned RTL at `x=896`, above the `PHYSICAL COMBAT READINESS` card. | `b89f1908e97b841be29e10f18f77ff2fbab05878b1f05cf1730eeaf48265a8b6` |
+| **13** | `13_home_fa_rtl_system_feed_empty.png` | `رویدادهای سیستم` at `y=1751` (was `SYSTEM INTELLIGENCE FEED`) with the empty state `فعالیت تازه‌ای وجود ندارد` at `y=1888` (was `NO INTEL FEED DETECTED`), inside the expanded `پروتکل‌ها و وضعیت سلامت` disclosure. | `a0d4e50ecf18d1a9bd25e0cec77bd116c84e3d093ea749e99a2e4f607637dfb6` |
+
+The five authorized Operational Tracks also re-rendered Persian in the same expanded state: `سیاه‌چال‌ها`, `مهارت‌ها`, `لیگ‌ها`, `حضور و غیاب`, `تحلیل‌ها` — and the `PRO` / Premium tile remained **absent**.
+
+**How FA mode was reached (reproducible):** AXIOM keeps its own language preference (`SharedPreferences axiom_lang` consumed by `MainActivity.attachBaseContext`, plus the DataStore key `language`), and the only in-app switcher is the first-run `LanguageThemeSetupScreen`; there is no post-onboarding toggle. The device was therefore set to FA on both stores via `run-as` (debug build): the DataStore protobuf (`files/datastore/axiom_prefs.preferences_pb`, 27 keys, `language` `en` → `fa`, all other keys byte-preserved) and `shared_prefs/axiom_lang.xml`. Both locale sources must agree, since `Locale.getDefault()` drives `isFa` in the Home composables while `preferences.languageFlow` drives `HomeViewModel`/voice copy.
+
+### 8.4 Local gates on the exact repaired head
+
+| Gate | Result |
+|---|---|
+| `git diff --check` | **PASS** — clean, exit 0 |
+| `./gradlew assembleDebug` | **PASS** — `BUILD SUCCESSFUL in 1m 59s`; APK `da4d01b1fa5fa0899e763b6face45f39bb2b29860b4964e5de2ad46cbb6396d1` |
+| `./gradlew testDebugUnitTest` | **PASS** — **65 suites / 426 tests / 0 failures / 0 errors / 0 skipped** |
+| `./gradlew testDebugUnitTest --tests com.axiom.app.db.NoWp207MigrationGuardTest` | **PASS** — 6/6, 0 failures |
+| `./gradlew lintDebug` (`lintAnalyzeDebug` + `lintReportDebug`) | **PASS** — **0 errors**, 344 warnings; zero findings referencing the touched files |
+| Room schema | **v18 unchanged**; **zero** `domain/` + `data/` entries in `git status` |
+
+### 8.5 Residual risks (honest, carried forward)
+
+1. **Muscle-group labels remain English by *data*, not by UI string:** `BodyStatusSection` renders `muscle.displayName.uppercase()`, seeded at `data/SeedDataHelper.kt:144-151` (`Chest`, `Back`, `Shoulders`, `Biceps`, `Triceps`, `Legs`, `Core`, `Forearms`) and persisted in Room. Localizing them requires a `data`/seed change, which this repair's boundary forbids. This is the largest remaining EN/FA gap *visible* on Home.
+2. **Combat-readiness summary interpolates the same English data:** `home_combat_readiness_summary` is a correctly localized FA template, but its `%s` muscle names come from the same seed, so the sentence reads as mixed script (`Chest مهیا شد …`). Same root cause and same boundary as (1).
+3. **Hunter default name is seeded English:** the starter profile is created with `name = "Hunter"`, so Persian Home addresses the user as `Hunter` (and `HomeViewModel`'s FA sentence ends `… حفظ کن، Hunter.`). User-editable data; a localized default would be a domain/seed change.
+4. **Western digits inside a Persian sentence:** `HomeViewModel`'s next-best-action line renders `1 مأموریت فعال است. زنجیره: 1 روز.` — Latin `1` rather than `۱` in otherwise Persian copy. Not English text (so it does not breach the stated criterion), but a numeral-shaping inconsistency worth a follow-up. Elsewhere Persian digits are correct (`۲۰/۱۰۰ تجربه`, `⚔ سطح ۱`).
+5. **Pre-existing FA mistranslation, not an English leak:** `nav_home` = `کارت` (literally *card*) for the Home tab, in `values-fa/strings.xml:9`. It is Persian, so it does not violate the zero-English requirement, but it is a copy defect outside this repair's named scope; flagged for a copy pass.
+6. **`MainHUD` is a shared shell surface:** localizing it changes HUD copy on *every* screen in FA mode, not only Home. This was the PO-authorized scope decision in §8.1; no other shell component was touched.
+7. **Emulator environment:** the AVD's `system_server`/`systemui` repeatedly raised `isn't responding` overlays under host CPU contention (the machine was also running Chrome/Spotify). AXIOM itself never crashed (`logcat -b crash` clean, pid alive, focus verified). The Gradle gates were run with the emulator stopped after a 600 s timeout on `assembleDebug`; the Kotlin compile had in fact completed and the re-run finished in 1m 59s.
+
+### 8.6 Score and Must Acceptance status
+
+- **Composite score: `9.8800 / 10.00` — deliberately UNCHANGED.** This repair closes a Must Acceptance gap; it does not license a re-score or inflation, and no reviewer re-scored. The four §4 review scores and the §5 rubric stand as recorded.
+- **Hard caps triggered: 0** (unchanged).
+- **Must Acceptance — EN/FA parity: now SATISFIED** for the packet's Home surface. Zero hardcoded English UI strings and zero English TalkBack strings remain on the rendered Persian Home surface; all surviving Latin text is data, a canonical token, or a deliberate bilingual gloss (§8.2). Residual EN/FA gaps that are **data-owned** (muscle names, hunter default name) are recorded in §8.5 and require a separately authorized data/seed change.
+- **Merge:** explicitly **NOT** performed. STOP gate observed for the second time.
