@@ -55,7 +55,13 @@ fun OperationalTracksSection(
             )
         }
 
-        // Grid of 5 authorized operational tracks
+        // Governance repair (WP-UIUX-02 / Issue #85 PO decision): Home must not expose
+        // AX-013 Dungeons (HIDE / G7), AX-016 Skill Tree (HIDE / G7) or AX-018 Leagues
+        // (FREEZE / G7). Their tiles and navigation callbacks were removed; canonical
+        // MODULE_DISPOSITION is unchanged and the routes still exist elsewhere.
+        // Retained under a bounded PO exception: AX-015 Daily Check-in and
+        // AX-022 Weekly Analytics, as existing secondary progressive-disclosure links.
+        // The remaining two tiles share one balanced row.
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -64,36 +70,7 @@ fun OperationalTracksSection(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                // Item 1: Dungeons
-                QuickLaunchItem(
-                    title = if (isFa) "سیاه‌چال‌ها" else "DUNGEONS",
-                    iconRes = R.drawable.ic_nav_missions,
-                    iconColor = colors.penaltyRed,
-                    onClick = { onNavigate(Screen.Dungeons.route) },
-                    modifier = Modifier.weight(1f)
-                )
-                // Item 2: Skills
-                QuickLaunchItem(
-                    title = if (isFa) "مهارت‌ها" else "SKILLS",
-                    iconRes = R.drawable.ic_nav_skills,
-                    iconColor = colors.systemGreen,
-                    onClick = { onNavigate(Screen.SkillTree.route) },
-                    modifier = Modifier.weight(1f)
-                )
-                // Item 3: Leagues
-                QuickLaunchItem(
-                    title = if (isFa) "لیگ‌ها" else "LEAGUES",
-                    iconRes = R.drawable.ic_nav_leagues,
-                    iconColor = colors.legendaryGold,
-                    onClick = { onNavigate(Screen.Leagues.route) },
-                    modifier = Modifier.weight(1f)
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                // Item 4: Check-in
+                // Item 1: Check-in
                 QuickLaunchItem(
                     title = if (isFa) "حضور و غیاب" else "CHECK-IN",
                     iconRes = R.drawable.ic_nav_habits,
@@ -101,7 +78,7 @@ fun OperationalTracksSection(
                     onClick = { onNavigate(Screen.DailyCheckin.route) },
                     modifier = Modifier.weight(1f)
                 )
-                // Item 5: Analytics
+                // Item 2: Analytics
                 QuickLaunchItem(
                     title = if (isFa) "تحلیل‌ها" else "ANALYTICS",
                     iconRes = R.drawable.ic_nav_system,
