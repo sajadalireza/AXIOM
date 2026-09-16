@@ -524,5 +524,5 @@ Evidence 18–21 were re-captured from the fresh build (the originals predated t
 - **Composite score: `9.8800 / 10.00` — deliberately UNCHANGED.** This round closes the residual localization gaps and adds regression guards; it does not license a re-score. No reviewer re-scored.
 - **Hard caps triggered: 0** (unchanged).
 - **Must Acceptance — Complete EN/FA parity: SATISFIED on the final tree.** Zero system-owned English copy, zero Latin units/meridiems, zero Western-digit owned counters on the rendered Persian Home/Nav surface; TalkBack-owned copy fully Persian; all surviving Latin is data or a numeric measurement token (§10.4).
-- **Source commit for this round:** `<<WP-UIUX-02-R4-COMMIT-SHA>>` (same branch, pushed to **PR #86**; canonical CI required 4/4 PASS on the exact new head before #85 returns to `state:review`).
+- **Source commit for this round:** `5ea098660aa8c2a9c8ec9c084662282c70bc18ef` (`fix(uiux-02): complete final Persian Home localization closure`, same branch, pushed to **PR #86**; canonical CI required 4/4 PASS on the exact new head before #85 returns to `state:review`). This §10 record itself is committed as the immediately-following docs-only commit on the same branch.
 - **Merge:** explicitly **NOT** performed. STOP gate observed for the fourth time.
