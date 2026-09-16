@@ -1,47 +1,100 @@
 # WP-UIUX-02 — BINDING VISUAL REFERENCE MANIFEST
 
-**Work Packet:** WP-UIUX-02 (Slice 2: Home Screen Visual Redesign & Core Navigation)  
-**Owning Gate:** Gate G3 — Core Loop & Data Truth (AX-009 Home and Today, AX-002 App shell and primary navigation)  
-**Status:** Canonical Product Owner Binding Target  
+**Work Packet:** WP-UIUX-02 (Slice 2: Home Screen Visual Redesign & Core Navigation)
+
+**Owning Gate:** Gate G3 — Core Loop & Data Truth (AX-009 Home and Today, AX-002 App shell and primary navigation)
+
+**Status:** Product Owner Binding Target — corrected 2026-09-16
 
 ---
 
-## 1. Selected Target Reference
+## 1. Product Owner Decision and Selected Target
 
-| File | SHA-256 | Description |
+The Product Owner explicitly rejected the earlier compact Home mockup built around `Customer Problem Interview / COMPLETE MISSION / 1 DAY STREAK` as the binding target. The Product Owner selected the **Mission-first Primary State** direction on 2026-09-16.
+
+| File | SHA-256 | Role |
 |---|---|---|
-| `docs/handoffs/wp-uiux-02/references/01_home_target.jpg` | `57a4825f7c9ae4ec04e0e132255d4191bf9040f00a442c478523a5f7ceac5f2f` | Product Owner-selected visual target for the Home Screen & Core Navigation Dock |
+| `docs/handoffs/wp-uiux-02/references/01_home_primary_state.png` | `4b0b36c360563b9c6a7affbf7b41da4044a0d383ce80b296d932bddbded658b0` | Binding local full-resolution Primary State source recovered from `/Users/sajadalireza/Documents/AXIOM photos/5106d160-36ac-476e-a790-7a7a72d173ba.png` |
+| `docs/handoffs/wp-uiux-02/references/rejected/00_superseded_compact_home_target.jpg` | `57a4825f7c9ae4ec04e0e132255d4191bf9040f00a442c478523a5f7ceac5f2f` | **REJECTED / historical only. Must not be used as a visual target.** |
 
-*Provenance Note:* Recovered from the authorized Product Owner handoff collection (`axiom_home_mockup_1789171453974.jpg`). Historical archives, deprecated proposals, and non-Home exploratory designs are strictly excluded.
+The Primary State reference is authoritative for visual hierarchy, grouping, density, card geometry, palette relationships, and Home/navigation composition. Canonical repository behavior remains authoritative for dynamic data, routes, state, module disposition, privacy, accessibility, localization, and offline behavior.
+
+### Product Owner-confirmed composition
+- AXIOM brand identity at the top; calm/cinematic rather than terminal-like.
+- Compact user/Hunter identity with truthful Level/XP progress.
+- **NEXT MEANINGFUL MISSION** is the dominant center of gravity.
+- Exactly one dominant `Start Mission` / truthful `Continue Mission` CTA.
+- Compact `Today` status row beneath the mission hero.
+- Xion Insight is subordinate/advisory and never a competing CTA or truth authority.
+- Weekly Progress is visible but subordinate to action.
+- Floating five-tab navigation remains `Missions / Physical / Home / Shadows / Hunter` for this packet's scope-preservation contract.
+- Home is the visual center of the dock. Use restrained Champagne Gold for identity/anchor emphasis and Deep Emerald/Cyan for action/state feedback. Do not copy illustrative mock data as facts.
 
 ---
 
-## 2. Binding Visual Hierarchy & Styling Rules
+## 2. Binding Visual Hierarchy
 
-The reference image is authoritative for visual hierarchy, spacing, geometry, and styling. Dynamic data, entity logic, and interaction behavior derive strictly from canonical repository code and domain models.
+### Layer 1 — NOW
+1. AXIOM identity / atmospheric header treatment.
+2. Compact truthful Hunter/Profile + Level/XP state.
+3. Next Meaningful Mission hero card.
+4. Exactly one dominant primary mission CTA.
 
-### A. PO-Binding Visual Details
-- **Palette & Mood:** Deep Emerald (`#0D1A14`, `#10B981`, `#00E599`) + restrained Champagne Gold (`#F0D590`) + Graphite (`#1A221E`). Dark Matte background (`#0A0E0C` / `#121614`).
-- **Header Structure:** Compact, refined header containing Hunter profile avatar, name, rank badge capsule (`RECRUIT I`), thin linear XP progress bar (`10 / 100 XP`), and clean flame streak counter (`1 Day`).
-- **Hero Mission Card (Dominant Center of Gravity):**
-  - Positioned prominently as the immediate primary visual focus (Layer 1 — NOW).
-  - Bold mission title typography.
-  - Duration pill (`25 min`) and reward pill (`+230 XP`).
-  - **Single Dominant Primary CTA:** Exactly one primary button (`"Start Mission"` / `"شروع مأموریت"`), styled with a large emerald gradient/glow.
-- **Streak & Habit Module:** Clean flame icon with a 7-day dot timeline.
-- **Core Navigation Dock:** Floating curved container (20dp rounded corners), subtle dark emerald border, monochromatic icons, and an animated soft emerald active pod indicator (`podWidth = 44.dp`), eliminating notification badge bombardment.
-- **Typography & Polish:** Modern geometric sans (Outfit / Inter) with clean hierarchy. Eliminate bracket clutter `[ ]`, cyber-terminal pseudo-code, all-caps noise, and RPG dominance.
+### Layer 2 — TODAY
+Use compact truthful cards/status summaries derived from existing capabilities. Preserve applicable Check-in, Vitals, Habits/Focus-equivalent status without inventing unsupported data.
 
-### B. Visual Inspiration Only (Not Canonical Domain Models)
-- Mockup text strings (`"Protocol: Deep Focus"`, `"+230 XP"`, `"25 min"`) are illustrative mockups; live fields bind dynamically to actual `Mission` entities in Room.
-- Decorative neon glow blurs are visual tokens; they must not compromise WCAG AAA text contrast, TalkBack labels, or performance.
+### Layer 3 — XION / PROGRESS
+- Xion Insight: subordinate; editable/rejectable/reportable where the canonical Decision Layer applies.
+- Weekly Progress / streak / challenge/progress information: visually subordinate to real action.
 
-### C. Current Canonical Product Behavior Preserved (No Feature Deletion)
-- **5-Tab Navigation Scope Preservation:** Missions, Physical, Home, Shadows, Hunter preserved in order and route semantics.
-- **Progressive Disclosure:** All real secondary Home capabilities remain fully accessible:
-  - Layer 1 (NOW): Next Meaningful Mission, Active Mission state, contextual Xion presence.
-  - Layer 2 (TODAY): Daily Outcomes, Next Best Action, eligible Daily Habit / Vitals, Program Countdown DatePicker.
-  - Layer 3 (PROGRESS): XP / Level / Rank progress, streak & weekly challenges, muscle recovery & body status, weekly review overdue banner.
-  - Layer 4 (SECONDARY): Operational Tracks, System Feed, low-priority existing tools.
-- **Database & Data Invariants:** Room schema v18 intact (0 migrations), 0 changes to `domain/` or `data/` layers.
-- **Accessibility & Parity:** Complete EN/FA parity, dynamic RTL mirroring, TalkBack semantic markup, 200% font scaling, $\ge 48\,\text{dp}$ touch targets, and a real Light Theme companion.
+### Layer 4 — SECONDARY / PROGRESSIVE DISCLOSURE
+Preserve existing real secondary Home capabilities without allowing them to compete with the Next Meaningful Mission. Apply current Module Disposition and explicit packet decisions before exposing routes.
+
+---
+
+## 3. Module-Disposition Boundary for Home
+
+The 2026-09-16 Product Owner decision for WP-UIUX-02 is binding:
+- `AX-013 Dungeons` — **not reachable from Home** (`HIDE / G7`).
+- `AX-016 Skill Tree` — **not reachable from Home** (`HIDE / G7`).
+- `AX-018 Leagues` — **not reachable from Home** (`FREEZE / G7`).
+- `AX-026 Premium / Entitlements` — **not reachable from Home** (`FREEZE / G6`).
+- `AX-015 Daily Check-in` — may remain only as an existing secondary progressive-disclosure link under this packet's bounded PO exception.
+- `AX-022 Weekly Analytics` — may remain only as an existing secondary progressive-disclosure link under this packet's bounded PO exception.
+
+This exception does not activate G7/G4/G5, change `MODULE_DISPOSITION`, or authorize new feature behavior.
+
+---
+
+## 4. Visual Inspiration vs Product Truth
+
+Illustrative mockup values such as a portrait/name, `Lv. 12`, `1,240 XP`, `3/4`, `Read 2 pages`, `5–10 min`, `+50 XP`, generated quotes, or generated Xion text are **not canonical product data**. Bind to real local models/state or show an honest empty/unknown state.
+
+Supporting AXIOM boards/photos may be used only to refine component styling, spacing, icon language, emerald/gold/glass treatment, and cross-screen visual consistency. They may not override this Primary State composition or introduce unsupported features.
+
+---
+
+## 5. Non-Negotiable Product Invariants
+
+- One primary CTA on Home.
+- Mission-first hierarchy; Goal Progress remains more important than XP.
+- No shame/punishment framing.
+- Room v18, zero migrations in this packet.
+- Zero `domain/` or `data/` behavior changes unless separately authorized.
+- No analytics/privacy expansion and no client secrets.
+- EN/FA parity, culturally appropriate Persian, RTL, TalkBack, 200% font scaling, >=48dp targets, reduced motion.
+- Real Light Theme companion; not simple inversion.
+- Local-first/offline behavior preserved.
+
+---
+
+## 6. Acceptance Evidence
+
+The packet is not visually accepted merely because build/tests are green. Final acceptance requires:
+1. fresh emulator screenshot at comparable viewport;
+2. side-by-side comparison with `01_home_primary_state.png`;
+3. explicit review of hierarchy, spacing, card geometry, CTA prominence, header/identity treatment, Today grouping, Xion/progress subordination, palette, and bottom dock;
+4. zero unjustified Critical visual deltas;
+5. zero unjustified Major visual deltas;
+6. every material deviation justified by canonical behavior/accessibility/localization/device constraints;
+7. canonical CI green on exact final PR head.

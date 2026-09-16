@@ -1,13 +1,21 @@
 # Four Independent Adversarial Reviews & Canonical Scorecard — Work Packet WP-UIUX-02 (Post-PO Repair Gate)
 
-**Target Work Packet:** WP-UIUX-02 — Slice 2: Home Screen Visual Redesign & Core Navigation Dock  
-**Parent Authorization:** `docs/handoffs/wp-uiux-02/01_BINDING_VISUAL_REFERENCE_MANIFEST.md`  
-**Tracking Issue:** [#85](https://github.com/sajadalireza/AXIOM/issues/85) (`state:active`, WIP = 1)  
-**Branch:** `codex/ui-ux-phase2-home-navigation`  
-**Base Commit:** [`a91d5659ab390cdbead7f0c31dc14d59a1e6c8b6`](https://github.com/sajadalireza/AXIOM/commit/a91d5659ab390cdbead7f0c31dc14d59a1e6c8b6) (main HEAD post-WP-UIUX-01)  
-**Date:** 2026-09-13 (first closure) · 2026-09-14 (second PO repair gate — Final Localization Acceptance Repair, see §8) · 2026-09-14 (third PO repair gate — Final Persian Localization Closure, see §9)  
-**Lead / Maintainer:** `sajadalireza`  
-**Canonical Status:** **READY FOR PRODUCT OWNER FINAL ACCEPTANCE (UNANIMOUS PASS)** — §5 composite score `9.8800` retained unchanged after the §8 and §9 localization repairs  
+**Target Work Packet:** WP-UIUX-02 — Slice 2: Home Screen Visual Redesign & Core Navigation Dock
+
+**Parent Authorization:** `docs/handoffs/wp-uiux-02/01_BINDING_VISUAL_REFERENCE_MANIFEST.md`
+
+**Tracking Issue:** [#85](https://github.com/sajadalireza/AXIOM/issues/85) (WIP = 1; the label is `state:active` only for the duration of a repair round and returns to `state:review` after exact-head CI is green)
+
+**Branch:** `codex/ui-ux-phase2-home-navigation`
+
+**Base Commit:** [`a91d5659ab390cdbead7f0c31dc14d59a1e6c8b6`](https://github.com/sajadalireza/AXIOM/commit/a91d5659ab390cdbead7f0c31dc14d59a1e6c8b6) (main HEAD post-WP-UIUX-01)
+
+**Date:** 2026-09-13 (first closure) · 2026-09-14 (second PO repair gate — Final Localization Acceptance Repair, see §8) · 2026-09-14 (third PO repair gate — Final Persian Localization Closure, see §9) · 2026-09-14 (fourth round — interrupted-session recovery & final Persian localization closure, see §10) · 2026-09-16 (fifth round — Home Module Disposition Boundaries, see §11)
+
+**Lead / Maintainer:** `sajadalireza`
+
+**Canonical Status:** **READY FOR PRODUCT OWNER FINAL ACCEPTANCE (UNANIMOUS PASS)** — §5 composite score `9.8800` retained unchanged after the §8, §9, §10 and §11 repairs
+
 **PR:** [#86](https://github.com/sajadalireza/AXIOM/pull/86) against `main` (linked to #85)
 
 ---
@@ -21,7 +29,7 @@ Following the Product Owner Repair Gate review on Issue #85, all 7 identified de
    - `HunterHeaderSection.kt`: Completely removed unused `onNavigateToPremium` parameter.
    - `SuccessContent.kt`: Removed `onNavigateToPremium` wiring at all call sites.
    - `OperationalTracksSection.kt`: A legacy baseline Premium quick-launch route (`.clickable { onNavigate(Screen.Premium.route) }`) was discovered during Product Owner verification on Issue #85. Provenance investigation confirmed this route pre-existed WP-UIUX-02 (introduced in baseline commits `051da1e` and `71c9ec0`). Because the Home screen is within this packet's boundary and canonical `MODULE_DISPOSITION` marks AX-026 (Premium & Entitlements) as FREEZE / G6, this legacy tile was removed as a strict compliance repair.
-   - All 5 authorized Operational Tracks (Dungeons, Skills, Leagues, Check-in, Analytics) are 100% preserved in a balanced 3+2 grid layout with equal row width (`weight(1f)`), without inventing any new capability, feature replacement, or leaving an empty grid hole.
+   - **(SUPERSEDED by §11.2–§11.3, 2026-09-16)** All 5 Operational Tracks (Dungeons, Skills, Leagues, Check-in, Analytics) were preserved in a balanced 3+2 grid layout with equal row width (`weight(1f)`) at this point in the chronology. The later Product Owner decision on Issue #85 required Home to stop exposing AX-013 Dungeons, AX-016 Skill Tree and AX-018 Leagues; §11.2–§11.3 record the bounded repair and the resulting two-tile layout. This bullet is retained as chronology, not as the current state.
    - Live interaction and code audit confirms zero routes or affordances leading to frozen Premium/Billing/Activation screens.
 
 2. **Primary CTA Semantics Correction:**
@@ -194,11 +202,13 @@ Device: Android 14 (API 34, `sdk=34`), `sdk_gphone64_arm64`, arm64-v8a, 1080 × 
 
 ### 7.3 Frozen-module reachability audit (re-performed)
 
+> **Superseded in part by §11.3 (2026-09-16).** This audit was scoped to frozen **Premium/Billing/Activation** exposure — a narrow denylist rather than the canonical disposition surface. The round-5 repair re-performed it across every module canonically disposed `HIDE` or `FREEZE`, which surfaced three real Home entry points (`dungeons`, `skill_tree`, `leagues`) that this section had recorded as ordinary Home-emitted targets.
+
 | Check | Result |
 |---|---|
 | `navigate(Screen.Premium…)` call sites in `app/src/main/java` | **0** — the `premium` route is registered in `AwakenNavGraph.kt:346` and consumed by `MainScreen.kt:323,364` but has **no navigator anywhere**; it is an orphan route, unreachable from any UI |
 | Frozen-term hits inside the changed Home surface (`presentation/home/**`, `AwakenBottomNavBar.kt`) | **1**, and it is a KDoc comment only (`SuccessContent.kt:37`). Zero functional hits |
-| Home-emitted navigation targets | `Profile`, `MissionDetail`, `AddMission`, `Missions`, `DailyCheckin`, `WeeklyReview`, `BodyMap`, `Dungeons`, `SkillTree`, `Leagues`, `WeeklyAnalytics`, plus the dynamic `state.nextBestActionRoute` |
+| Home-emitted navigation targets | `Profile`, `MissionDetail`, `AddMission`, `Missions`, `DailyCheckin`, `WeeklyReview`, `BodyMap`, `Dungeons`, `SkillTree`, `Leagues`, `WeeklyAnalytics`, plus the dynamic `state.nextBestActionRoute` — **(SUPERSEDED by §11.3)** `Dungeons`, `SkillTree` and `Leagues` were still Home-emitted at this point; they have since been removed per the Product Owner decision of 2026-09-16 |
 | `nextBestActionRoute` value space (`ui/HomeViewModel.kt:141`) | Closed set `{ "add_mission", "missions", null }` — **cannot** resolve to a frozen route |
 | `FeatureFlags.PREMIUM_PURCHASE_ENABLED` | `false` (`core/FeatureFlags.kt:20`) |
 | `StreakFlameWidget` (retains an `onNavigateToPremium` callback) | **0 call sites repo-wide** — dead component, unreachable |
@@ -526,3 +536,15 @@ Evidence 18–21 were re-captured from the fresh build (the originals predated t
 - **Must Acceptance — Complete EN/FA parity: SATISFIED on the final tree.** Zero system-owned English copy, zero Latin units/meridiems, zero Western-digit owned counters on the rendered Persian Home/Nav surface; TalkBack-owned copy fully Persian; all surviving Latin is data or a numeric measurement token (§10.4).
 - **Source commit for this round:** `5ea098660aa8c2a9c8ec9c084662282c70bc18ef` (`fix(uiux-02): complete final Persian Home localization closure`, same branch, pushed to **PR #86**; canonical CI required 4/4 PASS on the exact new head before #85 returns to `state:review`). This §10 record itself is committed as the immediately-following docs-only commit on the same branch.
 - **Merge:** explicitly **NOT** performed. STOP gate observed for the fourth time.
+
+---
+
+## 12. Product Owner Visual Target Reconciliation — 2026-09-16
+
+The Product Owner explicitly rejected the compact `Customer Problem Interview / COMPLETE MISSION / 1 DAY STREAK` mockup previously recorded as the binding Home target. The packet manifest has been corrected to the Mission-first Primary State direction (`references/01_home_primary_state.png`, SHA-256 `4b0b36c360563b9c6a7affbf7b41da4044a0d383ce80b296d932bddbded658b0`).
+
+Consequences:
+- all earlier visual-fidelity conclusions against SHA `57a4825f...` are historical only and cannot prove final visual acceptance;
+- build/test/schema evidence remains valid only for the exact commits it covered and does not replace the corrected target-vs-emulator comparison;
+- the historical composite `9.8800` is chronology only until the corrected visual repair completes and the four reviews are rerun;
+- PR #86 must not merge until zero unjustified Critical/Major visual deltas remain against the corrected target and all Must acceptance items pass.

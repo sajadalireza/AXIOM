@@ -44,7 +44,7 @@ If an authorized screen does not have an exact approved target reference in the 
 Before editing, produce a matrix:
 `Screen / Approved reference / Canonical behavior source / Required content adaptations / Expected deviations`.
 
-Only references explicitly marked approved in `03_VISUAL_REFERENCE_MANIFEST.md` may be used as visual targets. Runtime/baseline images are comparison evidence, not targets.
+Only references explicitly marked approved in the active packet-specific binding manifest (or, for WP-UIUX-01, `05_EXACT_PO_REFERENCE_MANIFEST.md`) may be used as visual targets. Runtime/baseline images and exploratory boards are comparison/supporting evidence, not targets.
 
 ## 6. Visual acceptance loop
 For every screen:
@@ -57,7 +57,7 @@ For every screen:
 A build/test PASS is necessary but NOT sufficient for Product Owner visual acceptance.
 
 ## 7. Acceptance MUST
-WP-UIUX-01 cannot be marked design-accepted unless:
+A UI/UX Work Packet cannot be marked design-accepted unless:
 - all canonical functional/accessibility requirements pass,
 - every authorized screen with a target reference completed the visual comparison loop,
 - zero unjustified Critical visual deltas remain,
