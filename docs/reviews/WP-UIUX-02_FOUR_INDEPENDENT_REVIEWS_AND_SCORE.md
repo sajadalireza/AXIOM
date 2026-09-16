@@ -421,3 +421,108 @@ Device: `warrior_test` AVD, `sdk=34`, arm64-v8a, 1080 × 2400, `persist.sys.loca
 - **Must Acceptance — Complete EN/FA parity: SATISFIED.** Zero hardcoded system-owned English UI strings and zero English TalkBack strings remain on the rendered Persian Home surface, **including the system muscle taxonomy**, which previously leaked through the seed data layer (§8.5 items 1–2 are now closed). All surviving Latin text is data, a locale-neutral unit/meridiem abbreviation, a numeral-shaping artifact, or a deliberate bilingual gloss (§9.3).
 - **PR:** repair pushed to the same **PR #86**; canonical CI required 4/4 PASS on the new exact head before #85 returns to `state:review`.
 - **Merge:** explicitly **NOT** performed. STOP gate observed for the third time.
+
+---
+
+## §10 — Round 4: Interrupted-Session Recovery & Final Persian Localization Closure (post-head `c24f530`)
+
+### 10.1 Interrupted-session recovery
+
+The previous session was interrupted after making source edits but **before** any additional commit. The working tree at branch `codex/ui-ux-phase2-home-navigation`, HEAD `c24f530aaf68d9ad3c6cfdad99f99b39efc88709`, carried exactly nine modified tracked files (six Kotlin presentation/UI sources, two strings resources, one contract test) plus four untracked final evidence screenshots (`18`–`21`) and four excluded temp captures (`home_check*.png`). Nothing was reset, stashed, checked out, or discarded; the full `git diff` was confirmed file-by-file before any further edit. All local work was preserved as the basis of this round.
+
+### 10.2 Exact final modified files (working tree this round, pre-commit)
+
+| File | Change class |
+|---|---|
+| `presentation/home/components/BodyStatusSection.kt` | Combat-readiness title now renders `R.string.home_combat_readiness_title` (FA string is Persian-only; EN gloss removed) |
+| `presentation/home/components/DailyHabitNudgeSection.kt` | Sleep value and teeth counter render through `home_habit_sleep_value` / `home_habit_teeth_format` resources |
+| `presentation/home/components/MomentumStreakSection.kt` | 7-day timeline day chips shape digits through `AxiomDateFormatter.toPersianDigits` in FA |
+| `ui/components/VitalsComponents.kt` | Water/sleep/energy values & targets, `AM`/`PM` meridiem, water/sleep dialogs, quick-add buttons all render through new localized resources |
+| `ui/components/WeeklyChallengeCard.kt` | Challenge completion counts shape digits through `AxiomDateFormatter.toPersianDigits` in FA |
+| `ui/XionViewModel.kt` | FA branch of the Xion contextual bubble sentence passes through `AxiomDateFormatter.toPersianDigits` |
+| `res/values/strings.xml` (+14) | EN resources for every new key |
+| `res/values-fa/strings.xml` (+14) | FA resources: `home_combat_readiness_title`, `home_habit_sleep_value`, `home_habit_teeth_format`, `home_vitals_water_value/target`, `home_vitals_sleep_value/target`, `home_vitals_energy_value/target`, `home_vitals_am` (ق.ظ), `home_vitals_pm` (ب.ظ), `home_vitals_water_quick_add`, `home_vitals_water_logged`, `home_vitals_sleep_logged` |
+| `test/.../HomeFontScaleContractTest.kt` | 14 new keys added to the parity `requiredKeys`; 3 new regression guards (§10.5) |
+
+### 10.3 Late-change scope verification (presentation/localization only)
+
+The late changes reached beyond the originally-screenshot targets into `MomentumStreakSection`, `WeeklyChallengeCard` and `XionViewModel`. Reachability and boundary checks:
+
+- **All three are genuinely reachable from the WP-UIUX-02 Home surface:** `MomentumStreakSection` and `WeeklyChallengeCard` (via `WeeklyChallengeSection`) are composed in `SuccessContent.kt` (items `momentum_streak` / `weekly_challenges`); the Xion contextual bubble renders in `CompanionXionWidget`, hosted by `MainScreen` — the shell HUD that is explicitly in-scope per §8.
+- **Digit shaping uses the pre-existing canonical engine** `core/localization/AxiomDateFormatter.toPersianDigits` (G3-P6 / E2.6) — no new utility, no engine modification, and the same mechanism `CountdownBannerSection` already used for Home countdown digits.
+- **FA-gated:** every call site branches on `isFa` (or the FA language branch in `XionViewModel`); EN rendering is byte-identical to before.
+- **Boundary:** zero `domain/` changes, zero `data/` changes, zero Room/schema changes (`git diff --name-only HEAD -- app/src/main/java/com/axiom/app/domain app/src/main/java/com/axiom/app/data` is empty), no navigation-behavior change, no analytics/privacy expansion. **Verdict: no late edit exceeds the packet boundary; nothing needed reverting.**
+
+### 10.4 Fresh static localization audit (FA Home/Nav, final tree)
+
+| Requirement | Result |
+|---|---|
+| No system-owned English Home copy | **PASS** — scripted scan of `values-fa/strings.xml` for Latin letters (format-spec and escape aware) surfaces no Home-surface owned-copy violation; `HunterHeaderSection` renders the localized `home_hunter_*` resources; `NextMissionHeroCard` renders only string resources plus mission/goal **data**; `WeeklyChallenge` FA titles in `SuccessContent` are Persian (`سهمیه مأموریت`, `پروتکل استمرار`, `آماده‌سازی مأموریت کمیاب`) |
+| No raw `ml` / `h` in Persian UI | **PASS** — FA values are `میلی‌لیتر` / `ساعت` through the new resources (evidence 19) |
+| No `AM` / `PM` in Persian UI | **PASS** — `home_vitals_am` = `ق.ظ`, `home_vitals_pm` = `ب.ظ` (evidence 20) |
+| Persian Combat Readiness title, no English gloss | **PASS** — FA `آمادگی رزمی فیزیکی`; no `COMBAT READINESS` gloss remains (evidence 18) |
+| Persian expected counters use Persian numerals | **PASS** — habit water `۰ / ۸ لیوان`, teeth `۰ / ۲`, vitals `۰ میلی‌لیتر` / `۰٫۰ ساعت`, weekly `۰/۳`, `۰/۵`, `۱/۳`, `۰/۱`, momentum chips `۱`–`۷`, HUD `۴۰/۱۰۰`, `⚔ سطح ۱` (evidence 19–23) |
+| System-owned muscle taxonomy is Persian | **PASS** — FA `muscle_*`: سینه، سرشانه، جلو بازو، پشت بازو، ساعد، پشت و زیربغل، شکم و میان‌تنه، پاها (zero Latin) |
+| `nav_home` = `خانه` | **PASS** — unchanged; dock renders `خانه` on every captured frame |
+| TalkBack-owned copy is Persian | **PASS** — fresh `uiautomator` audit over all captured frames: 8 unique `content-desc` values (خانه، سایه‌ها، مأموریت‌ها، هانتر، وضعیت بدنی، پروفایل، پروفایل هانتر: Hunter، رتبه RECRUIT-Rank، سطح ۱، پیشرفت و استمرار: ۱ روز استمرار) — the two Latin-bearing values interpolate hunter-name / rank-token **data** inside Persian templates (§9.3) |
+
+**Classification of every remaining Latin token on the rendered FA Home/Nav surface:**
+
+| Latin | Class |
+|---|---|
+| `Hunter`, `RECRUIT`/`RECRUIT-Rank`, `Customer Problem Interview (1-on-1)`, `Capability` | **User-entered / seeded data tokens** (hunter name, rank taxonomy, mission title, goal tag) — not translation defects |
+| `100%` (combat ring), `+15 XP` (recovery dialog), `100%` at dialog foot | **Numeric measurement tokens** rendered through ASCII digits by a neutral formatter — numeral-shaping artifact, not English copy |
+| None otherwise | No system-owned English label, unit, meridiem, or TalkBack string remains on the surface |
+
+### 10.5 Fresh regression tests added (on top of §9.5)
+
+| Test | Guards |
+|---|---|
+| `homeCombatReadinessTitle_isPersianOnlyInFa` | FA `home_combat_readiness_title` equals `آمادگی رزمی فیزیکی`, contains no Latin; `BodyStatusSection` renders the resource; no `(COMBAT READINESS)` gloss literal remains |
+| `homeVitalsUnitsAndMeridiem_localizedInPersian` | FA unit strings contain no Latin after stripping format specs; EN keeps `ml`/`h`; `home_vitals_am/pm` = `ق.ظ`/`ب.ظ` EN = `AM`/`PM`; `VitalsComponents` renders the resources and no hardcoded `"AM"`/`"PM"`/`ml` interpolation literals remain |
+| `homeTeethCounter_rendersThroughLocalizedFormat` | EN/FA `home_habit_teeth_format` keep `%1$d`/`%2$d`; `DailyHabitNudgeSection` renders the resource; no raw `$teethCount / 2` literal; habit sleep renders `home_habit_sleep_value` (no raw `h`) |
+| `homeHeroStrings_haveCompleteEnglishAndPersianParity` (extended) | `requiredKeys` now also covers all 14 new localization keys |
+
+### 10.6 Fresh local gate outputs (final working tree; all previous outputs stale and superseded)
+
+| Gate | Result |
+|---|---|
+| `git diff --check` | **PASS** — no whitespace errors |
+| `./gradlew testDebugUnitTest` | **PASS** — `BUILD SUCCESSFUL`; **432 tests, 0 failures, 0 errors** across 66 classes; includes `HomeFontScaleContractTest` **10/10 PASS** (7 prior + 3 new) and `NoWp207MigrationGuardTest` **6/6 PASS** |
+| `./gradlew testDebugUnitTest --tests com.axiom.app.db.NoWp207MigrationGuardTest` | **PASS** — `BUILD SUCCESSFUL` (explicit filtered invocation as required) |
+| `./gradlew lintDebug` | **PASS** — **0 errors, 336 warnings** |
+| `./gradlew assembleDebug` | **PASS** — `BUILD SUCCESSFUL`; final APK SHA-256 `c121048030a45635f0e996582e9b48a6ab5fd9c3b6b9d2e337bc222c92dccbe6` |
+| Room schema | **v18 unchanged** — migration guard PASS; zero `domain/`/`data/` modifications |
+
+### 10.7 Fresh runtime evidence (final APK installed via `adb install -r`; device `emulator-5554`, `persist.sys.locale=fa-IR`, font scale 1.0)
+
+Evidence 18–21 were re-captured from the fresh build (the originals predated the late source edits) and three new captures document the late digit-shaping changes. All frames are accessibility-tree verified (`uiautomator dump`). `home_check*.png` remain **excluded** temp files and are not acceptance evidence.
+
+| # | File | Frame content | SHA-256 |
+|---|---|---|---|
+| **18** | `18_home_fa_rtl_combat_header_final.png` | Combat widget renders **`آمادگی رزمی فیزیکی`** — no `(COMBAT READINESS)` gloss; Persian muscle taxonomy (سینه، پشت و زیربغل، سرشانه) visible on the same surface | `d6eda554d11449a49a258548ec998731f5dca2f08f2e9d08c25ea7793c930c8f` |
+| **19** | `19_home_fa_rtl_vitals_units_final.png` | Vitals row: **`۰ میلی‌لیتر`**, **`۰٫۰ ساعت`** — no raw `ml`/`h` | `300fda1c6313b08fa25f6d7b5e0b17dbbfaee3384b9d51efa0ff12af9ee8afe3` |
+| **20** | `20_home_fa_rtl_teeth_ampm_final.png` | Teeth card meridiem: **`ق.ظ`** / **`ب.ظ`** — no `AM`/`PM` | `e1b827b4c34534671662018d87c372df5545b5817f6127f8537841713d5b67a0` |
+| **21** | `21_home_fa_rtl_teeth_counter_final.png` | Habit nudge counters: water **`۰ / ۸ لیوان`**, teeth **`۰ / ۲`** — Persian numerals | `ff04371d14d35a780e4652a339ed5a44d1dd61939164ff277a80ab605fa9b30a` |
+| **22** | `22_home_fa_rtl_weekly_challenge_persian_counts.png` | Weekly protocol: `[ پروتکل هفتگی ]` **`۰/۳`**, `سهمیه مأموریت ۰/۵`, `پروتکل استمرار ۱/۳`, `آماده‌سازی مأموریت کمیاب ۰/۱` — all counts Persian | `0603f8cca7ab0d58893e418c840b2ad76fcbe67dd850a3214a7de8d2d6723d77` |
+| **23** | `23_home_fa_rtl_momentum_persian_digits.png` | Momentum timeline: `۱ روز استمرار` + day chips **`۱ ۲ ۳ ۴ ۵ ۶ ۷`** — Persian digits | `fd3d83798ad200936de884128fd8184da535a0f7ba9409b5bce3c125d15114e9` |
+| **24** | `24_home_fa_rtl_xion_persian_numerals.png` | Xion contextual bubble: **`[ سیستم ] ۳ روز غیبت شناسایی شد. پروتکل جریمه فعال شد، Hunter.`** — Persian numerals in the FA sentence | `0f9c81062b45169130cf038887b3ee98fcf259e2b706b956a0745884c676630b` |
+
+### 10.8 Residual risks (updated)
+
+§9.6 items 1–2 are now **closed** (units/meridiem localized; teeth counter and Xion FA sentences use Persian numerals). Remaining:
+
+1. **Hunter default name is still seeded English** (`Hunter`) — user-editable data; localized default is a domain/seed change outside this boundary.
+2. **`HomeViewModel`'s next-best-action FA lines and domain-engine FA strings** still interpolate ASCII digits (`۱ مأموریت فعال است` renders from `1`) — owned copy is Persian; only numeral shaping differs. A shared pass through `AxiomDateFormatter` for `HomeViewModel`/domain strings is a natural follow-up.
+3. **Combat-ring percentage renders ASCII digits** (`100%`) — measurement token inside a neutral formatter; digit shaping there is a cosmetic follow-up.
+4. **Two mechanisms resolve the same muscle taxonomy** (Home static map vs Atlas `getIdentifier`) — consolidation opportunity, unchanged from §9.6.
+5. **`MainHUD` / nav dock are shared shell surfaces** — unchanged from §9.6.
+6. **Environment:** emulator healthy this round; the inactivity recovery dialog appeared at fresh install (user-owned state, dismissed via its own control without data mutation).
+
+### 10.9 Score, commit, and merge status
+
+- **Composite score: `9.8800 / 10.00` — deliberately UNCHANGED.** This round closes the residual localization gaps and adds regression guards; it does not license a re-score. No reviewer re-scored.
+- **Hard caps triggered: 0** (unchanged).
+- **Must Acceptance — Complete EN/FA parity: SATISFIED on the final tree.** Zero system-owned English copy, zero Latin units/meridiems, zero Western-digit owned counters on the rendered Persian Home/Nav surface; TalkBack-owned copy fully Persian; all surviving Latin is data or a numeric measurement token (§10.4).
+- **Source commit for this round:** `<<WP-UIUX-02-R4-COMMIT-SHA>>` (same branch, pushed to **PR #86**; canonical CI required 4/4 PASS on the exact new head before #85 returns to `state:review`).
+- **Merge:** explicitly **NOT** performed. STOP gate observed for the fourth time.

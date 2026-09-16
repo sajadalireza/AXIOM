@@ -131,7 +131,21 @@ class HomeFontScaleContractTest {
             "muscle_triceps",
             "muscle_legs",
             "muscle_core",
-            "muscle_forearms"
+            "muscle_forearms",
+            "home_combat_readiness_title",
+            "home_habit_teeth_format",
+            "home_vitals_water_value",
+            "home_vitals_water_target",
+            "home_vitals_sleep_value",
+            "home_vitals_sleep_target",
+            "home_vitals_energy_value",
+            "home_vitals_energy_target",
+            "home_vitals_am",
+            "home_vitals_pm",
+            "home_vitals_water_quick_add",
+            "home_vitals_water_logged",
+            "home_vitals_sleep_logged",
+            "home_habit_sleep_value"
         )
 
         for (key in requiredKeys) {
@@ -267,6 +281,129 @@ class HomeFontScaleContractTest {
         assertTrue(
             "Home water counter must render the localized format resource",
             habit.contains("R.string.home_habit_water_format")
+        )
+    }
+
+    // ─── WP-UIUX-02 final culturally-appropriate Persian closure guards ────────
+
+    /**
+     * The combat-readiness widget carried a bilingual EN gloss in FA mode
+     * ("آمادگی رزمی فیزیکی (COMBAT READINESS)"). FA must be Persian-only.
+     */
+    @Test
+    fun homeCombatReadinessTitle_isPersianOnlyInFa() {
+        val enXml = locate("src/main/res/values/strings.xml").readText()
+        val faXml = locate("src/main/res/values-fa/strings.xml").readText()
+
+        val en = "name=\"home_combat_readiness_title\">([^<]+)</string>".toRegex().find(enXml)
+        val fa = "name=\"home_combat_readiness_title\">([^<]+)</string>".toRegex().find(faXml)
+        assertNotNull("English home_combat_readiness_title missing", en)
+        assertNotNull("Persian home_combat_readiness_title missing", fa)
+
+        assertEquals("PHYSICAL COMBAT READINESS", en!!.groupValues[1])
+        assertEquals("آمادگی رزمی فیزیکی", fa!!.groupValues[1])
+        assertFalse(
+            "Persian title must not keep the English gloss",
+            Regex("[A-Za-z]").containsMatchIn(fa.groupValues[1])
+        )
+
+        val bodyStatus = locate(
+            "src/main/java/com/axiom/app/presentation/home/components/BodyStatusSection.kt"
+        ).readText()
+        assertTrue("Body Status must render the localized title resource", bodyStatus.contains("R.string.home_combat_readiness_title"))
+        assertFalse("No bilingual FA gloss may remain in Body Status", bodyStatus.contains("(COMBAT READINESS)"))
+    }
+
+    /**
+     * Vitals water/sleep units and the teeth AM/PM meridiem must be Persian in FA:
+     * no raw `ml`, `h`, `AM` or `PM` may render in the Home Vitals row.
+     */
+    @Test
+    fun homeVitalsUnitsAndMeridiem_localizedInPersian() {
+        val enXml = locate("src/main/res/values/strings.xml").readText()
+        val faXml = locate("src/main/res/values-fa/strings.xml").readText()
+
+        val unitKeys = listOf(
+            "home_vitals_water_value",
+            "home_vitals_water_target",
+            "home_vitals_sleep_value",
+            "home_vitals_sleep_target",
+            "home_vitals_water_quick_add",
+            "home_vitals_water_logged",
+            "home_vitals_sleep_logged",
+            "home_habit_sleep_value"
+        )
+        // Strip Java format-spec placeholders (e.g. %1$d, %1$.1f) before the
+        // Latin-script check, otherwise the 'd'/'f' of the placeholder itself matches.
+        val formatSpec = Regex("%[0-9]+\\$[.0-9]*[A-Za-z]")
+        for (key in unitKeys) {
+            val en = "name=\"$key\">([^<]+)</string>".toRegex().find(enXml)
+            val fa = "name=\"$key\">([^<]+)</string>".toRegex().find(faXml)
+            assertNotNull("English resource missing: $key", en)
+            assertNotNull("Persian resource missing: $key", fa)
+            val faPlain = formatSpec.replace(fa!!.groupValues[1], "")
+            assertFalse(
+                "Persian $key must not leak Latin script: ${fa.groupValues[1]}",
+                Regex("[A-Za-z]").containsMatchIn(faPlain)
+            )
+        }
+
+        val enWater = "name=\"home_vitals_water_value\">([^<]+)</string>".toRegex().find(enXml)!!.groupValues[1]
+        val enSleep = "name=\"home_vitals_sleep_value\">([^<]+)</string>".toRegex().find(enXml)!!.groupValues[1]
+        assertTrue("EN water value must carry the ml unit, was: $enWater", enWater.contains("ml"))
+        assertTrue("EN sleep value must carry the h unit, was: $enSleep", enSleep.contains("h"))
+
+        val faAm = "name=\"home_vitals_am\">([^<]+)</string>".toRegex().find(faXml)!!.groupValues[1]
+        val faPm = "name=\"home_vitals_pm\">([^<]+)</string>".toRegex().find(faXml)!!.groupValues[1]
+        val enAm = "name=\"home_vitals_am\">([^<]+)</string>".toRegex().find(enXml)!!.groupValues[1]
+        val enPm = "name=\"home_vitals_pm\">([^<]+)</string>".toRegex().find(enXml)!!.groupValues[1]
+        assertEquals("ق.ظ", faAm)
+        assertEquals("ب.ظ", faPm)
+        assertEquals("AM", enAm)
+        assertEquals("PM", enPm)
+
+        val vitals = locate("src/main/java/com/axiom/app/ui/components/VitalsComponents.kt").readText()
+        assertTrue("Vitals row must render water through the localized value resource", vitals.contains("R.string.home_vitals_water_value"))
+        assertTrue("Teeth card must render AM through the localized meridiem resource", vitals.contains("R.string.home_vitals_am"))
+        assertTrue("Teeth card must render PM through the localized meridiem resource", vitals.contains("R.string.home_vitals_pm"))
+        assertFalse("No hardcoded \"AM\" Text literal may remain", vitals.contains("text = \"AM\""))
+        assertFalse("No hardcoded \"PM\" Text literal may remain", vitals.contains("text = \"PM\""))
+        assertFalse("No hardcoded water 'ml' interpolation may remain", vitals.contains("\"\${todayWater.toInt()}ml\""))
+    }
+
+    /**
+     * The habit teeth counter rendered Western digits ("0 / 2") in Persian Home.
+     * It must render through a localized format ("۰ / ۲").
+     */
+    @Test
+    fun homeTeethCounter_rendersThroughLocalizedFormat() {
+        val enXml = locate("src/main/res/values/strings.xml").readText()
+        val faXml = locate("src/main/res/values-fa/strings.xml").readText()
+
+        val en = "name=\"home_habit_teeth_format\">([^<]+)</string>".toRegex().find(enXml)
+        val fa = "name=\"home_habit_teeth_format\">([^<]+)</string>".toRegex().find(faXml)
+        assertNotNull("English home_habit_teeth_format missing", en)
+        assertNotNull("Persian home_habit_teeth_format missing", fa)
+
+        val enValue = en!!.groupValues[1]
+        val faValue = fa!!.groupValues[1]
+        assertTrue("EN teeth format must keep the %1\$d counter placeholder", enValue.contains("%1\$d"))
+        assertTrue("FA teeth format must keep the %1\$d counter placeholder", faValue.contains("%1\$d"))
+        assertTrue("EN teeth format must keep the %2\$d goal placeholder", enValue.contains("%2\$d"))
+        assertTrue("FA teeth format must keep the %2\$d goal placeholder", faValue.contains("%2\$d"))
+
+        val habit = locate(
+            "src/main/java/com/axiom/app/presentation/home/components/DailyHabitNudgeSection.kt"
+        ).readText()
+        assertTrue("Habit teeth counter must use the localized format resource", habit.contains("R.string.home_habit_teeth_format"))
+        assertFalse("No raw \"\$teethCount / 2\" literal may remain", habit.contains("\"\$teethCount / 2\""))
+        assertTrue(
+            "Habit sleep value must use the localized sleep resource",
+            habit.contains("R.string.home_habit_sleep_value")
+        )
+        assertFalse(
+            "No raw 'h' unit interpolation may remain in the habit sleep value",
+            habit.contains("}h\"")
         )
     }
 }

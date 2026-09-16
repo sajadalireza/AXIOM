@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.axiom.app.R
+import com.axiom.app.core.localization.AxiomDateFormatter
 import com.axiom.app.ui.theme.*
 
 /**
@@ -33,6 +34,7 @@ fun MomentumStreakSection(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAxiomColors.current
+    val isFa = java.util.Locale.getDefault().language == "fa"
     val streakTitle = stringResource(R.string.home_momentum_and_streak)
     val streakCountText = stringResource(R.string.home_streak_day_count, streakDays)
 
@@ -143,7 +145,7 @@ fun MomentumStreakSection(
                             }
 
                             Text(
-                                text = day.toString(),
+                                text = if (isFa) AxiomDateFormatter.toPersianDigits(day.toString()) else day.toString(),
                                 fontFamily = Outfit,
                                 fontSize = 11.sp,
                                 fontWeight = if (isDayComplete) FontWeight.SemiBold else FontWeight.Normal,

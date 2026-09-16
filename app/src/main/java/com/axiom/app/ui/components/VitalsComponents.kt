@@ -293,8 +293,8 @@ fun VitalsRow(
             Box(modifier = Modifier.weight(1f)) {
                 VitalCard(
                     title = if (isFa) "آب" else "WATER",
-                    value = "${todayWater.toInt()}ml",
-                    subValue = "/ ${waterTarget.toInt()}ml",
+                    value = stringResource(R.string.home_vitals_water_value, todayWater.toInt()),
+                    subValue = stringResource(R.string.home_vitals_water_target, waterTarget.toInt()),
                     borderColor = if (todayWater >= waterTarget) SystemGreen else BorderFaint,
                     onClick = { showWaterDialog = true }
                 )
@@ -309,8 +309,8 @@ fun VitalsRow(
                 }
                 VitalCard(
                     title = if (isFa) "خواب" else "SLEEP",
-                    value = String.format("%.1fh", todaySleep),
-                    subValue = "/ ${sleepTarget}h",
+                    value = stringResource(R.string.home_vitals_sleep_value, todaySleep),
+                    subValue = stringResource(R.string.home_vitals_sleep_target, sleepTarget),
                     borderColor = if (todaySleep > 0) sleepColor else BorderFaint,
                     onClick = { showSleepDialog = true }
                 )
@@ -336,8 +336,8 @@ fun VitalsRow(
                 }
                 VitalCard(
                     title = if (isFa) "انرژی" else "ENERGY",
-                    value = todayEnergy?.toString() ?: "-",
-                    subValue = "/ 10",
+                    value = todayEnergy?.let { stringResource(R.string.home_vitals_energy_value, it) } ?: "-",
+                    subValue = stringResource(R.string.home_vitals_energy_target, 10),
                     borderColor = energyBorderColor,
                     onClick = { showEnergyDialog = true }
                 )
@@ -483,7 +483,7 @@ private fun VitalTeethCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "AM",
+                        text = stringResource(R.string.home_vitals_am),
                         fontFamily = JetBrainsMono,
                         fontSize = 8.sp,
                         fontWeight = FontWeight.Bold,
@@ -501,7 +501,7 @@ private fun VitalTeethCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "PM",
+                        text = stringResource(R.string.home_vitals_pm),
                         fontFamily = JetBrainsMono,
                         fontSize = 8.sp,
                         fontWeight = FontWeight.Bold,
@@ -553,11 +553,7 @@ fun WaterLogDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = if (isFa) {
-                        "سطح کنونی: ${currentWater.toInt()} میلی‌لیتر از ${targetWater.toInt()} میلی‌لیتر هدف"
-                    } else {
-                        "Logged: ${currentWater.toInt()} / ${targetWater.toInt()} ml"
-                    },
+                    text = stringResource(R.string.home_vitals_water_logged, currentWater.toInt(), targetWater.toInt()),
                     fontFamily = Inter,
                     fontSize = 12.sp,
                     color = TextSecondary
@@ -574,7 +570,7 @@ fun WaterLogDialog(
                         colors = ButtonDefaults.buttonColors(containerColor = ShadowSurface, contentColor = TextPrimary),
                         modifier = Modifier.weight(1f).border(0.5.dp, BorderFaint, RoundedCornerShape(4.dp))
                     ) {
-                        Text("+250ml", fontFamily = JetBrainsMono, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.home_vitals_water_quick_add, 250), fontFamily = JetBrainsMono, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                     }
 
                     Button(
@@ -582,7 +578,7 @@ fun WaterLogDialog(
                         colors = ButtonDefaults.buttonColors(containerColor = ShadowSurface, contentColor = TextPrimary),
                         modifier = Modifier.weight(1f).border(0.5.dp, BorderFaint, RoundedCornerShape(4.dp))
                     ) {
-                        Text("+500ml", fontFamily = JetBrainsMono, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.home_vitals_water_quick_add, 500), fontFamily = JetBrainsMono, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                     }
                 }
 
@@ -659,11 +655,7 @@ fun SleepLogDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = if (isFa) {
-                        "خواب امروز: ${currentSleep} ساعت (هدف: ${targetSleep} ساعت)"
-                    } else {
-                        "Logged sleep: ${currentSleep}h (Target: ${targetSleep}h)"
-                    },
+                    text = stringResource(R.string.home_vitals_sleep_logged, currentSleep, targetSleep),
                     fontFamily = Inter,
                     fontSize = 12.sp,
                     color = TextSecondary

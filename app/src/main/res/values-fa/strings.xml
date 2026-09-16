@@ -104,6 +104,20 @@
     <string name="home_vitals_teeth_complete">کامل</string>
     <string name="home_vitals_teeth_pending">ناتمام</string>
     <string name="home_habit_water_format">%1$d / %2$d لیوان</string>
+    <string name="home_habit_sleep_value">%1$.1f ساعت</string>
+    <string name="home_habit_teeth_format">%1$d / %2$d</string>
+    <string name="home_combat_readiness_title">آمادگی رزمی فیزیکی</string>
+    <string name="home_vitals_water_value">%1$d میلی‌لیتر</string>
+    <string name="home_vitals_water_target">/ %1$d میلی‌لیتر</string>
+    <string name="home_vitals_sleep_value">%1$.1f ساعت</string>
+    <string name="home_vitals_sleep_target">/ %1$.1f ساعت</string>
+    <string name="home_vitals_energy_value">%1$d</string>
+    <string name="home_vitals_energy_target">/ %1$d</string>
+    <string name="home_vitals_am">ق.ظ</string>
+    <string name="home_vitals_pm">ب.ظ</string>
+    <string name="home_vitals_water_quick_add">+%1$d میلی‌لیتر</string>
+    <string name="home_vitals_water_logged">سطح کنونی: %1$d میلی‌لیتر از %2$d میلی‌لیتر هدف</string>
+    <string name="home_vitals_sleep_logged">خواب امروز: %1$.1f ساعت (هدف: %2$.1f ساعت)</string>
 
     <!-- Missions -->
     <string name="missions_title">عادت‌ها و جلسات کالیبره‌شده</string>

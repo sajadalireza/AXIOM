@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.axiom.app.core.XionEvent
 import com.axiom.app.core.XionEventBus
 import com.axiom.app.core.ai.SystemVoiceEngine
+import com.axiom.app.core.localization.AxiomDateFormatter
 import com.axiom.app.data.local.AxiomPreferences
 import com.axiom.app.domain.model.Hunter
 import com.axiom.app.domain.model.Mission
@@ -77,7 +78,7 @@ class XionViewModel @Inject constructor(
                     "زنجیره: ${s.streakDays} روز. ${s.hunterName}، رفتار انضباطی شما در حال پایدار شدن است."
                 else ->
                     "${s.activeMissionCount} مأموریت فعال است. زنجیره: ${s.streakDays} روز. پیوستگی زنجیره را حفظ کن، ${s.hunterName}."
-            }
+            }.let { AxiomDateFormatter.toPersianDigits(it) }
         } else {
             when {
                 s.inactiveDays >= 3 ->

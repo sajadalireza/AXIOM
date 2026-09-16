@@ -228,7 +228,7 @@ private fun CombatReadinessWidget(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = if (isFa) "آمادگی رزمی فیزیکی (COMBAT READINESS)" else "PHYSICAL COMBAT READINESS",
+                    text = stringResource(R.string.home_combat_readiness_title),
                     fontFamily = FiraCode,
                     fontWeight = FontWeight.Bold,
                     color = LegendaryGold,

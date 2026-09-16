@@ -28,7 +28,7 @@ fun DailyHabitNudgeSection(
 
     val water = log?.waterGlasses ?: 0
     val isSleepLogged = log?.sleepHours != null
-    val sleepText = if (isSleepLogged) "${log?.sleepHours}h" else (if (isFa) "ثبت‌نشده" else "Pending")
+    val sleepText = if (isSleepLogged) stringResource(R.string.home_habit_sleep_value, log?.sleepHours ?: 0f) else (if (isFa) "ثبت‌نشده" else "Pending")
 
     var teethCount = 0
     if (log?.teethMorning == true) teethCount++
@@ -126,7 +126,7 @@ fun DailyHabitNudgeSection(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "$teethCount / 2",
+                        text = stringResource(R.string.home_habit_teeth_format, teethCount, 2),
                         fontFamily = FiraCode,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,

@@ -104,6 +104,20 @@
     <string name="home_vitals_teeth_complete">COMPLETE</string>
     <string name="home_vitals_teeth_pending">PENDING</string>
     <string name="home_habit_water_format">%1$d / %2$d glasses</string>
+    <string name="home_habit_sleep_value">%1$.1f h</string>
+    <string name="home_habit_teeth_format">%1$d / %2$d</string>
+    <string name="home_combat_readiness_title">PHYSICAL COMBAT READINESS</string>
+    <string name="home_vitals_water_value">%1$d ml</string>
+    <string name="home_vitals_water_target">/ %1$d ml</string>
+    <string name="home_vitals_sleep_value">%1$.1f h</string>
+    <string name="home_vitals_sleep_target">/ %1$.1f h</string>
+    <string name="home_vitals_energy_value">%1$d</string>
+    <string name="home_vitals_energy_target">/ %1$d</string>
+    <string name="home_vitals_am">AM</string>
+    <string name="home_vitals_pm">PM</string>
+    <string name="home_vitals_water_quick_add">+%1$d ml</string>
+    <string name="home_vitals_water_logged">Logged: %1$d / %2$d ml</string>
+    <string name="home_vitals_sleep_logged">Logged sleep: %1$.1fh (Target: %2$.1fh)</string>
  
     <!-- Missions -->
     <string name="missions_title">HABITS &amp; SESSIONS</string>
