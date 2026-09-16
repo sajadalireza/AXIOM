@@ -188,7 +188,8 @@ class HomeModuleDispositionContractTest {
         val components = locateDir("src/main/java/com/axiom/app/presentation/home")
         val files = components.walkTopDown().filter { it.isFile && it.extension == "kt" }.toList()
         val homeStateProvider = locateOrNull("src/main/java/com/axiom/app/ui/HomeViewModel.kt")
-        return (files + listOfNotNull(homeStateProvider)).sortedBy { it.path }
+        val bottomNav = locateOrNull("src/main/java/com/axiom/app/ui/components/AwakenBottomNavBar.kt")
+        return (files + listOfNotNull(homeStateProvider, bottomNav)).sortedBy { it.path }
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -329,7 +330,7 @@ class HomeModuleDispositionContractTest {
 
     @Test
     fun primaryTabShellRemainsExactlyFiveCanonicalTabs() {
-        val source = locate("src/main/java/com/axiom/app/ui/MainScreen.kt").readText()
+        val source = locate("src/main/java/com/axiom/app/ui/components/AwakenBottomNavBar.kt").readText()
         val tabBlock = source.substringAfter("val tabs = remember {").substringBefore("}")
 
         val canonicalOrder = listOf(
@@ -342,15 +343,125 @@ class HomeModuleDispositionContractTest {
         var previousIndex = -1
         for (tab in canonicalOrder) {
             val at = tabBlock.indexOf(tab)
-            assertTrue("core shell must still declare the $tab primary tab", at > previousIndex)
+            assertTrue("rendered dock source must declare the $tab primary tab", at > previousIndex)
             previousIndex = at
         }
 
         val tabCount = Regex("""Screen\.\w+""").findAll(tabBlock).count()
         assertEquals(
-            "core shell must keep exactly five primary tabs",
+            "rendered dock must keep exactly five primary tabs",
             canonicalOrder.size,
             tabCount
         )
+    }
+
+    @Test
+    fun laterGateSurfacesAreNotOrdinarilyRenderedOnHome() {
+        val successContent = locate(
+            "src/main/java/com/axiom/app/presentation/home/components/SuccessContent.kt"
+        ).readText()
+
+        val prohibitedSurfaces = listOf(
+            "WeeklyReviewSection" to "AX-021 Weekly Review (G5)",
+            "weekly_review_overdue" to "AX-021 Weekly Review banner (G5)",
+            "MomentumStreakSection" to "AX-030 Momentum/Streak (G5)",
+            "WeeklyChallengeSection" to "AX-030 Weekly Challenges (G5)",
+            "BodyStatusSection" to "AX-014 Body Status recovery (G7)",
+            "VitalsRow" to "AX-015 Vitals (G7)",
+            "DailyHabitNudgeSection" to "AX-015 Habit nudge (G7)",
+            "DailyOutcomesSection" to "Legacy fabricated daily outcomes"
+        )
+
+        for ((symbol, description) in prohibitedSurfaces) {
+            assertTrue(
+                "Home must not ordinarily render $description",
+                !successContent.contains(symbol)
+            )
+        }
+    }
+
+    @Test
+    fun focusActiveChipDoesNotNavigateToLeagues() {
+        val mainScreen = locate("src/main/java/com/axiom/app/ui/MainScreen.kt").readText()
+        val chipBlock = mainScreen.substringAfter("FocusActiveChip(").substringBefore("AwakenBottomNavBar")
+        assertTrue(
+            "FocusActiveChip on Home shell must not navigate to Screen.Leagues.route (AX-018 FREEZE)",
+            !chipBlock.contains("Screen.Leagues.route")
+        )
+    }
+
+    @Test
+    fun homeScreenHasExactlyOneDominantPrimaryCta() {
+        val heroCard = locate(
+            "src/main/java/com/axiom/app/presentation/home/components/NextMissionHeroCard.kt"
+        ).readText()
+        val primaryCtaTags = Regex("""testTag\("home_primary_cta"\)""").findAll(heroCard).count()
+        assertEquals(
+            "NextMeaningfulMission hero card must host the home_primary_cta testTag",
+            2,
+            primaryCtaTags
+        )
+
+        val successContent = locate(
+            "src/main/java/com/axiom/app/presentation/home/components/SuccessContent.kt"
+        ).readText()
+        val competingCtas = listOf(
+            "burnout_ack_button",
+            "weekly_review_start",
+            "claim_bonus_button"
+        )
+        for (cta in competingCtas) {
+            assertTrue(
+                "SuccessContent must not contain competing primary CTA: $cta",
+                !successContent.contains(cta)
+            )
+        }
+    }
+
+    @Test
+    fun todayStatusRowBindsToRealG3State() {
+        val todayRow = locate(
+            "src/main/java/com/axiom/app/presentation/home/components/TodayStatusRow.kt"
+        ).readText()
+        assertTrue(
+            "TodayStatusRow must bind to real G3 Home state",
+            todayRow.contains("state.activeMissionsCount")
+        )
+        assertTrue(
+            "TodayStatusRow must not access AX-015 Vitals or SharedPreferences",
+            !todayRow.contains("getSharedPreferences") && !todayRow.contains("Vitals")
+        )
+    }
+
+    @Test
+    fun homeRenderedShellCannotReachForbiddenModules() {
+        val forbiddenRoutes = listOf(
+            "Screen.Dungeons.route",
+            "Screen.SkillTree.route",
+            "Screen.Leagues.route",
+            "Screen.Premium.route"
+        )
+
+        // 1. All Home presentation and dock source files
+        val homeSources = homeSurfaceSourceFiles()
+        for (file in homeSources) {
+            val text = file.readText()
+            for (forbidden in forbiddenRoutes) {
+                assertTrue(
+                    "${file.name} must not reach $forbidden",
+                    !text.contains(forbidden)
+                )
+            }
+        }
+
+        // 2. MainScreen Home shell (FocusActiveChip and BottomBar invocation)
+        val mainScreen = locate("src/main/java/com/axiom/app/ui/MainScreen.kt").readText()
+        val bottomBarBlock = mainScreen.substringAfter("bottomBar = {").substringBefore("AwakenNavGraph")
+        for (forbidden in forbiddenRoutes) {
+            assertTrue(
+                "MainScreen Home bottomBar shell must not reach $forbidden",
+                !bottomBarBlock.contains(forbidden)
+            )
+        }
     }
 }

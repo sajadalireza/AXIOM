@@ -45,15 +45,26 @@ fun HunterHeaderSection(
 ) {
     val colors = LocalAxiomColors.current
     val progress = hunter.progressPercent.coerceIn(0f, 1f)
+    val isFa = java.util.Locale.getDefault().language == "fa"
+    val fontScale = androidx.compose.ui.platform.LocalDensity.current.fontScale
 
     val defaultName = stringResource(R.string.home_hunter_default_name)
+    val defaultRank = stringResource(R.string.home_hunter_default_rank)
     val displayName = hunter.name.ifBlank { defaultName }
-    val rankText = hunter.rankLabel.ifBlank { "RECRUIT" }
+    val rankText = hunter.rankLabel.ifBlank { defaultRank }
+    val levelDisplay = if (isFa) com.axiom.app.core.localization.AxiomDateFormatter.toPersianDigits(hunter.level.toString()) else hunter.level.toString()
+    val progressPercentInt = (progress * 100).toInt()
+    val progressDisplay = if (isFa) com.axiom.app.core.localization.AxiomDateFormatter.toPersianDigits(progressPercentInt.toString()) else progressPercentInt.toString()
     val headerContentDesc = stringResource(
         R.string.home_hunter_profile_cd,
         displayName,
         rankText,
-        hunter.level
+        levelDisplay
+    )
+    val levelProgressCd = stringResource(
+        R.string.home_hunter_level_cd,
+        levelDisplay,
+        progressDisplay
     )
 
     Column(
@@ -63,9 +74,45 @@ fun HunterHeaderSection(
             .semantics {
                 contentDescription = headerContentDesc
             },
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // Identity Row: [Avatar] [Name + Rank] [XP Counter]
+        // AXIOM Brand Atmospheric Header
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 2.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    text = "▲",
+                    fontSize = 11.sp,
+                    color = colors.systemGreen
+                )
+                Text(
+                    text = "A X I O M",
+                    fontFamily = Outfit,
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colors.textPrimary,
+                    letterSpacing = 4.sp
+                )
+            }
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = stringResource(R.string.axiom_tagline),
+                fontFamily = Outfit,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Normal,
+                color = colors.textSecondary,
+                letterSpacing = 0.5.sp
+            )
+        }
+
+        // Identity Row: [Avatar] [Name + Rank] [Circular Gold Level Arc]
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -81,7 +128,7 @@ fun HunterHeaderSection(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(42.dp)
                         .clip(CircleShape)
                         .background(colors.dimSurface)
                         .border(1.dp, colors.borderFaint, CircleShape),
@@ -91,16 +138,15 @@ fun HunterHeaderSection(
                         painter = painterResource(id = R.drawable.ic_nav_habits),
                         contentDescription = stringResource(R.string.home_hunter_profile_icon_cd),
                         tint = colors.textSecondary,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(22.dp)
                     )
                 }
             }
 
             // Name & Rank Pill
-            Row(
+            Column(
                 modifier = Modifier.weight(1f),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(3.dp)
             ) {
                 Text(
                     text = displayName,
@@ -109,42 +155,96 @@ fun HunterHeaderSection(
                     fontWeight = FontWeight.SemiBold,
                     color = colors.textPrimary,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f, fill = false)
+                    overflow = TextOverflow.Ellipsis
                 )
 
-                // Canonical Rank Capsule Badge
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(colors.systemGreen.copy(alpha = 0.15f))
-                        .border(1.dp, colors.systemGreen.copy(alpha = 0.35f), RoundedCornerShape(12.dp))
-                        .padding(horizontal = 8.dp, vertical = 2.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    // Canonical Rank Capsule Badge
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(colors.systemGreen.copy(alpha = 0.15f))
+                            .border(1.dp, colors.systemGreen.copy(alpha = 0.35f), RoundedCornerShape(12.dp))
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = rankText,
+                            fontFamily = Outfit,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = colors.systemGreen,
+                            letterSpacing = 0.5.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+
+                    // XP Counter Text
+                    val currentXpDisplay = if (isFa) com.axiom.app.core.localization.AxiomDateFormatter.toPersianDigits(hunter.currentXP.toString()) else hunter.currentXP.toString()
+                    val nextXpDisplay = if (isFa) com.axiom.app.core.localization.AxiomDateFormatter.toPersianDigits(hunter.xpToNextLevel.toString()) else hunter.xpToNextLevel.toString()
                     Text(
-                        text = rankText,
+                        text = stringResource(R.string.home_hunter_xp_format, currentXpDisplay, nextXpDisplay),
                         fontFamily = Outfit,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = colors.systemGreen,
-                        letterSpacing = 0.5.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = colors.textSecondary
                     )
                 }
             }
 
-            // XP Counter Text
-            Text(
-                text = stringResource(R.string.home_hunter_xp_format, hunter.currentXP, hunter.xpToNextLevel),
-                fontFamily = Outfit,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Normal,
-                color = colors.textSecondary
-            )
+            // Circular Gold Level/XP Indicator with progress arc
+            val indicatorSize = if (fontScale > 1.3f) 52.dp else 46.dp
+            Box(
+                modifier = Modifier
+                    .size(indicatorSize)
+                    .semantics {
+                        contentDescription = levelProgressCd
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                androidx.compose.foundation.Canvas(modifier = Modifier.size(indicatorSize)) {
+                    val strokeWidth = 3.dp.toPx()
+                    drawCircle(
+                        color = colors.borderFaint,
+                        style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth)
+                    )
+                    drawArc(
+                        color = colors.legendaryGold,
+                        startAngle = -90f,
+                        sweepAngle = progress * 360f,
+                        useCenter = false,
+                        style = androidx.compose.ui.graphics.drawscope.Stroke(
+                            width = strokeWidth,
+                            cap = androidx.compose.ui.graphics.StrokeCap.Round
+                        )
+                    )
+                }
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_hunter_level_label),
+                        fontFamily = JetBrainsMono,
+                        fontSize = if (isFa) 7.sp else 8.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = colors.legendaryGold
+                    )
+                    Text(
+                        text = levelDisplay,
+                        fontFamily = Outfit,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = colors.textPrimary
+                    )
+                }
+            }
         }
 
-        // Sleek horizontal XP progress bar directly below the row
+        // Sleek horizontal XP progress bar
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -160,7 +260,7 @@ fun HunterHeaderSection(
                         .clip(RoundedCornerShape(2.dp))
                         .background(
                             Brush.horizontalGradient(
-                                listOf(colors.systemGreen, colors.systemGreen.copy(alpha = 0.8f))
+                                listOf(colors.systemGreen, colors.legendaryGold)
                             )
                         )
                 )

@@ -22,6 +22,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import com.axiom.app.R
 import com.axiom.app.ui.theme.*
 import com.axiom.app.ui.VitalsViewModel
@@ -389,6 +395,7 @@ private fun VitalCard(
     borderColor: Color,
     onClick: () -> Unit
 ) {
+    val cardDesc = "$title: $value, $subValue"
     Card(
         colors = CardDefaults.cardColors(
             containerColor = ShadowSurface,
@@ -398,7 +405,11 @@ private fun VitalCard(
         border = BorderStroke(1.dp, borderColor),
         modifier = Modifier
             .fillMaxWidth()
-            .height(58.dp)
+            .heightIn(min = 58.dp)
+            .clearAndSetSemantics {
+                role = Role.Button
+                contentDescription = cardDesc
+            }
             .clickable(onClick = onClick)
     ) {
         Column(
@@ -441,6 +452,11 @@ private fun VitalTeethCard(
 ) {
     val teethBothComplete = amChecked && pmChecked
     val borderColor = if (teethBothComplete) SystemGreen else BorderFaint
+    val teethTitle = stringResource(R.string.home_vitals_teeth)
+    val amText = stringResource(R.string.home_vitals_am)
+    val pmText = stringResource(R.string.home_vitals_pm)
+    val completeText = stringResource(R.string.home_vitals_teeth_complete)
+    val pendingText = stringResource(R.string.home_vitals_teeth_pending)
 
     Card(
         colors = CardDefaults.cardColors(
@@ -451,7 +467,7 @@ private fun VitalTeethCard(
         border = BorderStroke(1.dp, borderColor),
         modifier = Modifier
             .fillMaxWidth()
-            .height(58.dp)
+            .heightIn(min = 58.dp)
     ) {
         Column(
             modifier = Modifier
@@ -461,7 +477,7 @@ private fun VitalTeethCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = stringResource(R.string.home_vitals_teeth),
+                text = teethTitle,
                 fontFamily = JetBrainsMono,
                 fontSize = 8.sp,
                 fontWeight = FontWeight.Bold,
@@ -473,47 +489,71 @@ private fun VitalTeethCard(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // AM Box
+                // AM Box: >= 48dp interactive touch target with Role.Checkbox semantics
                 Box(
                     modifier = Modifier
-                        .size(16.dp)
-                        .background(if (amChecked) SystemGreen.copy(alpha = 0.2f) else Color.Transparent)
-                        .border(0.5.dp, if (amChecked) SystemGreen else TextDim, RoundedCornerShape(2.dp))
-                        .clickable(onClick = onToggleAm),
+                        .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
+                        .clickable(
+                            role = Role.Checkbox,
+                            onClick = onToggleAm
+                        )
+                        .semantics {
+                            contentDescription = "$teethTitle $amText"
+                            stateDescription = if (amChecked) completeText else pendingText
+                        },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = stringResource(R.string.home_vitals_am),
-                        fontFamily = JetBrainsMono,
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (amChecked) SystemGreen else TextDim
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(18.dp)
+                            .background(if (amChecked) SystemGreen.copy(alpha = 0.2f) else Color.Transparent)
+                            .border(0.5.dp, if (amChecked) SystemGreen else TextDim, RoundedCornerShape(2.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = amText,
+                            fontFamily = JetBrainsMono,
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (amChecked) SystemGreen else TextDim
+                        )
+                    }
                 }
 
-                // PM Box
+                // PM Box: >= 48dp interactive touch target with Role.Checkbox semantics
                 Box(
                     modifier = Modifier
-                        .size(16.dp)
-                        .background(if (pmChecked) SystemGreen.copy(alpha = 0.2f) else Color.Transparent)
-                        .border(0.5.dp, if (pmChecked) SystemGreen else TextDim, RoundedCornerShape(2.dp))
-                        .clickable(onClick = onTogglePm),
+                        .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
+                        .clickable(
+                            role = Role.Checkbox,
+                            onClick = onTogglePm
+                        )
+                        .semantics {
+                            contentDescription = "$teethTitle $pmText"
+                            stateDescription = if (pmChecked) completeText else pendingText
+                        },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = stringResource(R.string.home_vitals_pm),
-                        fontFamily = JetBrainsMono,
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (pmChecked) SystemGreen else TextDim
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(18.dp)
+                            .background(if (pmChecked) SystemGreen.copy(alpha = 0.2f) else Color.Transparent)
+                            .border(0.5.dp, if (pmChecked) SystemGreen else TextDim, RoundedCornerShape(2.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = pmText,
+                            fontFamily = JetBrainsMono,
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (pmChecked) SystemGreen else TextDim
+                        )
+                    }
                 }
             }
 
             Text(
-                text = stringResource(
-                    if (teethBothComplete) R.string.home_vitals_teeth_complete else R.string.home_vitals_teeth_pending
-                ),
+                text = if (teethBothComplete) completeText else pendingText,
                 fontFamily = JetBrainsMono,
                 fontSize = 7.sp,
                 color = if (teethBothComplete) SystemGreen else TextSecondary

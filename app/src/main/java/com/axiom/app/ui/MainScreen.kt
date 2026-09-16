@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import com.axiom.app.R
 import com.axiom.app.domain.model.WorkoutTemplate
 import com.axiom.app.ui.theme.LegendaryGold
 import androidx.lifecycle.Lifecycle
@@ -215,10 +216,10 @@ fun MainScreen(
                 Column {
                     if (isTimerActive) {
                         FocusActiveChip(
-                            missionTitle = activeTitle ?: if (java.util.Locale.getDefault().language == "fa") "هدف پروتکل فعال" else "Active Protocol Target",
+                            missionTitle = activeTitle ?: stringResource(R.string.focus_active_protocol_target),
                             timerSeconds = timerSeconds,
                             onTap = {
-                                safeNavigate(Screen.Leagues.route)
+                                // AX-018 Leagues is FREEZE / G7: informational only, no navigation from Home
                             },
                             onStop = {
                                 focusManager.pauseOrAbortFocusProtocol(isBreach = false)
@@ -247,7 +248,7 @@ fun MainScreen(
                 .then(swipeModifier)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                if (shouldShowBottomBar) {
+                if (shouldShowBottomBar && currentRoute != Screen.Home.route) {
                     val axiomViewModel: AxiomViewModel = hiltViewModel()
                     MainHUD(viewModel = axiomViewModel)
                 }

@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,7 +30,6 @@ fun OperationalTracksSection(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAxiomColors.current
-    val isFa = java.util.Locale.getDefault().language == "fa"
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -46,7 +46,7 @@ fun OperationalTracksSection(
                     .background(color = colors.systemGreen, shape = RoundedCornerShape(2.5.dp))
             )
             Text(
-                text = if (isFa) "ماژول‌های عملیاتی" else "OPERATIONAL MODULES",
+                text = stringResource(R.string.home_tracks_title),
                 fontFamily = JetBrainsMono,
                 fontSize = 11.sp,
                 color = colors.textSecondary,
@@ -72,7 +72,7 @@ fun OperationalTracksSection(
             ) {
                 // Item 1: Check-in
                 QuickLaunchItem(
-                    title = if (isFa) "حضور و غیاب" else "CHECK-IN",
+                    title = stringResource(R.string.home_tracks_checkin),
                     iconRes = R.drawable.ic_nav_habits,
                     iconColor = colors.uncommonTeal,
                     onClick = { onNavigate(Screen.DailyCheckin.route) },
@@ -80,7 +80,7 @@ fun OperationalTracksSection(
                 )
                 // Item 2: Analytics
                 QuickLaunchItem(
-                    title = if (isFa) "تحلیل‌ها" else "ANALYTICS",
+                    title = stringResource(R.string.home_tracks_analytics),
                     iconRes = R.drawable.ic_nav_system,
                     iconColor = colors.rareBlue,
                     onClick = { onNavigate(Screen.WeeklyAnalytics.route) },

@@ -10,14 +10,20 @@
 
 ## 1. Product Owner Decision and Selected Target
 
-The Product Owner explicitly rejected the earlier compact Home mockup built around `Customer Problem Interview / COMPLETE MISSION / 1 DAY STREAK` as the binding target. The Product Owner selected the **Mission-first Primary State** direction on 2026-09-16.
+The Product Owner explicitly rejected the earlier compact Home mockup built around `Customer Problem Interview / COMPLETE MISSION / 1 DAY STREAK` as the binding target. The Product Owner selected the **Mission-first Primary State** direction on 2026-09-16, and confirmed it as the **V3 Pixel Master** workflow.
+
+`01_home_primary_state.png is the WP-UIUX-02 V3 Pixel Master.`
 
 | File | SHA-256 | Role |
 |---|---|---|
-| `docs/handoffs/wp-uiux-02/references/01_home_primary_state.png` | `4b0b36c360563b9c6a7affbf7b41da4044a0d383ce80b296d932bddbded658b0` | Binding local full-resolution Primary State source recovered from `/Users/sajadalireza/Documents/AXIOM photos/5106d160-36ac-476e-a790-7a7a72d173ba.png` |
+| `docs/handoffs/wp-uiux-02/references/01_home_primary_state.png` | `4b0b36c360563b9c6a7affbf7b41da4044a0d383ce80b296d932bddbded658b0` | **WP-UIUX-02 V3 Pixel Master** — Authoritative for visual hierarchy, component inventory/order, relative geometry, card proportions, corner radii, typography hierarchy, palette relationships, artwork weight, glow hierarchy, and bottom-dock composition. |
 | `docs/handoffs/wp-uiux-02/references/rejected/00_superseded_compact_home_target.jpg` | `57a4825f7c9ae4ec04e0e132255d4191bf9040f00a442c478523a5f7ceac5f2f` | **REJECTED / historical only. Must not be used as a visual target.** |
 
-The Primary State reference is authoritative for visual hierarchy, grouping, density, card geometry, palette relationships, and Home/navigation composition. Canonical repository behavior remains authoritative for dynamic data, routes, state, module disposition, privacy, accessibility, localization, and offline behavior.
+### Authority and Precedence Rules
+1. **Visual Authority**: `01_home_primary_state.png` controls visual layout, spacing, colors, typography scales, card geometry, and bottom-dock styling.
+2. **Repository Truth Override**: Canonical repository governance (`PRODUCT_CONSTITUTION.md`, `MODULE_DISPOSITION.md`, `WIP_POLICY.md`) strictly overrides illustrative mockup text/data. Never copy mock values (e.g. `Lv. 12`, `1,240 XP`, fictional quotes/AI output) as product truth.
+3. **Gate & Module-Disposition Firewall**: Visual elements implying AX-013 Dungeons, AX-016 Skill Tree, AX-018 Leagues, AX-026 Premium, or unactivated AX-015 Vitals are blocked from Home. Only the bounded exceptions (Daily Check-in, Weekly Analytics in secondary progressive disclosure) are permitted.
+4. **Native Overlay Acceptance Method**: Emulator screenshots at comparable viewports must undergo direct overlay comparison against the Pixel Master. Deltas must be classified (Critical, Major, Minor, Justified) and repaired until zero unjustified Critical and zero unjustified Major deltas remain.
 
 ### Product Owner-confirmed composition
 - AXIOM brand identity at the top; calm/cinematic rather than terminal-like.
@@ -41,7 +47,9 @@ The Primary State reference is authoritative for visual hierarchy, grouping, den
 4. Exactly one dominant primary mission CTA.
 
 ### Layer 2 — TODAY
-Use compact truthful cards/status summaries derived from existing capabilities. Preserve applicable Check-in, Vitals, Habits/Focus-equivalent status without inventing unsupported data.
+Layer 2 = truthful G3-safe Today status cards.
+AX-015 Daily Check-in remains ONLY the already-approved secondary link in progressive disclosure.
+AX-015 Vitals are NOT activated by this packet.
 
 ### Layer 3 — XION / PROGRESS
 - Xion Insight: subordinate; editable/rejectable/reportable where the canonical Decision Layer applies.

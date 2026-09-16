@@ -6,10 +6,13 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -231,23 +234,36 @@ fun NextMissionHeroCard(
                     )
                 }
 
-                // Subordinate Secondary Link
-                Box(
+                // Subordinate Secondary Link (Direction-safe in RTL and LTR)
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 2.dp),
-                    contentAlignment = Alignment.Center
+                        .padding(top = 4.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = stringResource(R.string.home_hero_view_all_missions),
-                        fontFamily = Outfit,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = colors.textDim,
+                    Row(
                         modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
                             .clickable { onViewAllMissions() }
-                            .padding(vertical = 4.dp, horizontal = 8.dp)
-                    )
+                            .padding(vertical = 6.dp, horizontal = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.home_hero_view_all_missions),
+                            fontFamily = Outfit,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = colors.textDim
+                        )
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = null,
+                            tint = colors.textDim,
+                            modifier = Modifier.size(13.dp)
+                        )
+                    }
                 }
             } else {
                 // Empty state: Guide to commit to the next mission

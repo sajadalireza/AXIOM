@@ -12,7 +12,6 @@ import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.ui.graphics.Color
 import java.util.Locale
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -45,7 +44,6 @@ import com.axiom.app.ui.theme.*
 import androidx.compose.ui.unit.LayoutDirection
 import kotlin.math.roundToInt
 
-@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun AwakenBottomNavBar(
     currentRoute: String?,
@@ -58,30 +56,26 @@ fun AwakenBottomNavBar(
 ) {
     val colors = LocalAxiomColors.current
 
-    // Popup states for long press
-    var showMissionsPopup by remember { mutableStateOf(false) }
-    var showHomePopup by remember { mutableStateOf(false) }
-
     // 5 high-fidelity tab definitions: [⚔ MISSIONS]  [🏋 PHYSICAL]  [🏠 HOME]  [💀 SHADOWS]  [👤 HUNTER]
     val tabs = remember {
-        buildList {
-            add(NavBarTab(Screen.Missions, R.drawable.ic_nav_missions, R.string.nav_missions, "tab_missions"))
-            add(NavBarTab(Screen.BodyMap, R.drawable.ic_nav_physical, R.string.nav_physical_condition, "tab_physical"))
-            add(NavBarTab(Screen.Home, R.drawable.ic_nav_home, R.string.nav_home, "tab_home"))
-            add(NavBarTab(Screen.ShadowArmy, R.drawable.ic_nav_shadows, R.string.nav_shadows, "tab_shadow_army"))
-            add(NavBarTab(Screen.Profile, R.drawable.ic_nav_habits, R.string.nav_hunter, "tab_profile"))
-        }
+        listOf(
+            NavBarTab(Screen.Missions, R.drawable.ic_nav_missions, R.string.nav_missions, "tab_missions"),
+            NavBarTab(Screen.BodyMap, R.drawable.ic_nav_physical, R.string.nav_physical_condition, "tab_physical"),
+            NavBarTab(Screen.Home, R.drawable.ic_nav_home, R.string.nav_home, "tab_home"),
+            NavBarTab(Screen.ShadowArmy, R.drawable.ic_nav_shadows, R.string.nav_shadows, "tab_shadow_army"),
+            NavBarTab(Screen.Profile, R.drawable.ic_nav_habits, R.string.nav_hunter, "tab_profile")
+        )
     }
 
     // Identify current selected index dynamically mapping route to current enabled tabs list
     val selectedIndex = remember(currentRoute, tabs) {
         val index = tabs.indexOfFirst { tab ->
             currentRoute == tab.screen.route ||
-            (tab.screen == Screen.Missions && (currentRoute == Screen.Missions.route || currentRoute == Screen.Dungeons.route || currentRoute?.startsWith("dungeon") == true)) ||
+            (tab.screen == Screen.Missions && currentRoute == Screen.Missions.route) ||
             (tab.screen == Screen.BodyMap && (currentRoute == Screen.BodyMap.route || currentRoute == Screen.DailyCheckin.route)) ||
             (tab.screen == Screen.Home && currentRoute == Screen.Home.route) ||
             (tab.screen == Screen.ShadowArmy && (currentRoute == Screen.ShadowArmy.route || currentRoute?.startsWith("shadow") == true)) ||
-            (tab.screen == Screen.Profile && (currentRoute == Screen.Profile.route || currentRoute == Screen.CharacterStats.route || currentRoute == Screen.SkillTree.route))
+            (tab.screen == Screen.Profile && (currentRoute == Screen.Profile.route || currentRoute == Screen.CharacterStats.route))
         }
         if (index != -1) index else 2 // default to Center HOME tab
     }
@@ -94,10 +88,13 @@ fun AwakenBottomNavBar(
             .padding(start = 20.dp, end = 20.dp, bottom = 12.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
+        val fontScale = LocalDensity.current.fontScale
+        val navHeight = if (fontScale > 1.3f) 82.dp else 72.dp
+
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(72.dp)
+                .height(navHeight)
                 .background(colors.shadowSurface.copy(alpha = 0.95f), RoundedCornerShape(20.dp))
                 .border(1.dp, colors.borderFaint, RoundedCornerShape(20.dp))
                 .clip(RoundedCornerShape(20.dp))
@@ -159,7 +156,7 @@ fun AwakenBottomNavBar(
                 Canvas(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .offset { IntOffset(animatedXPx.roundToInt(), -with(density) { 5.dp.roundToPx() }) }
+                        .offset { IntOffset(animatedXPx.roundToInt(), -with(density) { 3.dp.roundToPx() }) }
                         .size(width = 40.dp, height = 3.dp)
                         .graphicsLayer {
                             scaleX = scaleAnim.value
@@ -201,17 +198,10 @@ fun AwakenBottomNavBar(
                             .weight(1f)
                             .fillMaxHeight()
                             .scale(scale)
-                            .combinedClickable(
+                            .clickable(
                                 interactionSource = interactionSource,
                                 indication = LocalIndication.current,
-                                onClick = { onNavigate(tab.screen) },
-                                onLongClick = {
-                                    if (tab.screen == Screen.Missions) {
-                                        showMissionsPopup = true
-                                    } else if (tab.screen == Screen.Home) {
-                                        showHomePopup = true
-                                    }
-                                }
+                                onClick = { onNavigate(tab.screen) }
                             )
                             .testTag(tab.testTag),
                         contentAlignment = Alignment.Center
@@ -221,7 +211,7 @@ fun AwakenBottomNavBar(
                             verticalArrangement = Arrangement.Center
                         ) {
                             Box(contentAlignment = Alignment.Center) {
-                                // For Home tab: circular emerald halo when selected (matching 01_home_target.jpg)
+                                // For Home tab: circular emerald halo when selected
                                 if (tab.screen == Screen.Home && isSelected) {
                                     Box(
                                         modifier = Modifier
@@ -239,10 +229,10 @@ fun AwakenBottomNavBar(
                                     modifier = Modifier.size(24.dp)
                                 )
 
-                                // Refined numeric badge overlay
+                                // Refined numeric badge overlay: no notification bombardment on Home
                                 val badgeCount = when (tab.screen) {
                                     Screen.BodyMap -> pendingCheckinCount
-                                    Screen.Home -> newSystemMessagesCount
+                                    Screen.Home -> 0
                                     Screen.Profile -> overdueWeeklyReviewCount
                                     else -> 0
                                 }
@@ -275,136 +265,13 @@ fun AwakenBottomNavBar(
                                 Text(
                                     text = stringResource(tab.labelRes),
                                     fontFamily = Outfit,
-                                    fontSize = 10.sp,
+                                    fontSize = if (fontScale > 1.3f) 9.sp else 10.sp,
                                     color = colors.systemGreen,
                                     fontWeight = FontWeight.SemiBold,
                                     letterSpacing = 0.5.sp,
-                                    modifier = Modifier.padding(top = 2.dp)
+                                    maxLines = 1,
+                                    modifier = Modifier.padding(top = if (fontScale > 1.3f) 1.dp else 2.dp)
                                 )
-                            }
-                        }
-
-                        // Missions Long Press Popup
-                        if (tab.screen == Screen.Missions && showMissionsPopup) {
-                            androidx.compose.ui.window.Popup(
-                                alignment = Alignment.TopCenter,
-                                offset = IntOffset(0, -220),
-                                onDismissRequest = { showMissionsPopup = false }
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .width(180.dp)
-                                        .background(colors.shadowSurface, RoundedCornerShape(8.dp))
-                                        .border(1.dp, colors.systemGreen.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
-                                        .padding(8.dp)
-                                ) {
-                                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                        Text(
-                                            text = if (Locale.getDefault().language == "fa") "دسترسی سریع مأموریت" else "MISSION PROTOCOL",
-                                            fontFamily = JetBrainsMono,
-                                            fontSize = 9.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = colors.systemGreen,
-                                            modifier = Modifier.padding(bottom = 4.dp)
-                                        )
-                                        // Action 1
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .clickable {
-                                                    showMissionsPopup = false
-                                                    onNavigate(Screen.AddMission)
-                                                }
-                                                .padding(vertical = 6.dp)
-                                        ) {
-                                            Text(
-                                                text = if (Locale.getDefault().language == "fa") "⚔ ایجاد مأموریت سریع" else "⚔ Create Quick Mission",
-                                                fontFamily = Inter,
-                                                fontSize = 11.sp,
-                                                color = colors.textPrimary
-                                            )
-                                        }
-                                        // Action 2
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .clickable {
-                                                    showMissionsPopup = false
-                                                    onNavigate(Screen.Dungeons)
-                                                }
-                                                .padding(vertical = 6.dp)
-                                        ) {
-                                            Text(
-                                                text = if (Locale.getDefault().language == "fa") "💀 ورود به سیاه‌چال" else "💀 Enter Dungeon",
-                                                fontFamily = Inter,
-                                                fontSize = 11.sp,
-                                                color = colors.textPrimary
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Home Long Press Popup
-                        if (tab.screen == Screen.Home && showHomePopup) {
-                            androidx.compose.ui.window.Popup(
-                                alignment = Alignment.TopCenter,
-                                offset = IntOffset(0, -220),
-                                onDismissRequest = { showHomePopup = false }
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .width(180.dp)
-                                        .background(colors.shadowSurface, RoundedCornerShape(8.dp))
-                                        .border(1.dp, colors.systemGreen.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
-                                        .padding(8.dp)
-                                ) {
-                                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                        Text(
-                                            text = if (Locale.getDefault().language == "fa") "دسترسی سریع خانه" else "HOME CONTROL",
-                                            fontFamily = JetBrainsMono,
-                                            fontSize = 9.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = colors.systemGreen,
-                                            modifier = Modifier.padding(bottom = 4.dp)
-                                        )
-                                        // Action 1
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .clickable {
-                                                    showHomePopup = false
-                                                    onNavigate(Screen.Home)
-                                                }
-                                                .padding(vertical = 6.dp)
-                                        ) {
-                                            Text(
-                                                text = if (Locale.getDefault().language == "fa") "⏱ شروع تایمر تمرکز" else "⏱ Start Focus Timer",
-                                                fontFamily = Inter,
-                                                fontSize = 11.sp,
-                                                color = colors.textPrimary
-                                            )
-                                        }
-                                        // Action 2
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .clickable {
-                                                    showHomePopup = false
-                                                    onNavigate(Screen.BodyMap)
-                                                }
-                                                .padding(vertical = 6.dp)
-                                        ) {
-                                            Text(
-                                                text = if (Locale.getDefault().language == "fa") "🏋 ثبت وضعیت بدنی" else "🏋 Physical Check-in",
-                                                fontFamily = Inter,
-                                                fontSize = 11.sp,
-                                                color = colors.textPrimary
-                                            )
-                                        }
-                                    }
-                                }
                             }
                         }
                     }
