@@ -92,7 +92,7 @@ fun TodayStatusRow(
         modifier = modifier
             .fillMaxWidth()
             .testTag("today_status_section"),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // Section Header
         Row(
@@ -103,15 +103,15 @@ fun TodayStatusRow(
             Text(
                 text = stringResource(R.string.home_today_header),
                 fontFamily = Outfit,
-                fontSize = 12.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = colors.systemGreen,
-                letterSpacing = 1.sp
+                color = colors.textPrimary,
+                letterSpacing = 0.sp
             )
             Text(
                 text = stringResource(R.string.home_today_subtitle, missionsCountStr),
                 fontFamily = Outfit,
-                fontSize = 11.sp,
+                fontSize = 10.sp,
                 fontWeight = FontWeight.Normal,
                 color = colors.textSecondary
             )
@@ -155,6 +155,7 @@ fun TodayStatusRow(
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 TodayMetricCard(
+                    glyph = "✓",
                     title = activeLabel,
                     value = activeVal,
                     subValue = activeSub,
@@ -162,6 +163,7 @@ fun TodayStatusRow(
                     modifier = Modifier.weight(1f)
                 )
                 TodayMetricCard(
+                    glyph = "→",
                     title = actionLabel,
                     value = actionVal,
                     subValue = actionSub,
@@ -169,6 +171,7 @@ fun TodayStatusRow(
                     modifier = Modifier.weight(1f)
                 )
                 TodayMetricCard(
+                    glyph = "◌",
                     title = trackLabel,
                     value = trackVal,
                     subValue = trackSub,
@@ -176,6 +179,7 @@ fun TodayStatusRow(
                     modifier = Modifier.weight(1f)
                 )
                 TodayMetricCard(
+                    glyph = "◎",
                     title = statusLabel,
                     value = statusVal,
                     subValue = statusSub,
@@ -189,6 +193,7 @@ fun TodayStatusRow(
 
 @Composable
 private fun TodayMetricCard(
+    glyph: String,
     title: String,
     value: String,
     subValue: String,
@@ -200,13 +205,13 @@ private fun TodayMetricCard(
 
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = colors.shadowSurface,
+            containerColor = colors.shadowSurface.copy(alpha = 0.92f),
             contentColor = colors.textPrimary
         ),
         shape = RoundedCornerShape(10.dp),
-        border = BorderStroke(1.dp, accentColor.copy(alpha = 0.5f)),
+        border = BorderStroke(1.dp, accentColor.copy(alpha = 0.45f)),
         modifier = modifier
-            .heightIn(min = 68.dp)
+            .heightIn(min = 72.dp)
             .clearAndSetSemantics {
                 contentDescription = cardContentDesc
             }
@@ -214,19 +219,31 @@ private fun TodayMetricCard(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 6.dp, vertical = 8.dp),
+                .padding(horizontal = 5.dp, vertical = 7.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = title,
-                fontFamily = JetBrainsMono,
-                fontSize = 8.sp,
-                fontWeight = FontWeight.Bold,
-                color = colors.textDim,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(3.dp)
+            ) {
+                Text(
+                    text = glyph,
+                    fontFamily = Outfit,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = accentColor
+                )
+                Text(
+                    text = title,
+                    fontFamily = JetBrainsMono,
+                    fontSize = 8.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colors.textDim,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
             Text(
                 text = value,
                 fontFamily = Outfit,

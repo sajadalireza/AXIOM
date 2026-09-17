@@ -267,7 +267,7 @@ fun MainScreen(
                 }
             )
 
-            val shouldShowXionWidget = shouldShowBottomBar && currentRoute != Screen.Splash.route
+            val shouldShowXionWidget = shouldShowBottomBar && currentRoute != Screen.Splash.route && currentRoute != Screen.Home.route
 
             if (shouldShowXionWidget) {
                 BoxWithConstraints(modifier = Modifier.fillMaxSize()) {

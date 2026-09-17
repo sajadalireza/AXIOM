@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -18,7 +19,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -32,7 +37,7 @@ import kotlin.math.roundToInt
 
 /**
  * Visual and operational center of gravity on the Home screen.
- * Matches binding PO visual target 01_home_target.jpg.
+ * Matches binding PO visual target 01_home_primary_state.png.
  *
  * Enforces the AXIOM Product Constitution Section 3.5 invariant:
  * "هر Screen فقط یک Primary CTA دارد." (Every Screen has exactly one Primary CTA).
@@ -45,7 +50,6 @@ fun NextMissionHeroCard(
     mission: Mission?,
     dungeons: List<Dungeon> = emptyList(),
     onPrimaryAction: (missionId: String?) -> Unit,
-    onViewAllMissions: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAxiomColors.current
@@ -53,17 +57,25 @@ fun NextMissionHeroCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(22.dp))
+            .clip(RoundedCornerShape(16.dp))
             .testTag("next_mission_hero_card"),
-        colors = CardDefaults.cardColors(containerColor = colors.shadowSurface),
-        border = BorderStroke(1.dp, colors.borderFaint),
-        shape = RoundedCornerShape(22.dp)
+        colors = CardDefaults.cardColors(containerColor = colors.shadowSurface.copy(alpha = 0.86f)),
+        border = BorderStroke(
+            1.dp,
+            Brush.linearGradient(
+                listOf(
+                    colors.systemGreen.copy(alpha = 0.45f),
+                    colors.borderFaint.copy(alpha = 0.25f)
+                )
+            )
+        ),
+        shape = RoundedCornerShape(16.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(22.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp)
         ) {
             // Header: Category Label ("ACTIVE MISSION" or "NEXT MEANINGFUL MISSION")
             Row(
@@ -71,18 +83,26 @@ fun NextMissionHeroCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = if (mission != null) {
-                        stringResource(R.string.home_hero_active_label)
-                    } else {
-                        stringResource(R.string.home_hero_label)
-                    },
-                    fontFamily = Outfit,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = colors.systemGreen,
-                    letterSpacing = 1.sp
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(7.dp)
+                            .clip(CircleShape)
+                            .background(colors.systemGreen)
+                            .border(1.dp, colors.systemGreen.copy(alpha = 0.4f), CircleShape)
+                    )
+                    Text(
+                        text = stringResource(R.string.home_hero_label),
+                        fontFamily = JetBrainsMono,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = colors.systemGreen,
+                        letterSpacing = 1.sp
+                    )
+                }
 
                 if (mission?.isTimedMission == true) {
                     Box(
@@ -90,12 +110,12 @@ fun NextMissionHeroCard(
                             .clip(RoundedCornerShape(6.dp))
                             .background(colors.legendaryGold.copy(alpha = 0.12f))
                             .border(1.dp, colors.legendaryGold.copy(alpha = 0.35f), RoundedCornerShape(6.dp))
-                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                            .padding(horizontal = 7.dp, vertical = 2.dp)
                     ) {
                         Text(
                             text = stringResource(R.string.home_hero_timed_sprint),
                             fontFamily = Outfit,
-                            fontSize = 10.sp,
+                            fontSize = 9.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = colors.legendaryGold
                         )
@@ -104,175 +124,211 @@ fun NextMissionHeroCard(
             }
 
             if (mission != null) {
-                // Mission Title
-                Text(
-                    text = mission.title,
-                    fontFamily = Outfit,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = colors.textPrimary,
-                    lineHeight = 30.sp,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                // Visible connection to Goal / Project
                 val connectedDungeon = mission.dungeonId?.let { id -> dungeons.find { it.id == id } }
                 val projectOrGoalTitle = connectedDungeon?.name ?: mission.track.takeIf { it != "DEFAULT" }
 
-                if (projectOrGoalTitle != null) {
-                    Row(
+                // Main Mission Body: [Icon Container] [Title + Subtitle] [Chevron]
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Mission Icon Container
+                    Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(colors.dimSurface)
-                            .border(1.dp, colors.borderFaint, RoundedCornerShape(8.dp))
-                            .padding(horizontal = 12.dp, vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            .size(52.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(colors.systemGreen.copy(alpha = 0.12f))
+                            .border(1.dp, colors.systemGreen.copy(alpha = 0.35f), RoundedCornerShape(14.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_nav_missions),
+                            contentDescription = null,
+                            tint = colors.systemGreen,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+
+                    // Title & Goal Connection
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
                         Text(
-                            text = "◈",
-                            fontSize = 12.sp,
-                            color = colors.legendaryGold
-                        )
-                        Text(
-                            text = stringResource(R.string.home_hero_advances_goal, projectOrGoalTitle),
+                            text = mission.title,
                             fontFamily = Outfit,
-                            fontSize = 12.sp,
-                            color = colors.textSecondary,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = colors.textPrimary,
+                            lineHeight = 22.sp,
+                            maxLines = 2,
                             overflow = TextOverflow.Ellipsis
+                        )
+
+                        if (projectOrGoalTitle != null) {
+                            Text(
+                                text = stringResource(R.string.home_hero_advances_goal, projectOrGoalTitle),
+                                fontFamily = Outfit,
+                                fontSize = 11.sp,
+                                color = colors.textSecondary,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+
+                    // Circular Detail Chevron (Decorative only; 52.dp button is the single dominant CTA)
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(colors.dimSurface),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = null,
+                            tint = colors.textSecondary,
+                            modifier = Modifier.size(14.dp)
                         )
                     }
                 }
 
-                // Execution Context details: Canonical Duration & XP Reward
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    val durationText = when {
-                        mission.estimatedHours <= 0f -> stringResource(R.string.home_hero_duration_unspecified)
-                        mission.estimatedHours < 1.0f -> {
-                            val totalMinutes = (mission.estimatedHours * 60).roundToInt()
-                            if (totalMinutes > 0) {
-                                stringResource(R.string.home_hero_duration_minutes, totalMinutes)
-                            } else {
-                                stringResource(R.string.home_hero_duration_unspecified)
-                            }
-                        }
-                        else -> {
-                            val totalMinutes = (mission.estimatedHours * 60).roundToInt()
-                            val hours = totalMinutes / 60
-                            val remainingMins = totalMinutes % 60
-                            if (remainingMins == 0) {
-                                stringResource(R.string.home_hero_duration_hours, hours)
-                            } else {
-                                stringResource(R.string.home_hero_duration_hours_mins, hours, remainingMins)
-                            }
+                // Metadata Row: Duration | Track | XP Reward
+                val durationText = when {
+                    mission.estimatedHours <= 0f -> stringResource(R.string.home_hero_duration_unspecified)
+                    mission.estimatedHours < 1.0f -> {
+                        val totalMinutes = (mission.estimatedHours * 60).roundToInt()
+                        if (totalMinutes > 0) {
+                            stringResource(R.string.home_hero_duration_minutes, totalMinutes)
+                        } else {
+                            stringResource(R.string.home_hero_duration_unspecified)
                         }
                     }
+                    else -> {
+                        val totalMinutes = (mission.estimatedHours * 60).roundToInt()
+                        val hours = totalMinutes / 60
+                        val remainingMins = totalMinutes % 60
+                        if (remainingMins == 0) {
+                            stringResource(R.string.home_hero_duration_hours, hours)
+                        } else {
+                            stringResource(R.string.home_hero_duration_hours_mins, hours, remainingMins)
+                        }
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        Text(
-                            text = "⏱",
-                            fontSize = 14.sp
-                        )
+                        Text(text = "⏱", fontSize = 12.sp)
                         Text(
                             text = durationText,
                             fontFamily = Outfit,
-                            fontSize = 14.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Medium,
                             color = colors.textSecondary
                         )
                     }
 
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(colors.systemGreen.copy(alpha = 0.15f))
-                            .padding(horizontal = 10.dp, vertical = 4.dp)
-                    ) {
+                    val validTrack = mission.track.takeIf { it.isNotBlank() && it != "DEFAULT" }
+                    if (validTrack != null) {
+                        Text(text = "|", color = colors.borderFaint, fontSize = 11.sp)
+
                         Text(
-                            text = stringResource(R.string.home_hero_xp_reward_format, mission.xpReward),
+                            text = validTrack,
                             fontFamily = Outfit,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = colors.systemGreen
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = colors.textSecondary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false)
                         )
                     }
+
+                    Text(text = "|", color = colors.borderFaint, fontSize = 11.sp)
+
+                    Text(
+                        text = stringResource(R.string.home_hero_xp_reward_format, mission.xpReward),
+                        fontFamily = JetBrainsMono,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = colors.legendaryGold
+                    )
                 }
 
-                // THE SINGLE DOMINANT PRIMARY CTA
+                // THE SINGLE DOMINANT PRIMARY CTA — Glowing Emerald Pill Button
                 Button(
                     onClick = { onPrimaryAction(mission.id) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 52.dp)
+                        .heightIn(min = 48.dp)
                         .testTag("home_primary_cta"),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = colors.systemGreen,
+                        containerColor = Color.Transparent,
                         contentColor = colors.voidBlack
                     ),
-                    shape = RoundedCornerShape(26.dp)
+                    contentPadding = PaddingValues(0.dp),
+                    shape = RoundedCornerShape(24.dp)
                 ) {
-                    Text(
-                        text = if (mission.status == "ACTIVE") {
-                            stringResource(R.string.home_hero_continue_mission)
-                        } else {
-                            stringResource(R.string.home_hero_start_mission)
-                        },
-                        fontFamily = Outfit,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.5.sp
-                    )
-                }
-
-                // Subordinate Secondary Link (Direction-safe in RTL and LTR)
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(
+                    Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickable { onViewAllMissions() }
-                            .padding(vertical = 6.dp, horizontal = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp)
+                            .background(
+                                Brush.horizontalGradient(
+                                    listOf(
+                                        colors.uncommonTeal,
+                                        colors.systemGreen,
+                                        lerp(colors.systemGreen, colors.shadowSurface, 0.12f)
+                                    )
+                                ),
+                                shape = RoundedCornerShape(24.dp)
+                            ),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = stringResource(R.string.home_hero_view_all_missions),
-                            fontFamily = Outfit,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = colors.textDim
-                        )
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                            contentDescription = null,
-                            tint = colors.textDim,
-                            modifier = Modifier.size(13.dp)
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Text(
+                                text = if (mission.status == "ACTIVE") {
+                                    stringResource(R.string.home_hero_continue_mission)
+                                } else {
+                                    stringResource(R.string.home_hero_start_mission)
+                                },
+                                fontFamily = Outfit,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.voidBlack,
+                                letterSpacing = 0.5.sp
+                            )
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                contentDescription = null,
+                                tint = colors.voidBlack,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     }
                 }
+
             } else {
                 // Empty state: Guide to commit to the next mission
                 Text(
                     text = stringResource(R.string.home_hero_no_mission_desc),
                     fontFamily = Outfit,
-                    fontSize = 14.sp,
+                    fontSize = 13.sp,
                     color = colors.textSecondary,
-                    lineHeight = 20.sp
+                    lineHeight = 18.sp
                 )
 
                 // THE SINGLE DOMINANT PRIMARY CTA FOR EMPTY STATE
@@ -280,21 +336,51 @@ fun NextMissionHeroCard(
                     onClick = { onPrimaryAction(null) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 52.dp)
+                        .heightIn(min = 48.dp)
                         .testTag("home_primary_cta"),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = colors.systemGreen,
+                        containerColor = Color.Transparent,
                         contentColor = colors.voidBlack
                     ),
-                    shape = RoundedCornerShape(26.dp)
+                    contentPadding = PaddingValues(0.dp),
+                    shape = RoundedCornerShape(24.dp)
                 ) {
-                    Text(
-                        text = stringResource(R.string.home_hero_commit_mission),
-                        fontFamily = Outfit,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.5.sp
-                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp)
+                            .background(
+                                Brush.horizontalGradient(
+                                    listOf(
+                                        colors.uncommonTeal,
+                                        colors.systemGreen,
+                                        lerp(colors.systemGreen, colors.shadowSurface, 0.12f)
+                                    )
+                                ),
+                                shape = RoundedCornerShape(24.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.home_hero_commit_mission),
+                                fontFamily = Outfit,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.voidBlack,
+                                letterSpacing = 0.5.sp
+                            )
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                contentDescription = null,
+                                tint = colors.voidBlack,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
                 }
             }
         }

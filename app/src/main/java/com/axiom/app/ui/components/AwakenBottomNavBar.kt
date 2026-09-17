@@ -7,12 +7,16 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import java.util.Locale
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -85,30 +89,69 @@ fun AwakenBottomNavBar(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(start = 20.dp, end = 20.dp, bottom = 12.dp),
+            .padding(start = 18.dp, end = 18.dp, bottom = 8.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
         val fontScale = LocalDensity.current.fontScale
-        val navHeight = if (fontScale > 1.3f) 82.dp else 72.dp
+        val navHeight = if (fontScale > 1.3f) 88.dp else 80.dp
+
+        val dockShape = RoundedCornerShape(30.dp)
+        val isDark = colors.voidBlack == AxiomDarkColors.voidBlack
+
+        val dockBackgroundBrush = if (isDark) {
+            Brush.verticalGradient(
+                listOf(
+                    lerp(colors.shadowSurface, colors.systemGreen, 0.08f).copy(alpha = 0.94f),
+                    lerp(colors.dimSurface, colors.voidBlack, 0.50f).copy(alpha = 0.97f)
+                )
+            )
+        } else {
+            Brush.verticalGradient(
+                listOf(
+                    lerp(colors.shadowSurface, colors.systemGreen, 0.04f).copy(alpha = 0.95f),
+                    lerp(colors.shadowSurface, colors.dimSurface, 0.60f).copy(alpha = 0.98f)
+                )
+            )
+        }
 
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(navHeight)
-                .background(colors.shadowSurface.copy(alpha = 0.95f), RoundedCornerShape(20.dp))
-                .border(1.dp, colors.borderFaint, RoundedCornerShape(20.dp))
-                .clip(RoundedCornerShape(20.dp))
+                .background(dockBackgroundBrush, shape = dockShape)
+                .border(
+                    BorderStroke(
+                        1.dp,
+                        Brush.verticalGradient(
+                            listOf(
+                                colors.legendaryGold.copy(alpha = 0.35f),
+                                colors.systemGreen.copy(alpha = 0.20f),
+                                colors.borderFaint.copy(alpha = 0.15f)
+                            )
+                        )
+                    ),
+                    shape = dockShape
+                )
+                .clip(dockShape)
         ) {
             val totalWidth = maxWidth
             val tabWidth = totalWidth / tabs.size
-            val podWidth = 40.dp
+            val podWidth = 48.dp
 
-            // Linear horizontal top highlight (1dp) inner glow accent line
+            // Linear horizontal top highlight (1dp) inner glow accent line with subtle gold/emerald tone
             Canvas(modifier = Modifier.fillMaxWidth().height(1.dp)) {
                 drawLine(
-                    color = colors.borderFaint.copy(alpha = 0.4f),
-                    start = Offset(24.dp.toPx(), 0f),
-                    end = Offset(size.width - 24.dp.toPx(), 0f),
+                    brush = Brush.horizontalGradient(
+                        listOf(
+                            Color.Transparent,
+                            colors.legendaryGold.copy(alpha = 0.35f),
+                            colors.systemGreen.copy(alpha = 0.25f),
+                            colors.legendaryGold.copy(alpha = 0.35f),
+                            Color.Transparent
+                        )
+                    ),
+                    start = Offset(28.dp.toPx(), 0f),
+                    end = Offset(size.width - 28.dp.toPx(), 0f),
                     strokeWidth = 1.dp.toPx()
                 )
             }
@@ -151,19 +194,26 @@ fun AwakenBottomNavBar(
                 label = "nav_pod_x"
             )
 
+            // Active indicator color: legendaryGold for Home, systemGreen for other tabs
+            val activePodColor = if (tabs.getOrNull(selectedIndex)?.screen == Screen.Home) {
+                colors.legendaryGold
+            } else {
+                colors.systemGreen
+            }
+
             // Active indicator: Uses absolute BottomStart alignment with LTR LayoutDirection for perfect layout positioning in both LTR & RTL
             CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides LayoutDirection.Ltr) {
                 Canvas(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .offset { IntOffset(animatedXPx.roundToInt(), -with(density) { 3.dp.roundToPx() }) }
-                        .size(width = 40.dp, height = 3.dp)
+                        .size(width = 48.dp, height = 3.dp)
                         .graphicsLayer {
                             scaleX = scaleAnim.value
                         }
                 ) {
                     drawRoundRect(
-                        color = colors.systemGreen,
+                        color = activePodColor,
                         cornerRadius = androidx.compose.ui.geometry.CornerRadius(1.5.dp.toPx(), 1.5.dp.toPx())
                     )
                 }
@@ -176,8 +226,13 @@ fun AwakenBottomNavBar(
             ) {
                 tabs.forEachIndexed { index, tab ->
                     val isSelected = index == selectedIndex
+                    val isHome = tab.screen == Screen.Home
+
+                    // Selected Home uses colors.legendaryGold accent; other selected tabs use systemGreen
+                    val selectedColor = if (isHome) colors.legendaryGold else colors.systemGreen
+
                     val iconColor by animateColorAsState(
-                        targetValue = if (isSelected) colors.systemGreen else colors.textDim,
+                        targetValue = if (isSelected) selectedColor else colors.textDim,
                         animationSpec = tween(durationMillis = 250, easing = LinearOutSlowInEasing),
                         label = "tab_icon_color"
                     )
@@ -197,6 +252,7 @@ fun AwakenBottomNavBar(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
+                            .heightIn(min = 48.dp)
                             .scale(scale)
                             .clickable(
                                 interactionSource = interactionSource,
@@ -211,14 +267,42 @@ fun AwakenBottomNavBar(
                             verticalArrangement = Arrangement.Center
                         ) {
                             Box(contentAlignment = Alignment.Center) {
-                                // For Home tab: circular emerald halo when selected
-                                if (tab.screen == Screen.Home && isSelected) {
+                                // Elevated center Home anchor with radial emerald fill and dual gold/emerald border
+                                if (isHome) {
+                                    val homeAnchorBackground = if (isDark) {
+                                        Brush.radialGradient(
+                                            listOf(
+                                                lerp(colors.shadowSurface, colors.systemGreen, if (isSelected) 0.38f else 0.24f),
+                                                lerp(colors.shadowSurface, colors.systemGreen, if (isSelected) 0.20f else 0.12f),
+                                                lerp(colors.voidBlack, colors.systemGreen, 0.05f)
+                                            )
+                                        )
+                                    } else {
+                                        Brush.radialGradient(
+                                            listOf(
+                                                lerp(colors.shadowSurface, colors.systemGreen, if (isSelected) 0.22f else 0.10f),
+                                                lerp(colors.shadowSurface, colors.systemGreen, if (isSelected) 0.12f else 0.05f),
+                                                colors.dimSurface.copy(alpha = 0.85f)
+                                            )
+                                        )
+                                    }
+
                                     Box(
                                         modifier = Modifier
-                                            .size(36.dp)
-                                            .clip(RoundedCornerShape(18.dp))
-                                            .background(colors.systemGreen.copy(alpha = 0.15f))
-                                            .border(1.dp, colors.systemGreen.copy(alpha = 0.40f), RoundedCornerShape(18.dp))
+                                            .size(54.dp)
+                                            .clip(CircleShape)
+                                            .border(
+                                                width = 1.dp,
+                                                color = if (isSelected) colors.legendaryGold.copy(alpha = 0.85f) else colors.legendaryGold.copy(alpha = 0.40f),
+                                                shape = CircleShape
+                                            )
+                                            .padding(1.5.dp)
+                                            .border(
+                                                width = 1.dp,
+                                                color = if (isSelected) colors.systemGreen.copy(alpha = 0.70f) else colors.systemGreen.copy(alpha = 0.35f),
+                                                shape = CircleShape
+                                            )
+                                            .background(homeAnchorBackground, CircleShape)
                                     )
                                 }
 
@@ -226,7 +310,7 @@ fun AwakenBottomNavBar(
                                     painter = painterResource(id = tab.iconRes),
                                     contentDescription = stringResource(tab.labelRes),
                                     tint = iconColor,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(if (isHome) 28.dp else 21.dp)
                                 )
 
                                 // Refined numeric badge overlay: no notification bombardment on Home
@@ -258,7 +342,7 @@ fun AwakenBottomNavBar(
                                 }
                             }
                             AnimatedVisibility(
-                                visible = isSelected,
+                                visible = if (fontScale > 1.3f) isSelected else true,
                                 enter = fadeIn(tween(200)) + expandVertically(tween(200)),
                                 exit = fadeOut(tween(150)) + shrinkVertically(tween(150))
                             ) {
@@ -266,8 +350,8 @@ fun AwakenBottomNavBar(
                                     text = stringResource(tab.labelRes),
                                     fontFamily = Outfit,
                                     fontSize = if (fontScale > 1.3f) 9.sp else 10.sp,
-                                    color = colors.systemGreen,
-                                    fontWeight = FontWeight.SemiBold,
+                                    color = if (isSelected) selectedColor else colors.textDim,
+                                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
                                     letterSpacing = 0.5.sp,
                                     maxLines = 1,
                                     modifier = Modifier.padding(top = if (fontScale > 1.3f) 1.dp else 2.dp)

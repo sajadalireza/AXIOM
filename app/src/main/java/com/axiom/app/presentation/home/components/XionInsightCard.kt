@@ -14,10 +14,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.axiom.app.R
@@ -52,86 +55,96 @@ fun XionInsightCard(
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .testTag("xion_insight_card"),
-        colors = CardDefaults.cardColors(containerColor = colors.shadowSurface),
-        border = BorderStroke(1.dp, colors.borderFaint),
+        colors = CardDefaults.cardColors(containerColor = colors.shadowSurface.copy(alpha = 0.92f)),
+        border = BorderStroke(
+            1.dp,
+            Brush.linearGradient(
+                listOf(
+                    colors.systemGreen.copy(alpha = 0.35f),
+                    colors.borderFaint.copy(alpha = 0.2f)
+                )
+            )
+        ),
         shape = RoundedCornerShape(16.dp)
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Header Row: Luminous Orb + "XION" + "ADVISORY" tag
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            // Luminous Radiant Orb matching Pixel Master Xion Insight
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(CircleShape)
+                    .background(
+                        Brush.radialGradient(
+                            listOf(
+                                lerp(colors.systemGreen, colors.textPrimary, 0.18f),
+                                lerp(colors.systemGreen, colors.dimSurface, 0.20f),
+                                lerp(colors.shadowSurface, colors.systemGreen, 0.12f)
+                            )
+                        )
+                    )
+                    .border(1.dp, colors.systemGreen.copy(alpha = 0.5f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(14.dp)
+                        .clip(CircleShape)
+                        .background(colors.textPrimary.copy(alpha = 0.75f))
+                )
+            }
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Luminous glowing orb
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(colors.systemGreen)
-                            .border(1.5.dp, colors.systemGreen.copy(alpha = 0.3f), CircleShape)
-                    )
                     Text(
                         text = stringResource(R.string.home_xion_header),
                         fontFamily = JetBrainsMono,
-                        fontSize = 10.sp,
+                        fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = colors.systemGreen,
                         letterSpacing = 1.sp
                     )
+
+                    Box(
+                        modifier = Modifier
+                            .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
+                            .clickable(
+                                onClickLabel = stringResource(R.string.home_xion_dismiss)
+                            ) { isAcknowledged = true },
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        Text(
+                            text = stringResource(R.string.home_xion_dismiss),
+                            fontFamily = Outfit,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = colors.textDim,
+                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                        )
+                    }
                 }
 
-                // Subordinate tag
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(colors.dimSurface)
-                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.home_xion_subordinate_tag),
-                        fontFamily = Outfit,
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = colors.textDim
-                    )
-                }
-            }
-
-            // Advisory Text: Truthful nextBestAction or honest neutral state
-            Text(
-                text = advisoryText,
-                fontFamily = Outfit,
-                fontSize = if (fontScale > 1.3f) 12.sp else 13.sp,
-                fontWeight = FontWeight.Normal,
-                color = colors.textSecondary,
-                lineHeight = if (fontScale > 1.3f) 16.sp else 18.sp
-            )
-
-            // Subordinate Actions Row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
                 Text(
-                    text = stringResource(R.string.home_xion_dismiss),
+                    text = advisoryText,
                     fontFamily = Outfit,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = colors.textDim,
-                    modifier = Modifier
-                        .clickable { isAcknowledged = true }
-                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                    fontSize = if (fontScale > 1.3f) 12.sp else 13.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = colors.textSecondary,
+                    lineHeight = 17.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
