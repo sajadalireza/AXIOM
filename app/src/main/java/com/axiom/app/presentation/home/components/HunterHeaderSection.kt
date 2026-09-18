@@ -57,6 +57,7 @@ fun HunterHeaderSection(
     val levelDisplay = if (isFa) com.axiom.app.core.localization.AxiomDateFormatter.toPersianDigits(hunter.level.toString()) else hunter.level.toString()
     val progressPercentInt = (progress * 100).toInt()
     val progressDisplay = if (isFa) com.axiom.app.core.localization.AxiomDateFormatter.toPersianDigits(progressPercentInt.toString()) else progressPercentInt.toString()
+    val profileIconContentDesc = stringResource(R.string.home_hunter_profile_icon_cd)
     val headerContentDesc = stringResource(
         R.string.home_hunter_profile_cd,
         displayName,
@@ -128,12 +129,13 @@ fun HunterHeaderSection(
                 modifier = Modifier
                     .size(54.dp)
                     .clip(CircleShape)
+                    .semantics { contentDescription = profileIconContentDesc }
                     .clickable { onNavigateToProfile() },
                 contentAlignment = Alignment.Center
             ) {
                 Box(
                     modifier = Modifier
-                        .size(50.dp)
+                        .size(48.dp)
                         .clip(CircleShape)
                         .background(
                             Brush.radialGradient(

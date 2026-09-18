@@ -270,7 +270,7 @@ fun NextMissionHeroCard(
                     onClick = { onPrimaryAction(mission.id) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 48.dp)
+                        .heightIn(min = 52.dp)
                         .testTag("home_primary_cta"),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Transparent,
@@ -282,7 +282,7 @@ fun NextMissionHeroCard(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 48.dp)
+                            .heightIn(min = 52.dp)
                             .background(
                                 Brush.horizontalGradient(
                                     listOf(
@@ -336,7 +336,7 @@ fun NextMissionHeroCard(
                     onClick = { onPrimaryAction(null) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 48.dp)
+                        .heightIn(min = 52.dp)
                         .testTag("home_primary_cta"),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Transparent,
@@ -348,7 +348,7 @@ fun NextMissionHeroCard(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 48.dp)
+                            .heightIn(min = 52.dp)
                             .background(
                                 Brush.horizontalGradient(
                                     listOf(
