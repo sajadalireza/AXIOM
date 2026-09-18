@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.axiom.app.R
+import com.axiom.app.ui.HomeNextAction
 import com.axiom.app.ui.theme.*
 
 /**
@@ -38,7 +39,7 @@ import com.axiom.app.ui.theme.*
  */
 @Composable
 fun XionInsightCard(
-    nextBestAction: String?,
+    nextBestAction: HomeNextAction?,
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAxiomColors.current
@@ -47,8 +48,14 @@ fun XionInsightCard(
 
     if (isAcknowledged) return
 
-    val advisoryText = nextBestAction?.ifBlank { null }
-        ?: stringResource(R.string.home_xion_unavailable)
+    val advisorySpec = nextBestAction?.let { homeNextActionStrings(it) }
+    val advisoryText = advisorySpec?.let { spec ->
+        if (spec.formatArgs.isEmpty()) {
+            stringResource(spec.resId)
+        } else {
+            stringResource(spec.resId, *spec.formatArgs.toTypedArray())
+        }
+    } ?: stringResource(R.string.home_xion_unavailable)
 
     Card(
         modifier = modifier
@@ -143,10 +150,31 @@ fun XionInsightCard(
                     fontWeight = FontWeight.Normal,
                     color = colors.textSecondary,
                     lineHeight = 17.sp,
-                    maxLines = 2,
+                    maxLines = if (fontScale > 1.3f) 3 else 2,
                     overflow = TextOverflow.Ellipsis
                 )
             }
         }
     }
+}
+
+/** Resource specification for a Home advisory; the string itself resolves at render time. */
+internal data class HomeNextActionStrings(
+    val resId: Int,
+    val formatArgs: List<String> = emptyList()
+)
+
+/**
+ * Language-neutral mapping from advisory state to the resource that renders it.
+ *
+ * The mapping never consults any stored language state, so the advisory is always resolved
+ * under the exact configuration that renders the rest of the screen.
+ */
+internal fun homeNextActionStrings(action: HomeNextAction): HomeNextActionStrings = when (action) {
+    HomeNextAction.AddFirstMission ->
+        HomeNextActionStrings(R.string.home_next_action_add_first_mission)
+    is HomeNextAction.CompleteMission ->
+        HomeNextActionStrings(R.string.home_next_action_complete_mission, listOf(action.missionTitle))
+    HomeNextAction.BuildStreak ->
+        HomeNextActionStrings(R.string.home_next_action_build_streak)
 }

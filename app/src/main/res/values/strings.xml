@@ -772,6 +772,9 @@
     <string name="home_xion_unavailable">No tactical advisory available.</string>
     <string name="home_xion_default_advisory">No tactical advisory available.</string>
     <string name="home_xion_dismiss">Dismiss</string>
+    <string name="home_next_action_add_first_mission">Add your first mission to get started</string>
+    <string name="home_next_action_complete_mission">Complete: %1$s</string>
+    <string name="home_next_action_build_streak">Keep going — build your streak</string>
     <string name="home_progress_header">PROGRESS</string>
     <string name="home_progress_level_format">LVL %s</string>
     <string name="home_progress_level_label">Level Progress</string>

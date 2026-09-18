@@ -57,6 +57,71 @@ class HomeFontScaleContractTest {
         )
     }
 
+    /**
+     * WP-UIUX-02 Blocker 3: at 200% system font scale the hero mission title and its
+     * goal/track connection must stay meaningfully readable instead of collapsing to a
+     * one-line ellipsis, while the single dominant CTA stays reachable at >=52dp.
+     */
+    @Test
+    fun heroMissionContent_staysReadableAt200PercentFontScale() {
+        val heroCard = locate(
+            "src/main/java/com/axiom/app/presentation/home/components/NextMissionHeroCard.kt"
+        ).readText()
+
+        assertTrue(
+            "Hero card must branch on the system font scale",
+            heroCard.contains("LocalDensity.current.fontScale > 1.3f")
+        )
+        assertTrue(
+            "Large-font layout must raise the title line budget above the default 2 lines",
+            heroCard.contains("val titleMaxLines = if (isLargeFont) 4 else 2")
+        )
+        assertTrue(
+            "Large-font layout must raise the goal-connection line budget above the default 1 line",
+            heroCard.contains("val goalMaxLines = if (isLargeFont) 3 else 1")
+        )
+
+        val largeFontBranch = heroCard
+            .substringAfter("if (isLargeFont) {")
+            .substringBefore("} else {")
+        assertTrue(
+            "Large-font layout must stack the mission block as a full-width column",
+            largeFontBranch.contains("Column(") && largeFontBranch.contains("Modifier.fillMaxWidth()")
+        )
+        assertFalse(
+            "Large-font layout must not squeeze the title block into a width-shared row",
+            largeFontBranch.contains("weight(1f)")
+        )
+
+        val titleBlock = heroCard.substringAfter("private fun MissionTitleBlock")
+        assertTrue(
+            "Mission title must consume the adaptive line budget",
+            titleBlock.contains("maxLines = titleMaxLines")
+        )
+        assertTrue(
+            "Goal connection must consume the adaptive line budget",
+            titleBlock.contains("maxLines = goalMaxLines")
+        )
+        assertFalse(
+            "Mission title must never be hard-capped to a single line",
+            titleBlock.contains("maxLines = 1")
+        )
+
+        assertTrue(
+            "Track value must wrap to two lines at large font scale and is never sliced",
+            heroCard.contains("maxLines = if (isLargeFont) 2 else 1")
+        )
+        assertTrue(
+            "The primary CTA must keep its 52dp minimum target at 200% font scale",
+            heroCard.contains(".heightIn(min = 52.dp)")
+        )
+        assertEquals(
+            "Each hero branch (mission / empty state) renders exactly one primary CTA",
+            2,
+            Regex(Regex.escape(".testTag(\"home_primary_cta\")")).findAll(heroCard).count()
+        )
+    }
+
     @Test
     fun countdownDigitBlock_avoidsFixedClippingHeight() {
         val countdown = locate(

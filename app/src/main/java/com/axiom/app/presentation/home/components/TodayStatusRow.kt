@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -68,10 +69,10 @@ fun TodayStatusRow(
         stringResource(R.string.home_today_action_sub_standby)
     }
 
-    // Metric 3: Real Mission Track
+    // Metric 3: Real Mission Track — rendered in full; only the presentation layer may wrap it
     val trackLabel = stringResource(R.string.home_today_track_title)
     val primaryTrack = state.topMissions.firstOrNull()?.track
-    val trackVal = primaryTrack?.take(10) ?: stringResource(R.string.home_today_track_none)
+    val trackVal = primaryTrack ?: stringResource(R.string.home_today_track_none)
     val trackSub = if (primaryTrack != null) {
         stringResource(R.string.home_today_track_sub_primary)
     } else {
@@ -250,7 +251,8 @@ private fun TodayMetricCard(
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = colors.textPrimary,
-                maxLines = 1,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
@@ -294,7 +296,7 @@ private fun TodayAdaptiveRowCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 14.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f, fill = false)) {
@@ -309,15 +311,23 @@ private fun TodayAdaptiveRowCard(
                     text = subValue,
                     fontFamily = Outfit,
                     fontSize = 11.sp,
-                    color = colors.textSecondary
+                    color = colors.textSecondary,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
+            // Both sides share the row proportionally so a long truthful value wraps instead
+            // of squeezing the label or overflowing the card at high font scale.
             Text(
                 text = value,
                 fontFamily = Outfit,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = colors.textPrimary
+                color = colors.textPrimary,
+                textAlign = TextAlign.End,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f, fill = false)
             )
         }
     }

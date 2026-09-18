@@ -3,7 +3,6 @@ package com.axiom.app.presentation.home.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,11 +21,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.axiom.app.R
@@ -53,6 +54,7 @@ fun NextMissionHeroCard(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAxiomColors.current
+    val isLargeFont = LocalDensity.current.fontScale > 1.3f
 
     Card(
         modifier = modifier
@@ -128,71 +130,52 @@ fun NextMissionHeroCard(
                 val projectOrGoalTitle = connectedDungeon?.name ?: mission.track.takeIf { it != "DEFAULT" }
 
                 // Main Mission Body: [Icon Container] [Title + Subtitle] [Chevron]
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    // Mission Icon Container
-                    Box(
-                        modifier = Modifier
-                            .size(52.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(colors.systemGreen.copy(alpha = 0.12f))
-                            .border(1.dp, colors.systemGreen.copy(alpha = 0.35f), RoundedCornerShape(14.dp)),
-                        contentAlignment = Alignment.Center
+                val titleMaxLines = if (isLargeFont) 4 else 2
+                val goalMaxLines = if (isLargeFont) 3 else 1
+                if (isLargeFont) {
+                    // Accessibility layout: the title and goal connection own the full card width so
+                    // essential mission context stays readable instead of being ellipsized away.
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_nav_missions),
-                            contentDescription = null,
-                            tint = colors.systemGreen,
-                            modifier = Modifier.size(24.dp)
+                        MissionIconBlock(size = 40.dp, iconSize = 20.dp)
+                        MissionTitleBlock(
+                            mission = mission,
+                            projectOrGoalTitle = projectOrGoalTitle,
+                            titleMaxLines = titleMaxLines,
+                            goalMaxLines = goalMaxLines
                         )
                     }
-
-                    // Title & Goal Connection
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                } else {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(
-                            text = mission.title,
-                            fontFamily = Outfit,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = colors.textPrimary,
-                            lineHeight = 22.sp,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
+                        MissionIconBlock(size = 52.dp, iconSize = 24.dp)
+                        MissionTitleBlock(
+                            mission = mission,
+                            projectOrGoalTitle = projectOrGoalTitle,
+                            titleMaxLines = titleMaxLines,
+                            goalMaxLines = goalMaxLines,
+                            modifier = Modifier.weight(1f)
                         )
-
-                        if (projectOrGoalTitle != null) {
-                            Text(
-                                text = stringResource(R.string.home_hero_advances_goal, projectOrGoalTitle),
-                                fontFamily = Outfit,
-                                fontSize = 11.sp,
-                                color = colors.textSecondary,
-                                fontWeight = FontWeight.Medium,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                        // Circular Detail Chevron (Decorative only; 52.dp button is the single dominant CTA)
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(colors.dimSurface),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                contentDescription = null,
+                                tint = colors.textSecondary,
+                                modifier = Modifier.size(14.dp)
                             )
                         }
-                    }
-
-                    // Circular Detail Chevron (Decorative only; 52.dp button is the single dominant CTA)
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape)
-                            .background(colors.dimSurface),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                            contentDescription = null,
-                            tint = colors.textSecondary,
-                            modifier = Modifier.size(14.dp)
-                        )
                     }
                 }
 
@@ -242,15 +225,16 @@ fun NextMissionHeroCard(
                     if (validTrack != null) {
                         Text(text = "|", color = colors.borderFaint, fontSize = 11.sp)
 
+                        // The truthful track value may wrap at high font scale; it is never sliced.
                         Text(
                             text = validTrack,
                             fontFamily = Outfit,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium,
                             color = colors.textSecondary,
-                            maxLines = 1,
+                            maxLines = if (isLargeFont) 2 else 1,
                             overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f, fill = false)
+                            modifier = Modifier.weight(1f)
                         )
                     }
 
@@ -261,7 +245,8 @@ fun NextMissionHeroCard(
                         fontFamily = JetBrainsMono,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = colors.legendaryGold
+                        color = colors.legendaryGold,
+                        maxLines = 1
                     )
                 }
 
@@ -383,6 +368,65 @@ fun NextMissionHeroCard(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun MissionIconBlock(size: Dp, iconSize: Dp) {
+    val colors = LocalAxiomColors.current
+    val shape = RoundedCornerShape(size * 0.27f)
+    Box(
+        modifier = Modifier
+            .size(size)
+            .clip(shape)
+            .background(colors.systemGreen.copy(alpha = 0.12f))
+            .border(1.dp, colors.systemGreen.copy(alpha = 0.35f), shape),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_nav_missions),
+            contentDescription = null,
+            tint = colors.systemGreen,
+            modifier = Modifier.size(iconSize)
+        )
+    }
+}
+
+@Composable
+private fun MissionTitleBlock(
+    mission: Mission,
+    projectOrGoalTitle: String?,
+    titleMaxLines: Int,
+    goalMaxLines: Int,
+    modifier: Modifier = Modifier
+) {
+    val colors = LocalAxiomColors.current
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Text(
+            text = mission.title,
+            fontFamily = Outfit,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = colors.textPrimary,
+            lineHeight = 22.sp,
+            maxLines = titleMaxLines,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        if (projectOrGoalTitle != null) {
+            Text(
+                text = stringResource(R.string.home_hero_advances_goal, projectOrGoalTitle),
+                fontFamily = Outfit,
+                fontSize = 11.sp,
+                color = colors.textSecondary,
+                fontWeight = FontWeight.Medium,
+                maxLines = goalMaxLines,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

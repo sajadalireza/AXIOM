@@ -772,6 +772,9 @@
     <string name="home_xion_unavailable">توصیه تاکتیکی در دسترس نیست.</string>
     <string name="home_xion_default_advisory">توصیه تاکتیکی در دسترس نیست.</string>
     <string name="home_xion_dismiss">بستن</string>
+    <string name="home_next_action_add_first_mission">اولین مأموریت خود را برای شروع اضافه کنید</string>
+    <string name="home_next_action_complete_mission">تکمیل کنید: %1$s</string>
+    <string name="home_next_action_build_streak">ادامه دهید — رکوردهای متوالی را به ثبت برسانید</string>
     <string name="home_progress_header">پیشرفت</string>
     <string name="home_progress_level_format">سطح %s</string>
     <string name="home_progress_level_label">پیشرفت سطح</string>
