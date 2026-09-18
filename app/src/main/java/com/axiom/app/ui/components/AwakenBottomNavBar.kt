@@ -7,13 +7,16 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import java.util.Locale
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -45,7 +48,6 @@ import com.axiom.app.ui.theme.*
 import androidx.compose.ui.unit.LayoutDirection
 import kotlin.math.roundToInt
 
-@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun AwakenBottomNavBar(
     currentRoute: String?,
@@ -58,30 +60,26 @@ fun AwakenBottomNavBar(
 ) {
     val colors = LocalAxiomColors.current
 
-    // Popup states for long press
-    var showMissionsPopup by remember { mutableStateOf(false) }
-    var showHomePopup by remember { mutableStateOf(false) }
-
     // 5 high-fidelity tab definitions: [⚔ MISSIONS]  [🏋 PHYSICAL]  [🏠 HOME]  [💀 SHADOWS]  [👤 HUNTER]
     val tabs = remember {
-        buildList {
-            add(NavBarTab(Screen.Missions, R.drawable.ic_nav_missions, R.string.nav_missions, "tab_missions"))
-            add(NavBarTab(Screen.BodyMap, R.drawable.ic_nav_physical, R.string.nav_physical_condition, "tab_physical"))
-            add(NavBarTab(Screen.Home, R.drawable.ic_nav_home, R.string.nav_home, "tab_home"))
-            add(NavBarTab(Screen.ShadowArmy, R.drawable.ic_nav_shadows, R.string.nav_shadows, "tab_shadow_army"))
-            add(NavBarTab(Screen.Profile, R.drawable.ic_nav_habits, R.string.nav_hunter, "tab_profile"))
-        }
+        listOf(
+            NavBarTab(Screen.Missions, R.drawable.ic_nav_missions, R.string.nav_missions, "tab_missions"),
+            NavBarTab(Screen.BodyMap, R.drawable.ic_nav_physical, R.string.nav_physical_condition, "tab_physical"),
+            NavBarTab(Screen.Home, R.drawable.ic_nav_home, R.string.nav_home, "tab_home"),
+            NavBarTab(Screen.ShadowArmy, R.drawable.ic_nav_shadows, R.string.nav_shadows, "tab_shadow_army"),
+            NavBarTab(Screen.Profile, R.drawable.ic_nav_habits, R.string.nav_hunter, "tab_profile")
+        )
     }
 
     // Identify current selected index dynamically mapping route to current enabled tabs list
     val selectedIndex = remember(currentRoute, tabs) {
         val index = tabs.indexOfFirst { tab ->
             currentRoute == tab.screen.route ||
-            (tab.screen == Screen.Missions && (currentRoute == Screen.Missions.route || currentRoute == Screen.Dungeons.route || currentRoute?.startsWith("dungeon") == true)) ||
+            (tab.screen == Screen.Missions && currentRoute == Screen.Missions.route) ||
             (tab.screen == Screen.BodyMap && (currentRoute == Screen.BodyMap.route || currentRoute == Screen.DailyCheckin.route)) ||
             (tab.screen == Screen.Home && currentRoute == Screen.Home.route) ||
             (tab.screen == Screen.ShadowArmy && (currentRoute == Screen.ShadowArmy.route || currentRoute?.startsWith("shadow") == true)) ||
-            (tab.screen == Screen.Profile && (currentRoute == Screen.Profile.route || currentRoute == Screen.CharacterStats.route || currentRoute == Screen.SkillTree.route))
+            (tab.screen == Screen.Profile && (currentRoute == Screen.Profile.route || currentRoute == Screen.CharacterStats.route))
         }
         if (index != -1) index else 2 // default to Center HOME tab
     }
@@ -91,25 +89,67 @@ fun AwakenBottomNavBar(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(start = 24.dp, end = 24.dp, bottom = 12.dp),
+            .padding(start = 18.dp, end = 18.dp, bottom = 8.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
+        val fontScale = LocalDensity.current.fontScale
+        val navHeight = if (fontScale > 1.3f) 88.dp else 80.dp
+
+        val dockShape = RoundedCornerShape(30.dp)
+        val isDark = colors.voidBlack == AxiomDarkColors.voidBlack
+
+        val dockBackgroundBrush = if (isDark) {
+            Brush.verticalGradient(
+                listOf(
+                    lerp(colors.shadowSurface, colors.systemGreen, 0.08f).copy(alpha = 0.94f),
+                    lerp(colors.dimSurface, colors.voidBlack, 0.50f).copy(alpha = 0.97f)
+                )
+            )
+        } else {
+            Brush.verticalGradient(
+                listOf(
+                    lerp(colors.shadowSurface, colors.systemGreen, 0.04f).copy(alpha = 0.95f),
+                    lerp(colors.shadowSurface, colors.dimSurface, 0.60f).copy(alpha = 0.98f)
+                )
+            )
+        }
+
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(72.dp)
-                .background(Color(0xEB141413), RoundedCornerShape(20.dp))
-                .border(1.dp, Color(0xFF2A3A32), RoundedCornerShape(20.dp))
-                .clip(RoundedCornerShape(20.dp))
+                .height(navHeight)
+                .background(dockBackgroundBrush, shape = dockShape)
+                .border(
+                    BorderStroke(
+                        1.dp,
+                        Brush.verticalGradient(
+                            listOf(
+                                colors.legendaryGold.copy(alpha = 0.35f),
+                                colors.systemGreen.copy(alpha = 0.20f),
+                                colors.borderFaint.copy(alpha = 0.15f)
+                            )
+                        )
+                    ),
+                    shape = dockShape
+                )
+                .clip(dockShape)
         ) {
             val totalWidth = maxWidth
             val tabWidth = totalWidth / tabs.size
-            val podWidth = 44.dp
-            
-            // Linear horizontal top highlight (1dp) inner glow accent line
+            val podWidth = 48.dp
+
+            // Linear horizontal top highlight (1dp) inner glow accent line with subtle gold/emerald tone
             Canvas(modifier = Modifier.fillMaxWidth().height(1.dp)) {
                 drawLine(
-                    color = BorderFaint.copy(alpha = 0.5f),
+                    brush = Brush.horizontalGradient(
+                        listOf(
+                            Color.Transparent,
+                            colors.legendaryGold.copy(alpha = 0.35f),
+                            colors.systemGreen.copy(alpha = 0.25f),
+                            colors.legendaryGold.copy(alpha = 0.35f),
+                            Color.Transparent
+                        )
+                    ),
                     start = Offset(28.dp.toPx(), 0f),
                     end = Offset(size.width - 28.dp.toPx(), 0f),
                     strokeWidth = 1.dp.toPx()
@@ -124,7 +164,7 @@ fun AwakenBottomNavBar(
                 if (selectedIndex != lastSelectedIndex) {
                     lastSelectedIndex = selectedIndex
                     scaleAnim.animateTo(
-                        targetValue = 1.20f,
+                        targetValue = 1.15f,
                         animationSpec = spring(
                             dampingRatio = Spring.DampingRatioMediumBouncy,
                             stiffness = Spring.StiffnessHigh
@@ -154,19 +194,27 @@ fun AwakenBottomNavBar(
                 label = "nav_pod_x"
             )
 
+            // Active indicator color: legendaryGold for Home, systemGreen for other tabs
+            val activePodColor = if (tabs.getOrNull(selectedIndex)?.screen == Screen.Home) {
+                colors.legendaryGold
+            } else {
+                colors.systemGreen
+            }
+
             // Active indicator: Uses absolute BottomStart alignment with LTR LayoutDirection for perfect layout positioning in both LTR & RTL
             CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides LayoutDirection.Ltr) {
                 Canvas(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .offset { IntOffset(animatedXPx.roundToInt(), -with(density) { 4.dp.roundToPx() }) }
-                        .size(width = 44.dp, height = 2.dp)
+                        .offset { IntOffset(animatedXPx.roundToInt(), -with(density) { 3.dp.roundToPx() }) }
+                        .size(width = 48.dp, height = 3.dp)
                         .graphicsLayer {
                             scaleX = scaleAnim.value
                         }
                 ) {
-                    drawRect(
-                        color = SystemGreen
+                    drawRoundRect(
+                        color = activePodColor,
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(1.5.dp.toPx(), 1.5.dp.toPx())
                     )
                 }
             }
@@ -178,16 +226,21 @@ fun AwakenBottomNavBar(
             ) {
                 tabs.forEachIndexed { index, tab ->
                     val isSelected = index == selectedIndex
+                    val isHome = tab.screen == Screen.Home
+
+                    // Selected Home uses colors.legendaryGold accent; other selected tabs use systemGreen
+                    val selectedColor = if (isHome) colors.legendaryGold else colors.systemGreen
+
                     val iconColor by animateColorAsState(
-                        targetValue = if (isSelected) SystemGreen else TextDim,
-                        animationSpec = tween(durationMillis = 300, easing = LinearOutSlowInEasing),
+                        targetValue = if (isSelected) selectedColor else colors.textDim,
+                        animationSpec = tween(durationMillis = 250, easing = LinearOutSlowInEasing),
                         label = "tab_icon_color"
                     )
 
                     val interactionSource = remember { MutableInteractionSource() }
                     val isPressed by interactionSource.collectIsPressedAsState()
                     val scale by animateFloatAsState(
-                        targetValue = if (isPressed) 0.96f else 1.0f,
+                        targetValue = if (isPressed) 0.95f else 1.0f,
                         animationSpec = spring(
                             dampingRatio = Spring.DampingRatioMediumBouncy,
                             stiffness = Spring.StiffnessHigh
@@ -199,18 +252,12 @@ fun AwakenBottomNavBar(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
+                            .heightIn(min = 48.dp)
                             .scale(scale)
-                            .combinedClickable(
+                            .clickable(
                                 interactionSource = interactionSource,
                                 indication = LocalIndication.current,
-                                onClick = { onNavigate(tab.screen) },
-                                onLongClick = {
-                                    if (tab.screen == Screen.Missions) {
-                                        showMissionsPopup = true
-                                    } else if (tab.screen == Screen.Home) {
-                                        showHomePopup = true
-                                    }
-                                }
+                                onClick = { onNavigate(tab.screen) }
                             )
                             .testTag(tab.testTag),
                         contentAlignment = Alignment.Center
@@ -220,17 +267,56 @@ fun AwakenBottomNavBar(
                             verticalArrangement = Arrangement.Center
                         ) {
                             Box(contentAlignment = Alignment.Center) {
+                                // Elevated center Home anchor with radial emerald fill and dual gold/emerald border
+                                if (isHome) {
+                                    val homeAnchorBackground = if (isDark) {
+                                        Brush.radialGradient(
+                                            listOf(
+                                                lerp(colors.shadowSurface, colors.systemGreen, if (isSelected) 0.38f else 0.24f),
+                                                lerp(colors.shadowSurface, colors.systemGreen, if (isSelected) 0.20f else 0.12f),
+                                                lerp(colors.voidBlack, colors.systemGreen, 0.05f)
+                                            )
+                                        )
+                                    } else {
+                                        Brush.radialGradient(
+                                            listOf(
+                                                lerp(colors.shadowSurface, colors.systemGreen, if (isSelected) 0.22f else 0.10f),
+                                                lerp(colors.shadowSurface, colors.systemGreen, if (isSelected) 0.12f else 0.05f),
+                                                colors.dimSurface.copy(alpha = 0.85f)
+                                            )
+                                        )
+                                    }
+
+                                    Box(
+                                        modifier = Modifier
+                                            .size(54.dp)
+                                            .clip(CircleShape)
+                                            .border(
+                                                width = 1.dp,
+                                                color = if (isSelected) colors.legendaryGold.copy(alpha = 0.85f) else colors.legendaryGold.copy(alpha = 0.40f),
+                                                shape = CircleShape
+                                            )
+                                            .padding(1.5.dp)
+                                            .border(
+                                                width = 1.dp,
+                                                color = if (isSelected) colors.systemGreen.copy(alpha = 0.70f) else colors.systemGreen.copy(alpha = 0.35f),
+                                                shape = CircleShape
+                                            )
+                                            .background(homeAnchorBackground, CircleShape)
+                                    )
+                                }
+
                                 Icon(
                                     painter = painterResource(id = tab.iconRes),
                                     contentDescription = stringResource(tab.labelRes),
                                     tint = iconColor,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(if (isHome) 28.dp else 21.dp)
                                 )
 
-                                // Holographic/Cyber numeric badge overlay
+                                // Refined numeric badge overlay: no notification bombardment on Home
                                 val badgeCount = when (tab.screen) {
                                     Screen.BodyMap -> pendingCheckinCount
-                                    Screen.Home -> newSystemMessagesCount
+                                    Screen.Home -> 0
                                     Screen.Profile -> overdueWeeklyReviewCount
                                     else -> 0
                                 }
@@ -239,160 +325,37 @@ fun AwakenBottomNavBar(
                                     Box(
                                         modifier = Modifier
                                             .align(Alignment.TopEnd)
-                                            .offset(x = 10.dp, y = (-6).dp)
-                                            .background(Color(0xFFE53935), RoundedCornerShape(10.dp))
-                                            .border(1.dp, VoidBlack, RoundedCornerShape(10.dp))
+                                            .offset(x = 8.dp, y = (-5).dp)
+                                            .background(colors.penaltyRed, RoundedCornerShape(8.dp))
+                                            .border(1.dp, colors.shadowSurface, RoundedCornerShape(8.dp))
                                             .padding(horizontal = 4.dp, vertical = 1.dp),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
                                             text = badgeCount.toString(),
-                                            fontFamily = JetBrainsMono,
-                                            fontSize = 8.sp,
+                                            fontFamily = Outfit,
+                                            fontSize = 9.sp,
                                             fontWeight = FontWeight.Bold,
-                                            color = TextPrimary
+                                            color = Color.White
                                         )
                                     }
                                 }
                             }
                             AnimatedVisibility(
-                                visible = isSelected,
+                                visible = if (fontScale > 1.3f) isSelected else true,
                                 enter = fadeIn(tween(200)) + expandVertically(tween(200)),
                                 exit = fadeOut(tween(150)) + shrinkVertically(tween(150))
                             ) {
                                 Text(
                                     text = stringResource(tab.labelRes),
-                                    fontFamily = JetBrainsMono,
-                                    fontSize = 9.sp,
-                                    color = SystemGreen,
-                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = Outfit,
+                                    fontSize = if (fontScale > 1.3f) 9.sp else 10.sp,
+                                    color = if (isSelected) selectedColor else colors.textDim,
+                                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
                                     letterSpacing = 0.5.sp,
-                                    modifier = Modifier.padding(top = 2.dp)
+                                    maxLines = 1,
+                                    modifier = Modifier.padding(top = if (fontScale > 1.3f) 1.dp else 2.dp)
                                 )
-                            }
-                        }
-
-                        // Missions Long Press Popup
-                        if (tab.screen == Screen.Missions && showMissionsPopup) {
-                            androidx.compose.ui.window.Popup(
-                                alignment = Alignment.TopCenter,
-                                offset = IntOffset(0, -220),
-                                onDismissRequest = { showMissionsPopup = false }
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .width(180.dp)
-                                        .background(colors.shadowSurface, RoundedCornerShape(8.dp))
-                                        .border(1.dp, colors.systemGreen.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
-                                        .padding(8.dp)
-                                ) {
-                                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                        Text(
-                                            text = if (Locale.getDefault().language == "fa") "دسترسی سریع مأموریت" else "MISSION PROTOCOL",
-                                            fontFamily = JetBrainsMono,
-                                            fontSize = 9.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = colors.systemGreen,
-                                            modifier = Modifier.padding(bottom = 4.dp)
-                                        )
-                                        // Action 1
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .clickable {
-                                                    showMissionsPopup = false
-                                                    onNavigate(Screen.AddMission)
-                                                }
-                                                .padding(vertical = 6.dp)
-                                        ) {
-                                            Text(
-                                                text = if (Locale.getDefault().language == "fa") "⚔ ایجاد مأموریت سریع" else "⚔ Create Quick Mission",
-                                                fontFamily = Inter,
-                                                fontSize = 11.sp,
-                                                color = colors.textPrimary
-                                            )
-                                        }
-                                        // Action 2
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .clickable {
-                                                    showMissionsPopup = false
-                                                    onNavigate(Screen.Dungeons)
-                                                }
-                                                .padding(vertical = 6.dp)
-                                        ) {
-                                            Text(
-                                                text = if (Locale.getDefault().language == "fa") "💀 ورود به سیاه‌چال" else "💀 Enter Dungeon",
-                                                fontFamily = Inter,
-                                                fontSize = 11.sp,
-                                                color = colors.textPrimary
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Home Long Press Popup
-                        if (tab.screen == Screen.Home && showHomePopup) {
-                            androidx.compose.ui.window.Popup(
-                                alignment = Alignment.TopCenter,
-                                offset = IntOffset(0, -220),
-                                onDismissRequest = { showHomePopup = false }
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .width(180.dp)
-                                        .background(colors.shadowSurface, RoundedCornerShape(8.dp))
-                                        .border(1.dp, colors.systemGreen.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
-                                        .padding(8.dp)
-                                ) {
-                                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                        Text(
-                                            text = if (Locale.getDefault().language == "fa") "دسترسی سریع خانه" else "HOME CONTROL",
-                                            fontFamily = JetBrainsMono,
-                                            fontSize = 9.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = colors.systemGreen,
-                                            modifier = Modifier.padding(bottom = 4.dp)
-                                        )
-                                        // Action 1
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .clickable {
-                                                    showHomePopup = false
-                                                    onNavigate(Screen.Home)
-                                                }
-                                                .padding(vertical = 6.dp)
-                                        ) {
-                                            Text(
-                                                text = if (Locale.getDefault().language == "fa") "⏱ شروع تایمر تمرکز" else "⏱ Start Focus Timer",
-                                                fontFamily = Inter,
-                                                fontSize = 11.sp,
-                                                color = colors.textPrimary
-                                            )
-                                        }
-                                        // Action 2
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .clickable {
-                                                    showHomePopup = false
-                                                    onNavigate(Screen.BodyMap)
-                                                }
-                                                .padding(vertical = 6.dp)
-                                        ) {
-                                            Text(
-                                                text = if (Locale.getDefault().language == "fa") "🏋 ثبت وضعیت بدنی" else "🏋 Physical Check-in",
-                                                fontFamily = Inter,
-                                                fontSize = 11.sp,
-                                                color = colors.textPrimary
-                                            )
-                                        }
-                                    }
-                                }
                             }
                         }
                     }

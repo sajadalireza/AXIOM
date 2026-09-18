@@ -1,0 +1,120 @@
+21:02:38 APK under test: app/build/outputs/apk/debug/app-debug.apk
+21:02:38 APK sha256: 746d6f0f5290cc29e0872c93178961ebbcf697eeedd2480f49ca83c316e4e31d
+21:02:44 installed app/build/outputs/apk/debug/app-debug.apk
+21:02:44 === Dark EN 100% (desync state: UI=en, datastore language=fa) ===
+21:02:49 state: UI language -> en
+21:02:50 state: font_scale -> 1.0
+21:02:52 state: night mode -> yes
+21:03:25   waiting: UI dump unavailable (Animating)
+21:03:32   home asserted: dock='HOME' hero='NEXT MEANINGFUL MISSION' (no Begin/شروع marker)
+64_fixed_dark_en_100_top.png @ 2026-09-18 21:03:37
+assert: top: dock='HOME' hero='NEXT MEANINGFUL MISSION' reject=False
+sha256: 59b2eded15f51cc52863afc4e0e74c6040ae62a88b5d8becae829c1aea5f19e4
+--- state @ 2026-09-18 21:03:37 ---
+font_scale: 1.0
+night_mode: Night mode: yes
+axiom_lang: <?xml version="1.0" encoding="utf-8" standalone="yes" ?><map><string name="lang">en</string></map>
+datastore:  language=fa theme_mode=SYSTEM
+21:03:37 captured: docs/reviews/screenshots/wp-uiux-02/64_fixed_dark_en_100_top.png
+65_fixed_dark_en_100_lower.png @ 2026-09-18 21:03:44
+assert: scrolled: dock='HOME' section=(TODAY|XION|PROGRESS) reject=False (Home asserted at top before scroll)
+sha256: 73ab3dc4c8080bbf1716c8136ef5e71ab2fd1061b06e093b70ee95f5c2affe5e
+--- state @ 2026-09-18 21:03:44 ---
+font_scale: 1.0
+night_mode: Night mode: yes
+axiom_lang: <?xml version="1.0" encoding="utf-8" standalone="yes" ?><map><string name="lang">en</string></map>
+datastore:  language=fa theme_mode=SYSTEM
+21:03:45 captured: docs/reviews/screenshots/wp-uiux-02/65_fixed_dark_en_100_lower.png
+21:03:45 === Dark FA RTL 100% ===
+21:03:45 state: UI language -> fa
+21:03:45 state: font_scale -> 1.0
+21:03:45 state: night mode -> yes
+21:03:59   waiting: Home markers not yet present
+21:04:05   waiting: Home markers not yet present
+21:04:15   waiting: Splash/Onboarding marker present (frame rejected)
+21:04:21   home asserted: dock='خانه' hero='مأموریت معنادار بعدی' (no Begin/شروع marker)
+66_fixed_dark_fa_rtl_100_top.png @ 2026-09-18 21:04:26
+assert: top: dock='خانه' hero='مأموریت معنادار بعدی' reject=False
+sha256: 95b98ed783dd907bf3855dc2dbdabd64804992cbc86a7d096a1c0805ca396025
+--- state @ 2026-09-18 21:04:26 ---
+font_scale: 1.0
+night_mode: Night mode: yes
+axiom_lang: <?xml version="1.0" encoding="utf-8" standalone="yes" ?><map><string name="lang">fa</string></map>
+datastore:  language=fa theme_mode=SYSTEM
+21:04:26 captured: docs/reviews/screenshots/wp-uiux-02/66_fixed_dark_fa_rtl_100_top.png
+67_fixed_dark_fa_rtl_100_lower.png @ 2026-09-18 21:04:34
+assert: scrolled: dock='خانه' section=(امروز|زیون|پیشرفت) reject=False (Home asserted at top before scroll)
+sha256: 648cbdd6b74882cef64bcf242d83ec1a65ef70fa16053d50be389d99af8f8bf5
+--- state @ 2026-09-18 21:04:34 ---
+font_scale: 1.0
+night_mode: Night mode: yes
+axiom_lang: <?xml version="1.0" encoding="utf-8" standalone="yes" ?><map><string name="lang">fa</string></map>
+datastore:  language=fa theme_mode=SYSTEM
+21:04:34 captured: docs/reviews/screenshots/wp-uiux-02/67_fixed_dark_fa_rtl_100_lower.png
+21:04:34 === Dark EN 200% ===
+21:04:35 state: UI language -> en
+21:04:35 state: font_scale -> 2.0
+21:04:35 state: night mode -> yes
+21:04:45   waiting: Home markers not yet present
+21:04:50   waiting: Home markers not yet present
+21:04:58   waiting: Home markers not yet present
+21:05:03   home asserted: dock='HOME' hero='NEXT MEANINGFUL MISSION' (no Begin/شروع marker)
+68_fixed_dark_en_200_top.png @ 2026-09-18 21:05:09
+assert: top: dock='HOME' hero='NEXT MEANINGFUL MISSION' reject=False
+sha256: 07d8b1f39c73ceec333ce18e8423ee8c586181662de0b3027ee9e2c43cf80860
+--- state @ 2026-09-18 21:05:09 ---
+font_scale: 2.0
+night_mode: Night mode: yes
+axiom_lang: <?xml version="1.0" encoding="utf-8" standalone="yes" ?><map><string name="lang">en</string></map>
+datastore:  language=fa theme_mode=SYSTEM
+21:05:10 captured: docs/reviews/screenshots/wp-uiux-02/68_fixed_dark_en_200_top.png
+69_fixed_dark_en_200_lower.png @ 2026-09-18 21:05:19
+assert: scrolled: dock='HOME' section=(TODAY|XION|PROGRESS) reject=False (Home asserted at top before scroll)
+sha256: 1e05b398ca1e7b5f7d370882a5aaa42bf6ed2dacf0418cdde03c5598395e03f3
+--- state @ 2026-09-18 21:05:19 ---
+font_scale: 2.0
+night_mode: Night mode: yes
+axiom_lang: <?xml version="1.0" encoding="utf-8" standalone="yes" ?><map><string name="lang">en</string></map>
+datastore:  language=fa theme_mode=SYSTEM
+21:05:19 captured: docs/reviews/screenshots/wp-uiux-02/69_fixed_dark_en_200_lower.png
+70_fixed_dark_en_200_deep.png @ 2026-09-18 21:05:30
+assert: scrolled: dock='HOME' section=(TODAY|XION|PROGRESS) reject=False (Home asserted at top before scroll)
+sha256: 73fd871c1cdc1534f6efbfc1f8759d405cb430633a8cc482f7c4bfd048baf6f5
+--- state @ 2026-09-18 21:05:30 ---
+font_scale: 2.0
+night_mode: Night mode: yes
+axiom_lang: <?xml version="1.0" encoding="utf-8" standalone="yes" ?><map><string name="lang">en</string></map>
+datastore:  language=fa theme_mode=SYSTEM
+21:05:31 captured: docs/reviews/screenshots/wp-uiux-02/70_fixed_dark_en_200_deep.png
+21:05:31 === Light EN 100% ===
+21:05:31 state: UI language -> en
+21:05:32 state: font_scale -> 1.0
+21:05:34 state: night mode -> no
+21:05:46   waiting: Home markers not yet present
+21:05:55   waiting: Home markers not yet present
+21:06:01   waiting: Home markers not yet present
+21:06:07   waiting: Home markers not yet present
+21:06:13   home asserted: dock='HOME' hero='NEXT MEANINGFUL MISSION' (no Begin/شروع marker)
+71_fixed_light_en_100_top.png @ 2026-09-18 21:06:17
+assert: top: dock='HOME' hero='NEXT MEANINGFUL MISSION' reject=False
+sha256: 4337b901076433b56a5e179102ed0abab57634906397e6f91fdfe7a70b58e1f8
+--- state @ 2026-09-18 21:06:17 ---
+font_scale: 1.0
+night_mode: Night mode: no
+axiom_lang: <?xml version="1.0" encoding="utf-8" standalone="yes" ?><map><string name="lang">en</string></map>
+datastore:  language=fa theme_mode=SYSTEM
+21:06:17 captured: docs/reviews/screenshots/wp-uiux-02/71_fixed_light_en_100_top.png
+72_fixed_light_en_100_lower.png @ 2026-09-18 21:06:26
+assert: scrolled: dock='HOME' section=(TODAY|XION|PROGRESS) reject=False (Home asserted at top before scroll)
+sha256: 30e837d6eaef30ff060b0653d0858a83a187040242da97b74c874759460da548
+--- state @ 2026-09-18 21:06:26 ---
+font_scale: 1.0
+night_mode: Night mode: no
+axiom_lang: <?xml version="1.0" encoding="utf-8" standalone="yes" ?><map><string name="lang">en</string></map>
+datastore:  language=fa theme_mode=SYSTEM
+21:06:27 captured: docs/reviews/screenshots/wp-uiux-02/72_fixed_light_en_100_lower.png
+21:06:27 === restore emulator defaults (UI=en, font 1.0, night=yes) ===
+21:06:27 state: UI language -> en
+21:06:27 state: font_scale -> 1.0
+21:06:28 state: night mode -> yes
+21:06:29 done. run log: docs/reviews/evidence-logs/wp-uiux-02/capture_run_20260918_210237.log

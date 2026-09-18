@@ -6,7 +6,7 @@
     <string name="privacy_policy_link">حریم خصوصی</string>
 
     <!-- Navigation -->
-    <string name="nav_home">کارت</string>
+    <string name="nav_home">خانه</string>
     <string name="nav_missions">مأموریت‌ها</string>
     <string name="nav_dungeons">اسپرینت‌ها</string>
     <string name="nav_gates">مأموریت‌ها</string>
@@ -94,6 +94,30 @@
     <string name="home_system_error">خطای انتقال تلماتری هسته اصلی</string>
     <string name="home_awaiting_mission">[ OS ] در حالت انتظار. اولین جلسه تمرکز را آغاز کنید.</string>
     <string name="home_xp_active">%s برابر ضریب تکانه‌ فعال است</string>
+    <string name="home_body_status_title">وضعیت بدن</string>
+    <string name="home_system_feed_title">رویدادهای سیستم</string>
+    <string name="home_system_feed_empty">فعالیت تازه‌ای وجود ندارد</string>
+    <string name="home_active_mission_stage_boss">نبرد باس</string>
+    <string name="home_active_mission_stage">مرحله %1$d</string>
+    <string name="home_active_mission_quick_complete_cd">تکمیل سریع</string>
+    <string name="home_vitals_teeth">دندان</string>
+    <string name="home_vitals_teeth_complete">کامل</string>
+    <string name="home_vitals_teeth_pending">ناتمام</string>
+    <string name="home_habit_water_format">%1$d / %2$d لیوان</string>
+    <string name="home_habit_sleep_value">%1$.1f ساعت</string>
+    <string name="home_habit_teeth_format">%1$d / %2$d</string>
+    <string name="home_combat_readiness_title">آمادگی رزمی فیزیکی</string>
+    <string name="home_vitals_water_value">%1$d میلی‌لیتر</string>
+    <string name="home_vitals_water_target">/ %1$d میلی‌لیتر</string>
+    <string name="home_vitals_sleep_value">%1$.1f ساعت</string>
+    <string name="home_vitals_sleep_target">/ %1$.1f ساعت</string>
+    <string name="home_vitals_energy_value">%1$d</string>
+    <string name="home_vitals_energy_target">/ %1$d</string>
+    <string name="home_vitals_am">ق.ظ</string>
+    <string name="home_vitals_pm">ب.ظ</string>
+    <string name="home_vitals_water_quick_add">+%1$d میلی‌لیتر</string>
+    <string name="home_vitals_water_logged">سطح کنونی: %1$d میلی‌لیتر از %2$d میلی‌لیتر هدف</string>
+    <string name="home_vitals_sleep_logged">خواب امروز: %1$.1f ساعت (هدف: %2$.1f ساعت)</string>
 
     <!-- Missions -->
     <string name="missions_title">عادت‌ها و جلسات کالیبره‌شده</string>
@@ -693,17 +717,82 @@
     <string name="first_win_next_title">این حرکت را ادامه بده</string>
     <string name="first_win_next_body">انتخاب کن بعدش چه شود. می‌توانی یک کار کوچک دیگر را زمان‌بندی کنی یا فعلاً تمام کنی.</string>
 
-    <!-- G3-P3 Home Primary Action & Hero Card -->
+    <!-- G3-P3 & WP-UIUX-02 Home Primary Action & Hero Card -->
     <string name="home_hero_label">مأموریت معنادار بعدی</string>
+    <string name="home_hero_active_label">مأموریت فعال</string>
     <string name="home_hero_start_mission">شروع مأموریت</string>
+    <string name="home_hero_complete_mission">تکمیل مأموریت</string>
+    <string name="home_hero_continue_mission">ادامه مأموریت</string>
     <string name="home_hero_commit_mission">+ ثبت مأموریت جدید</string>
     <string name="home_hero_no_mission_desc">هیچ مأموریت فعالی ثبت نشده است. اقدام معنادار بعدی خود را برای پیشبرد اهداف انتخاب کنید.</string>
     <string name="home_hero_advances_goal">پیشبرد هدف: %s</string>
     <string name="home_hero_advances_project">پروژه: %s</string>
     <string name="home_hero_view_all_missions">مشاهده همه مأموریت‌ها</string>
+    <string name="home_hero_timed_sprint">ماراتن زمان‌دار</string>
+    <string name="home_hero_duration_minutes">%d دقیقه</string>
+    <string name="home_hero_duration_hours">%d ساعت</string>
+    <string name="home_hero_duration_hours_mins">%1$d ساعت و %2$d دقیقه</string>
+    <string name="home_hero_duration_unspecified">—</string>
+    <string name="home_hero_xp_reward_format">+%d امتیاز تجربه</string>
+    <string name="home_hunter_profile_cd">پروفایل هانتر: %1$s، رتبه %2$s، سطح %3$s</string>
+    <string name="home_hunter_profile_icon_cd">پروفایل</string>
+    <string name="home_hunter_default_name">هانتر</string>
+    <string name="home_hunter_default_rank">تازه‌وارد</string>
+    <string name="home_hunter_xp_format">%1$s / %2$s امتیاز تجربه</string>
+    <string name="home_hunter_level_label">سطح</string>
+    <string name="home_hunter_level_cd">سطح %1$s، %2$s درصد پیشرفت</string>
+    <string name="axiom_tagline">اهداف واقعی. مأموریت‌های کوچک. پیشرفت مشهود.</string>
+    <string name="home_today_header">امروز</string>
+    <string name="home_today_subtitle">%s تعهد فعال</string>
+    <string name="home_today_missions_title">مأموریت‌ها</string>
+    <string name="home_today_missions_count">%s فعال</string>
+    <string name="home_today_missions_sub">تعهد شده</string>
+    <string name="home_today_action_title">اقدام بعدی</string>
+    <string name="home_today_action_available">در دسترس</string>
+    <string name="home_today_action_none">ندارد</string>
+    <string name="home_today_action_sub_ready">آماده</string>
+    <string name="home_today_action_sub_standby">آماده‌باش</string>
+    <string name="home_today_track_title">مسیر</string>
+    <string name="home_today_track_none">نامشخص</string>
+    <string name="home_today_track_sub_primary">اصلی</string>
+    <string name="home_today_track_sub_none">بدون مسیر</string>
+    <string name="home_today_focus_title">تمرکز</string>
+    <string name="home_today_focus_active">اولویت</string>
+    <string name="home_today_focus_ready">آماده</string>
+    <string name="home_today_focus_sub">اقدام مستقیم</string>
+    <string name="home_today_track_core">اصلی</string>
+    <string name="home_today_track_sub">حوزه</string>
+    <string name="home_today_protocol_title">وضعیت</string>
+    <string name="home_today_status_engaged">درگیر</string>
+    <string name="home_today_status_standby">آماده‌باش</string>
+    <string name="home_today_status_sub">پروتکل</string>
+    <string name="home_xion_header">زیون</string>
+    <string name="home_xion_subordinate_tag">پیشنهادی</string>
+    <string name="home_xion_action_suggestion">%s</string>
+    <string name="home_xion_unavailable">توصیه تاکتیکی در دسترس نیست.</string>
+    <string name="home_xion_default_advisory">توصیه تاکتیکی در دسترس نیست.</string>
+    <string name="home_xion_dismiss">بستن</string>
+    <string name="home_next_action_add_first_mission">اولین مأموریت خود را برای شروع اضافه کنید</string>
+    <string name="home_next_action_complete_mission">تکمیل کنید: %1$s</string>
+    <string name="home_next_action_build_streak">ادامه دهید — رکوردهای متوالی را به ثبت برسانید</string>
+    <string name="home_progress_header">پیشرفت</string>
+    <string name="home_progress_level_format">سطح %s</string>
+    <string name="home_progress_level_label">پیشرفت سطح</string>
+    <string name="home_progress_goal_label">پیشرفت سطح</string>
+    <string name="home_progress_missions_label">مأموریت‌ها</string>
+    <string name="home_progress_missions_active">%s فعال</string>
+    <string name="home_weekly_review_overdue_title">مرور هفتگی به تعویق افتاده</string>
+    <string name="home_weekly_review_overdue_desc">پروتکل ارزیابی ۶ مرحله‌ای را برای هماهنگی اهداف هفته اجرا کنید.</string>
+    <string name="home_weekly_review_start">شروع</string>
     <string name="home_secondary_surfaces_title">پروتکل‌ها و وضعیت سلامت</string>
     <string name="home_secondary_surfaces_expand">نمایش جزئیات</string>
     <string name="home_secondary_surfaces_collapse">پنهان کردن جزئیات</string>
+    <string name="home_tracks_title">ماژول‌های عملیاتی</string>
+    <string name="home_tracks_checkin">حضور و غیاب</string>
+    <string name="home_tracks_analytics">تحلیل‌ها</string>
+    <string name="focus_active_protocol_target">هدف پروتکل فعال</string>
+    <string name="home_momentum_and_streak">پیشرفت و استمرار</string>
+    <string name="home_streak_day_count">%d روز استمرار</string>
 
     <!-- WP-BODY-01 Body Map Integration & Accessibility -->
     <string name="bodymap_title">هسته اطلس فیزیولوژیک کالیبر</string>
@@ -797,4 +886,10 @@
     <string name="first_win_quote">«گام‌های کوچک، شتاب بزرگ.»</string>
     <string name="first_win_quote_author">— اکسیوم</string>
     <string name="first_win_btn_home">بازگشت به خانه</string>
+
+    <!-- Main HUD (app shell telemetry strip) -->
+    <string name="main_hud_level">⚔ سطح %1$d</string>
+    <string name="main_hud_xp">%1$d/%2$d تجربه</string>
+    <string name="main_hud_streak">🔥 %1$d روز</string>
+    <string name="main_hud_rank">رتبه: %1$s</string>
 </resources>

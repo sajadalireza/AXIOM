@@ -36,10 +36,22 @@ sealed interface HomeUiState {
         val showPremiumNudge: Boolean = false,
         val dungeons: List<Dungeon> = emptyList(),
         // PRIORITY 2: null = hide card
-        val nextBestAction: String? = null,
-        val nextBestActionRoute: String? = null
+        val nextBestAction: HomeNextAction? = null
     ) : HomeUiState
     data class Error(val message: String) : HomeUiState
+}
+
+/**
+ * Language-neutral descriptor of Home's next meaningful action.
+ *
+ * Deliberately carries no display text: the advisory string is resolved from resources
+ * by the presentation layer so the rendered language can never diverge from the locale
+ * that renders the rest of the screen.
+ */
+sealed interface HomeNextAction {
+    data object AddFirstMission : HomeNextAction
+    data class CompleteMission(val missionTitle: String) : HomeNextAction
+    data object BuildStreak : HomeNextAction
 }
 
 @HiltViewModel
@@ -81,7 +93,10 @@ class HomeViewModel @Inject constructor(
             val shown = preferences.briefingHomeFlow.first()
             if (!shown) {
                 delay(1500) // let the screen load first
-                val isFa = preferences.languageFlow.first() == "fa"
+                // The UI locale is the single authoritative language signal (same source the
+                // screen's resources resolve against), so the persisted briefing can never be
+                // written in a language other than the one the user is actually seeing.
+                val isFa = java.util.Locale.getDefault().language == "fa"
                 val welcomeMsg = if (isFa) {
                     "پروفایل هانتر با موفقیت ایجاد شد. هیچ مأموریت فعالی شناسایی نشد. اولین هدف خود را در بخش مأموریت‌ها ثبت کنید."
                 } else {
@@ -104,13 +119,12 @@ class HomeViewModel @Inject constructor(
         getMissionsUseCase(activeOnly = true),
         getDungeonsUseCase(),
         systemFeedRepository.getSystemMessages(),
-        combine(preferences.statsFlow, preferences.streakFlow, preferences.languageFlow) { stats, streak, lang -> Triple(stats, streak, lang) }
-    ) { hunter, missions, dungeons, messages, statsStreakLang ->
+        combine(preferences.statsFlow, preferences.streakFlow) { stats, streak -> stats to streak }
+    ) { hunter, missions, dungeons, messages, statsStreak ->
         if (hunter == null) {
             HomeUiState.Loading
         } else {
-            val (stats, streak, lang) = statsStreakLang
-            val isFa = lang == "fa"
+            val (stats, streak) = statsStreak
             val streakMultiplier = when {
                 streak < 7  -> 1.0f
                 streak < 14 -> 1.15f
@@ -133,15 +147,10 @@ class HomeViewModel @Inject constructor(
                 showPremiumNudge = showNudge,
                 dungeons = dungeons,
                 nextBestAction = when {
-                    missions.isEmpty() -> if (isFa) "اولین مأموریت خود را برای شروع اضافه کنید" else "Add your first mission to get started"
-                    missions.none { it.status == "COMPLETED" } -> missions.firstOrNull()?.title?.let { if (isFa) "تکمیل کنید: $it" else "Complete: $it" }
-                    streak < 3 -> if (isFa) "ادامه دهید — رکوردهای متوالی را به ثبت برسانید" else "Keep going — build your streak"
-                    else -> null
-                },
-                nextBestActionRoute = when {
-                    missions.isEmpty() -> "add_mission"
-                    missions.none { it.status == "COMPLETED" } -> "missions"
-                    streak < 3 -> "missions"
+                    missions.isEmpty() -> HomeNextAction.AddFirstMission
+                    missions.none { it.status == "COMPLETED" } ->
+                        missions.firstOrNull()?.title?.let { HomeNextAction.CompleteMission(it) }
+                    streak < 3 -> HomeNextAction.BuildStreak
                     else -> null
                 }
             )

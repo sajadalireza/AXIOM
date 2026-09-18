@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.axiom.app.core.localization.AxiomDateFormatter
 import com.axiom.app.domain.model.WeeklyChallenge
 import com.axiom.app.ui.theme.*
 
@@ -28,6 +29,7 @@ fun WeeklyChallengeCard(
     val c = LocalAxiomColors.current
     val allComplete = challenges.all { it.isCompleted }
     val isFa = java.util.Locale.getDefault().language == "fa"
+    val localizedCount = { n: Int -> if (isFa) AxiomDateFormatter.toPersianDigits(n.toString()) else n.toString() }
 
     Column(
         modifier = modifier
@@ -55,7 +57,7 @@ fun WeeklyChallengeCard(
                 color = if (allComplete) c.legendaryGold else c.systemGreen
             )
             Text(
-                "${challenges.count { it.isCompleted }}/${challenges.size}",
+                "${localizedCount(challenges.count { it.isCompleted })}/${localizedCount(challenges.size)}",
                 fontFamily = JetBrainsMono, fontSize = 11.sp, color = c.textDim
             )
         }
@@ -69,7 +71,7 @@ fun WeeklyChallengeCard(
                         color = if (ch.isCompleted) c.systemGreen else c.textSecondary,
                         fontWeight = if (ch.isCompleted) FontWeight.Bold else FontWeight.Normal
                     )
-                    Text("${ch.currentValue}/${ch.targetValue}", fontFamily = JetBrainsMono, fontSize = 10.sp, color = c.textDim)
+                    Text("${localizedCount(ch.currentValue)}/${localizedCount(ch.targetValue)}", fontFamily = JetBrainsMono, fontSize = 10.sp, color = c.textDim)
                 }
                 LinearProgressIndicator(
                     progress = { progress },

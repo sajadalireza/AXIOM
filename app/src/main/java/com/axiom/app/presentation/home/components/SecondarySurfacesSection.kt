@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +37,7 @@ fun SecondarySurfacesSection(
 ) {
     var expanded by remember { mutableStateOf(initiallyExpanded) }
     val colors = LocalAxiomColors.current
+    val fontScale = LocalDensity.current.fontScale
 
     Column(
         modifier = Modifier
@@ -75,17 +77,19 @@ fun SecondarySurfacesSection(
                     letterSpacing = 1.sp
                 )
             }
-            Text(
-                text = if (expanded) {
-                    stringResource(R.string.home_secondary_surfaces_collapse)
-                } else {
-                    stringResource(R.string.home_secondary_surfaces_expand)
-                },
-                fontFamily = FiraCode,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                color = colors.systemGreen
-            )
+            if (fontScale <= 1.3f) {
+                Text(
+                    text = if (expanded) {
+                        stringResource(R.string.home_secondary_surfaces_collapse)
+                    } else {
+                        stringResource(R.string.home_secondary_surfaces_expand)
+                    },
+                    fontFamily = FiraCode,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colors.systemGreen
+                )
+            }
         }
 
         AnimatedVisibility(

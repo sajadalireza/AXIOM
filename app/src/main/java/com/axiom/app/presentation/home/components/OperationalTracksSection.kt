@@ -11,9 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,7 +30,6 @@ fun OperationalTracksSection(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAxiomColors.current
-    val isFa = java.util.Locale.getDefault().language == "fa"
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -47,7 +46,7 @@ fun OperationalTracksSection(
                     .background(color = colors.systemGreen, shape = RoundedCornerShape(2.5.dp))
             )
             Text(
-                text = if (isFa) "ماژول‌های عملیاتی" else "OPERATIONAL MODULES",
+                text = stringResource(R.string.home_tracks_title),
                 fontFamily = JetBrainsMono,
                 fontSize = 11.sp,
                 color = colors.textSecondary,
@@ -56,7 +55,13 @@ fun OperationalTracksSection(
             )
         }
 
-        // 3x2 Grid of launch items
+        // Governance repair (WP-UIUX-02 / Issue #85 PO decision): Home must not expose
+        // AX-013 Dungeons (HIDE / G7), AX-016 Skill Tree (HIDE / G7) or AX-018 Leagues
+        // (FREEZE / G7). Their tiles and navigation callbacks were removed; canonical
+        // MODULE_DISPOSITION is unchanged and the routes still exist elsewhere.
+        // Retained under a bounded PO exception: AX-015 Daily Check-in and
+        // AX-022 Weekly Analytics, as existing secondary progressive-disclosure links.
+        // The remaining two tiles share one balanced row.
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -65,84 +70,22 @@ fun OperationalTracksSection(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                // Item 1: Dungeons
+                // Item 1: Check-in
                 QuickLaunchItem(
-                    title = if (isFa) "سیاه‌چال‌ها" else "DUNGEONS",
-                    iconRes = R.drawable.ic_nav_missions,
-                    iconColor = colors.penaltyRed,
-                    onClick = { onNavigate(Screen.Dungeons.route) },
-                    modifier = Modifier.weight(1f)
-                )
-                // Item 2: Skills
-                QuickLaunchItem(
-                    title = if (isFa) "مهارت‌ها" else "SKILLS",
-                    iconRes = R.drawable.ic_nav_skills,
-                    iconColor = colors.systemGreen,
-                    onClick = { onNavigate(Screen.SkillTree.route) },
-                    modifier = Modifier.weight(1f)
-                )
-                // Item 3: Leagues
-                QuickLaunchItem(
-                    title = if (isFa) "لیگ‌ها" else "LEAGUES",
-                    iconRes = R.drawable.ic_nav_leagues,
-                    iconColor = colors.legendaryGold,
-                    onClick = { onNavigate(Screen.Leagues.route) },
-                    modifier = Modifier.weight(1f)
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                // Item 4: Check-in
-                QuickLaunchItem(
-                    title = if (isFa) "حضور و غیاب" else "CHECK-IN",
+                    title = stringResource(R.string.home_tracks_checkin),
                     iconRes = R.drawable.ic_nav_habits,
                     iconColor = colors.uncommonTeal,
                     onClick = { onNavigate(Screen.DailyCheckin.route) },
                     modifier = Modifier.weight(1f)
                 )
-                // Item 5: Analytics
+                // Item 2: Analytics
                 QuickLaunchItem(
-                    title = if (isFa) "تحلیل‌ها" else "ANALYTICS",
+                    title = stringResource(R.string.home_tracks_analytics),
                     iconRes = R.drawable.ic_nav_system,
                     iconColor = colors.rareBlue,
                     onClick = { onNavigate(Screen.WeeklyAnalytics.route) },
                     modifier = Modifier.weight(1f)
                 )
-                // Item 6: Pro
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(82.dp)
-                        .clip(RoundedCornerShape(AxiomRadius.l))
-                        .background(
-                            Brush.linearGradient(
-                                colors = listOf(colors.dimSurface, colors.shadowSurface)
-                            )
-                        )
-                        .border(AxiomBorder.thin, colors.legendaryGold.copy(alpha = 0.35f), RoundedCornerShape(AxiomRadius.l))
-                        .clickable { onNavigate(Screen.Premium.route) }
-                        .padding(vertical = 14.dp, horizontal = 8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(7.dp)
-                    ) {
-                        Text(
-                            text = "👑",
-                            fontSize = 18.sp
-                        )
-                        Text(
-                            text = if (isFa) "حرفه‌ای" else "PRO",
-                            fontFamily = JetBrainsMono,
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.legendaryGold
-                        )
-                    }
-                }
             }
         }
     }
